@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHE·NU™ — Theme v1 Final & Typography by Role</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════════════
+       CHE·NU™ — THEME v1 FINAL (LOCKED)
+       UN SEUL THÈME. Adaptation par rôle = typographique uniquement.
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    :root {
+      /* ═══ COLORS (STABLE) ═══ */
+      --bg-root: #1F2429;
+      --bg-dashboard: #242A30;
+      --bg-collaboration: #20262C;
+      --bg-workspace: #1F2429;
+      
+      --surface-dashboard: #2A3138;
+      --surface-collaboration: #2D343C;
+      --surface-workspace: #323A42;
+      --surface-focus: #39424A;
+      
+      --text-primary: #E2E5E8;
+      --text-secondary: #B5BBC2;
+      --text-muted: #8E949B;
+      
+      --accent-soft: rgba(191, 174, 122, 0.35);
+      
+      /* ═══ BORDERS & SHADOWS ═══ */
+      --border-subtle: rgba(255, 255, 255, 0.04);
+      --shadow-soft: inset 0 1px 0 rgba(255,255,255,0.03), 0 8px 24px rgba(0,0,0,0.28);
+      
+      /* ═══ TYPOGRAPHY BASE ═══ */
+      --font-primary: 'Inter', system-ui, sans-serif;
+      --font-size-title-xl: 21px;
+      --font-size-title: 17px;
+      --font-size-section: 15px;
+      --font-size-body: 14px;
+      --font-size-meta: 12px;
+      
+      /* Brand colors for UI */
+      --gold: #BFAE7A;
+      --cyan: #6EAFC4;
+      --green: #6FAF9A;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: var(--font-primary);
+      font-size: var(--font-size-body);
+      line-height: 1.6;
+      background: linear-gradient(180deg, #181C20, var(--bg-root));
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+    
+    .container { max-width: 1000px; margin: 0 auto; padding: 40px 24px; }
+    
+    /* Header */
+    .header { text-align: center; margin-bottom: 48px; }
+    .header h1 { font-size: var(--font-size-title-xl); font-weight: 500; color: var(--gold); margin-bottom: 8px; }
+    .header .subtitle { font-size: var(--font-size-section); color: var(--text-secondary); margin-bottom: 20px; }
+    .header .rule {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: rgba(191, 174, 122, 0.1);
+      border: 1px solid var(--gold);
+      border-radius: 8px;
+      font-size: var(--font-size-body);
+      color: var(--gold);
+    }
+    
+    /* Section */
+    .section { margin-bottom: 48px; }
+    .section-title {
+      font-size: var(--font-size-title);
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       COLOR SWATCHES
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+    }
+    
+    .color-swatch {
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+    }
+    
+    .color-preview {
+      height: 60px;
+    }
+    
+    .color-info {
+      padding: 10px 12px;
+      background-color: var(--surface-dashboard);
+    }
+    
+    .color-info .name {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-bottom: 2px;
+    }
+    
+    .color-info .value {
+      font-size: 10px;
+      font-family: monospace;
+      color: var(--text-muted);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       TYPOGRAPHY BY ROLE
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .roles-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .roles-grid { grid-template-columns: 1fr; }
+    }
+    
+    .role-card {
+      background-color: var(--surface-dashboard);
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+    }
+    
+    .role-header {
+      padding: 16px 20px;
+      background-color: var(--surface-focus);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .role-header .icon { font-size: 24px; }
+    .role-header .name { font-size: var(--font-size-section); font-weight: 500; flex: 1; }
+    
+    .role-content { padding: 20px; }
+    
+    .role-intention {
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    
+    .role-intention .label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    
+    .role-intention ul {
+      list-style: none;
+      font-size: var(--font-size-meta);
+      color: var(--text-secondary);
+    }
+    
+    .role-intention li { padding: 2px 0; }
+    
+    .role-adjustments .label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    
+    .adjustment-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      font-size: var(--font-size-meta);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+    }
+    
+    .adjustment-item:last-child { border-bottom: none; }
+    
+    .adjustment-item .key { color: var(--text-secondary); }
+    .adjustment-item .value {
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--cyan);
+      background-color: rgba(110, 175, 196, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       DEMO COMPARISON
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .demo-container {
+      background-color: var(--surface-dashboard);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid var(--border-subtle);
+    }
+    
+    .demo-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 12px;
+    }
+    
+    .demo-tab {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: var(--font-size-meta);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: 1px solid transparent;
+    }
+    
+    .demo-tab:hover { color: var(--text-secondary); }
+    .demo-tab.active {
+      background-color: rgba(110, 175, 196, 0.1);
+      color: var(--cyan);
+      border-color: rgba(110, 175, 196, 0.2);
+    }
+    
+    /* Demo content styles per role */
+    .demo-content {
+      display: none;
+    }
+    
+    .demo-content.active {
+      display: block;
+    }
+    
+    /* Owner style */
+    .demo-owner .demo-title {
+      font-size: var(--font-size-title);
+      font-weight: 600; /* Semibold */
+      color: var(--text-primary);
+      margin-bottom: calc(16px * 1.05);
+    }
+    
+    .demo-owner .demo-decision {
+      font-weight: 600; /* Semibold */
+      color: var(--text-primary);
+      margin-bottom: calc(16px * 1.1);
+    }
+    
+    .demo-owner .demo-meta {
+      color: var(--text-secondary); /* Increased contrast */
+    }
+    
+    /* Contributor style */
+    .demo-contributor .demo-title {
+      font-size: var(--font-size-title);
+      font-weight: 500; /* Medium */
+      color: var(--text-primary);
+      margin-bottom: 16px;
+    }
+    
+    .demo-contributor .demo-decision {
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: calc(16px * 1.1);
+    }
+    
+    .demo-contributor .demo-meta {
+      color: var(--text-muted); /* Standard */
+    }
+    
+    /* Facilitator style */
+    .demo-facilitator .demo-title {
+      font-size: var(--font-size-title);
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: calc(16px * 1.08);
+    }
+    
+    .demo-facilitator .demo-decision {
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: calc(16px * 1.18); /* +8% + 10% */
+    }
+    
+    /* Observer style */
+    .demo-observer .demo-title {
+      font-size: var(--font-size-title);
+      font-weight: 400; /* Regular */
+      color: var(--text-primary);
+      margin-bottom: 16px;
+    }
+    
+    .demo-observer .demo-decision {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    
+    .demo-observer .demo-meta {
+      color: var(--text-secondary); /* Increased */
+    }
+    
+    /* Common demo elements */
+    .demo-note {
+      font-weight: 400;
+      color: var(--text-secondary);
+      max-width: 65ch;
+      margin-bottom: 16px;
+    }
+    
+    .demo-decision {
+      padding: 12px 16px;
+      background-color: var(--surface-collaboration);
+      border-radius: 8px;
+      border-left: 3px solid var(--accent-soft);
+      margin-bottom: 16px;
+    }
+    
+    .demo-meta {
+      font-size: var(--font-size-meta);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       FORBIDDEN & TESTS
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .rules-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .rules-grid { grid-template-columns: 1fr; }
+    }
+    
+    .rules-card {
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+    }
+    
+    .rules-card.forbidden {
+      background-color: rgba(196, 112, 112, 0.08);
+      border-color: rgba(196, 112, 112, 0.2);
+    }
+    
+    .rules-card.tests {
+      background-color: rgba(111, 175, 154, 0.08);
+      border-color: rgba(111, 175, 154, 0.2);
+    }
+    
+    .rules-card h4 {
+      font-size: var(--font-size-section);
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+    
+    .rules-card.forbidden h4 { color: #C47070; }
+    .rules-card.tests h4 { color: var(--green); }
+    
+    .rules-card ul { list-style: none; }
+    .rules-card li {
+      font-size: var(--font-size-body);
+      color: var(--text-secondary);
+      padding: 4px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    
+    /* Goal */
+    .goal-card {
+      padding: 24px;
+      background-color: rgba(191, 174, 122, 0.08);
+      border: 1px solid rgba(191, 174, 122, 0.2);
+      border-radius: 12px;
+      text-align: center;
+    }
+    
+    .goal-card .quote {
+      font-size: var(--font-size-title);
+      font-weight: 500;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    
+    .goal-card .values {
+      font-size: var(--font-size-body);
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+    
+    .goal-card .tagline {
+      font-size: var(--font-size-body);
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 40px 0;
+      border-top: 1px solid var(--border-subtle);
+      margin-top: 48px;
+    }
+    
+    .footer p { font-size: var(--font-size-body); color: var(--text-muted); }
+    .footer .brand { color: var(--gold); font-weight: 500; }
+    .footer .version {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 2px 8px;
+      background-color: rgba(111, 175, 154, 0.15);
+      color: var(--green);
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>✧ CHE·NU™ Theme v1 Final</h1>
+      <p class="subtitle">& Typography by Role — VERSION LOCKED</p>
+      <div class="rule">
+        🔒 UN SEUL THÈME. Adaptation par rôle = typographique uniquement.
+      </div>
+    </header>
+
+    <!-- Colors -->
+    <section class="section">
+      <h2 class="section-title">🎨 Theme v1 — Tokens Finaux</h2>
+      
+      <div class="color-grid">
+        <div class="color-swatch">
+          <div class="color-preview" style="background-color: #1F2429;"></div>
+          <div class="color-info">
+            <div class="name">--bg-root</div>
+            <div class="value">#1F2429</div>
+          </div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-preview" style="background-color: #242A30;"></div>
+          <div class="color-info">
+            <div class="name">--bg-dashboard</div>
+            <div class="value">#242A30</div>
+          </div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-preview" style="background-color: #2A3138;"></div>
+          <div class="color-info">
+            <div class="name">--surface-dashboard</div>
+            <div class="value">#2A3138</div>
+          </div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-preview" style="background-color: #2D343C;"></div>
+          <div class="color-info">
+            <div class="name">--surface-collaboration</div>
+            <div class="value">#2D343C</div>
+          </div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-preview" style="background-color: #39424A;"></div>
+          <div class="color-info">
+            <div class="name">--surface-focus</div>
+            <div class="value">#39424A</div>
+          </div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-preview" style="background-color: #E2E5E8;"></div>
+          <div class="color-info">
+            <div class="name">--text-primary</div>
+            <div class="value">#E2E5E8</div>
+          </div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-preview" style="background-color: #B5BBC2;"></div>
+          <div class="color-info">
+            <div class="name">--text-secondary</div>
+            <div class="value">#B5BBC2</div>
+          </div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-preview" style="background-color: #8E949B;"></div>
+          <div class="color-info">
+            <div class="name">--text-muted</div>
+            <div class="value">#8E949B</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Typography by Role -->
+    <section class="section">
+      <h2 class="section-title">👤 Typography by Role</h2>
+      
+      <div class="roles-grid">
+        <!-- Owner -->
+        <div class="role-card">
+          <div class="role-header">
+            <span class="icon">👑</span>
+            <span class="name">Owner / Founder</span>
+          </div>
+          <div class="role-content">
+            <div class="role-intention">
+              <div class="label">Intention</div>
+              <ul>
+                <li>Vision globale</li>
+                <li>Décisions structurantes</li>
+                <li>Lecture synthétique</li>
+              </ul>
+            </div>
+            <div class="role-adjustments">
+              <div class="label">Ajustements</div>
+              <div class="adjustment-item">
+                <span class="key">Titres</span>
+                <span class="value">Semibold (600)</span>
+              </div>
+              <div class="adjustment-item">
+                <span class="key">Décisions</span>
+                <span class="value">Semibold (600)</span>
+              </div>
+              <div class="adjustment-item">
+                <span class="key">Meta</span>
+                <span class="value">+contrast</span>
+              </div>
+              <div class="adjustment-item">
+                <span class="key">Espacement</span>
+                <span class="value">+5%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Contributor -->
+        <div class="role-card">
+          <div class="role-header">
+            <span class="icon">✍️</span>
+            <span class="name">Contributor / Team</span>
+          </div>
+          <div class="role-content">
+            <div class="role-intention">
+              <div class="label">Intention</div>
+              <ul>
+                <li>Produire</li>
+                <li>Collaborer</li>
+                <li>Écrire longtemps</li>
+              </ul>
+            </div>
+            <div class="role-adjustments">
+              <div class="label">Ajustements</div>
+              <div class="adjustment-item">
+                <span class="key">Titres</span>
+                <span class="value">Medium (500)</span>
+              </div>
+              <div class="adjustment-item">
+                <span class="key">Corps</span>
+                <span class="value">Regular (400)</span>
+              </div>
+              <div class="adjustment-item">
+                <span class="key">Notes</span>
+                <span class="value">Atténuées</span>
+              </div>
+              <div class="adjustment-item">
+                <span class="key">Espacement</span>
+                <span class="value">Standard</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Facilitator -->
+        <div class="role-card">
+          <div class="role-header">
+            <span class="icon">🎯</span>
+            <span class="name">Facilitator / Lead</span>
+          </div>
+          <div class="role-content">
+            <div class="role-intention">
+              <div class="label">Intention</div>
+              <ul>
+                <li>Guider les discussions</li>
+                <li>Clarifier</li>
+                <li>Structurer sans imposer</li>
+              </ul>
+            </div>
+            <div class="role-adjustments">
+              <div class="label">Ajustements</div>
+              <div class="adjustment-item">
+                <span class="key">Titres</span>
+                <span class="value">Medium (500)</span>
+              </div>
+              <div class="adjustment-item">
+                <span class="key">Décisions</span>
+                <span class="value">Medium (500)</span>
+              </div>
+              <div class="adjustment-item">
+                <span class="key">Espacement</span>
+                <span class="value">+8%</span>
+              </div>
+              <div class="adjustment-item">
+                <span class="key">Séparations</span>
+                <span class="value">+visibles</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Observer -->
+        <div class="role-card">
+          <div class="role-header">
+            <span class="icon">👁️</span>
+            <span class="name">Observer / Read-only</span>
+          </div>
+          <div class="role-content">
+            <div class="role-intention">
+              <div class="label">Intention</div>
+              <ul>
+                <li>Comprendre rapidement</li>
+                <li>Ne pas intervenir</li>
+              </ul>
+            </div>
+            <div class="role-adjustments">
+              <div class="label">Ajustements</div>
+              <div class="adjustment-item">
+                <span class="key">Titres</span>
+                <span class="value">Regular (400)</span>
+              </div>
+              <div class="adjustment-item">
+                <span class="key">Meta</span>
+                <span class="value">+visible</span>
+              </div>
+              <div class="adjustment-item">
+                <span class="key">Densité</span>
+                <span class="value">Réduite</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Demo -->
+    <section class="section">
+      <h2 class="section-title">🔍 Démonstration par Rôle</h2>
+      
+      <div class="demo-container">
+        <div class="demo-tabs">
+          <span class="demo-tab active" onclick="showDemo('owner')">👑 Owner</span>
+          <span class="demo-tab" onclick="showDemo('contributor')">✍️ Contributor</span>
+          <span class="demo-tab" onclick="showDemo('facilitator')">🎯 Facilitator</span>
+          <span class="demo-tab" onclick="showDemo('observer')">👁️ Observer</span>
+        </div>
+        
+        <div id="demo-owner" class="demo-content demo-owner active">
+          <div class="demo-title">Architecture API V50</div>
+          <div class="demo-note">
+            La discussion a porté sur le choix du framework backend. Plusieurs options ont été considérées.
+          </div>
+          <div class="demo-decision">
+            Adopter FastAPI + PostgreSQL comme stack backend principal pour CHE·NU V50.
+          </div>
+          <div class="demo-meta">15 Dec 2024 • Decision Meeting #42</div>
+        </div>
+        
+        <div id="demo-contributor" class="demo-content demo-contributor">
+          <div class="demo-title">Architecture API V50</div>
+          <div class="demo-note">
+            La discussion a porté sur le choix du framework backend. Plusieurs options ont été considérées.
+          </div>
+          <div class="demo-decision">
+            Adopter FastAPI + PostgreSQL comme stack backend principal pour CHE·NU V50.
+          </div>
+          <div class="demo-meta">15 Dec 2024 • Decision Meeting #42</div>
+        </div>
+        
+        <div id="demo-facilitator" class="demo-content demo-facilitator">
+          <div class="demo-title">Architecture API V50</div>
+          <div class="demo-note">
+            La discussion a porté sur le choix du framework backend. Plusieurs options ont été considérées.
+          </div>
+          <div class="demo-decision">
+            Adopter FastAPI + PostgreSQL comme stack backend principal pour CHE·NU V50.
+          </div>
+          <div class="demo-meta">15 Dec 2024 • Decision Meeting #42</div>
+        </div>
+        
+        <div id="demo-observer" class="demo-content demo-observer">
+          <div class="demo-title">Architecture API V50</div>
+          <div class="demo-note">
+            La discussion a porté sur le choix du framework backend. Plusieurs options ont été considérées.
+          </div>
+          <div class="demo-decision">
+            Adopter FastAPI + PostgreSQL comme stack backend principal pour CHE·NU V50.
+          </div>
+          <div class="demo-meta">15 Dec 2024 • Decision Meeting #42</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rules -->
+    <section class="section">
+      <div class="rules-grid">
+        <div class="rules-card forbidden">
+          <h4>❌ Strictement Interdit</h4>
+          <ul>
+            <li><span>→</span> Thèmes par rôle</li>
+            <li><span>→</span> Couleurs par rôle</li>
+            <li><span>→</span> Tailles différentes par rôle</li>
+            <li><span>→</span> Bold généralisé</li>
+            <li><span>→</span> Effets décoratifs</li>
+          </ul>
+        </div>
+        <div class="rules-card tests">
+          <h4>✅ Tests de Validation</h4>
+          <ul>
+            <li><span>1)</span> Lecture 10 min sans fatigue</li>
+            <li><span>2)</span> Décision repérée en < 2s</li>
+            <li><span>3)</span> Notes lisibles</li>
+            <li><span>4)</span> Aucune dominance inutile</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Goal -->
+    <section class="section">
+      <div class="goal-card">
+        <div class="quote">"Quel que soit mon rôle, cet espace me respecte."</div>
+        <div class="values">
+          Même langage visuel. Même calme. Même cohérence.
+        </div>
+        <div class="tagline">
+          Le système s'adapte à l'humain, sans jamais se fragmenter.
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>
+        <span class="brand">CHE·NU™</span> Theme v1
+        <span class="version">LOCKED</span>
+      </p>
+      <p style="margin-top: 8px; font-size: 12px;">
+        UN SEUL THÈME. Adaptation typographique uniquement.
+      </p>
+    </footer>
+  </div>
+  
+  <script>
+    function showDemo(role) {
+      // Hide all demos
+      document.querySelectorAll('.demo-content').forEach(el => el.classList.remove('active'));
+      // Show selected demo
+      document.getElementById('demo-' + role).classList.add('active');
+      // Update tabs
+      document.querySelectorAll('.demo-tab').forEach(el => el.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+  </script>
+</body>
+</html>

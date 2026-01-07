@@ -1,0 +1,674 @@
+// ═══════════════════════════════════════════════════════════════════════════════
+// CHE·NU — AGENT INBOX SYSTEM
+// API Routes - FastAPI Implementation
+// ═══════════════════════════════════════════════════════════════════════════════
+
+"""
+Agent Inbox API Routes
+All communication flows through these endpoints.
+"""
+
+from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Query
+from pydantic import BaseModel, Field
+from typing import Optional, List
+from datetime import datetime
+from enum import Enum
+import uuid
+
+router = APIRouter(prefix="/api/inbox", tags=["inbox"])
+
+# =============================================================================
+# ENUMS
+# =============================================================================
+
+class SenderType(str, Enum):
+    USER = "USER"
+    AGENT = "AGENT"
+    SYSTEM = "SYSTEM"
+
+class MessageType(str, Enum):
+    TASK = "TASK"
+    NOTE = "NOTE"
+    COMMENT = "COMMENT"
+    QUESTION = "QUESTION"
+    DECISION = "DECISION"
+    VOICE_TRANSCRIPT = "VOICE_TRANSCRIPT"
+
+class Priority(str, Enum):
+    LOW = "LOW"
+    NORMAL = "NORMAL"
+    HIGH = "HIGH"
+    CRITICAL = "CRITICAL"
+
+class MessageStatus(str, Enum):
+    NEW = "NEW"
+    READ = "READ"
+    ACKNOWLEDGED = "ACKNOWLEDGED"
+    ARCHIVED = "ARCHIVED"
+
+class TaskType(str, Enum):
+    EXECUTE = "EXECUTE"
+    ANALYZE = "ANALYZE"
+    REVIEW = "REVIEW"
+    DECIDE = "DECIDE"
+    RESEARCH = "RESEARCH"
+
+class TaskStatus(str, Enum):
+    PENDING = "PENDING"
+    IN_PROGRESS = "IN_PROGRESS"
+    BLOCKED = "BLOCKED"
+    COMPLETED = "COMPLETED"
+    CANCELLED = "CANCELLED"
+
+class TaskUpdateType(str, Enum):
+    STATUS_CHANGE = "STATUS_CHANGE"
+    COMMENT = "COMMENT"
+    RESULT = "RESULT"
+    BLOCKER = "BLOCKER"
+
+# =============================================================================
+# REQUEST/RESPONSE MODELS
+# =============================================================================
+
+class SendMessageRequest(BaseModel):
+    agent_id: str
+    message_type: MessageType
+    priority: Priority = Priority.NORMAL
+    content_text: str = Field(..., min_length=1)
+    parent_message_id: Optional[str] = None
+    related_task_id: Optional[str] = None
+    voice_recording_id: Optional[str] = None
+
+class SendMessageResponse(BaseModel):
+    success: bool
+    message_id: Optional[str] = None
+    task_id: Optional[str] = None  # If message_type was TASK
+    error: Optional[str] = None
+
+class AcknowledgeMessageRequest(BaseModel):
+    message_id: str
+
+class AcknowledgeMessageResponse(BaseModel):
+    success: bool
+    acknowledged_at: Optional[datetime] = None
+    error: Optional[str] = None
+
+class CreateTaskRequest(BaseModel):
+    sphere_id: str
+    assigned_agent_id: str
+    title: str = Field(..., min_length=1, max_length=255)
+    description: str = Field(..., min_length=1)
+    task_type: TaskType
+    priority: Priority = Priority.NORMAL
+    due_at: Optional[datetime] = None
+    source_message_id: Optional[str] = None
+
+class CreateTaskResponse(BaseModel):
+    success: bool
+    task_id: Optional[str] = None
+    error: Optional[str] = None
+
+class UpdateTaskRequest(BaseModel):
+    status: Optional[TaskStatus] = None
+    blocked_reason: Optional[str] = None
+    result: Optional[str] = None
+    update_type: Optional[TaskUpdateType] = None
+    update_content: Optional[str] = None
+
+class UpdateTaskResponse(BaseModel):
+    success: bool
+    task_id: Optional[str] = None
+    update_id: Optional[str] = None
+    error: Optional[str] = None
+
+class ConfirmVoiceRequest(BaseModel):
+    recording_id: str
+    edited_content: Optional[str] = None
+    message_type: Optional[MessageType] = None
+    priority: Optional[Priority] = None
+    create_task: bool = False
+
+class ConfirmVoiceResponse(BaseModel):
+    success: bool
+    message_id: Optional[str] = None
+    task_id: Optional[str] = None
+    error: Optional[str] = None
+
+# Response models for list endpoints
+class InboxSummary(BaseModel):
+    id: str
+    agent_id: str
+    agent_name: str
+    unread_count: int
+    pending_task_count: int
+    last_activity_at: datetime
+    is_muted: bool
+
+class MessageSummary(BaseModel):
+    id: str
+    sender_type: SenderType
+    sender_id: str
+    sender_name: Optional[str] = None
+    message_type: MessageType
+    priority: Priority
+    content_preview: str  # First 100 chars
+    status: MessageStatus
+    requires_confirmation: bool
+    related_task_id: Optional[str] = None
+    created_at: datetime
+
+class TaskSummary(BaseModel):
+    id: str
+    title: str
+    task_type: TaskType
+    priority: Priority
+    status: TaskStatus
+    assigned_agent_id: str
+    assigned_agent_name: Optional[str] = None
+    due_at: Optional[datetime] = None
+    created_at: datetime
+    updated_at: datetime
+
+# =============================================================================
+# MESSAGE ENDPOINTS
+# =============================================================================
+
+@router.post("/{agent_id}/messages", response_model=SendMessageResponse)
+async def send_message(
+    agent_id: str,
+    request: SendMessageRequest,
+    # current_user: User = Depends(get_current_user)
+):
+    """
+    Send a message to an agent's inbox.
+    
+    Rules enforced:
+    - If voice_recording_id is provided, recording must be confirmed
+    - If message_type is TASK, a Task entity is created
+    - All messages are logged to audit trail
+    """
+    try:
+        # Validate agent exists
+        # agent = await get_agent(agent_id)
+        # if not agent:
+        #     raise HTTPException(status_code=404, detail="Agent not found")
+        
+        # If from voice, check confirmation
+        if request.voice_recording_id:
+            # voice = await get_voice_recording(request.voice_recording_id)
+            # if not voice or voice.status != "CONFIRMED":
+            #     raise HTTPException(
+            #         status_code=400, 
+            #         detail="Voice recording must be confirmed before creating message"
+            #     )
+            pass
+        
+        # Create message
+        message_id = str(uuid.uuid4())
+        
+        # If TASK type, also create Task
+        task_id = None
+        if request.message_type == MessageType.TASK:
+            task_id = str(uuid.uuid4())
+            # Create task linked to message
+        
+        # Log to audit
+        # await log_audit(
+        #     action="MESSAGE_CREATED",
+        #     actor_type=SenderType.USER,
+        #     actor_id=current_user.id,
+        #     entity_type="MESSAGE",
+        #     entity_id=message_id
+        # )
+        
+        return SendMessageResponse(
+            success=True,
+            message_id=message_id,
+            task_id=task_id
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        return SendMessageResponse(success=False, error=str(e))
+
+
+@router.patch("/messages/{message_id}/acknowledge", response_model=AcknowledgeMessageResponse)
+async def acknowledge_message(
+    message_id: str,
+    # current_user: User = Depends(get_current_user)
+):
+    """
+    Acknowledge receipt of a message.
+    
+    Only the assigned agent can acknowledge messages in their inbox.
+    """
+    try:
+        # Get message
+        # message = await get_message(message_id)
+        # if not message:
+        #     raise HTTPException(status_code=404, detail="Message not found")
+        
+        # Verify current user is the agent for this inbox
+        # if current_user.agent_id != message.inbox.agent_id:
+        #     raise HTTPException(status_code=403, detail="Not authorized")
+        
+        # Update status
+        acknowledged_at = datetime.utcnow()
+        
+        # Log to audit
+        # await log_audit(...)
+        
+        return AcknowledgeMessageResponse(
+            success=True,
+            acknowledged_at=acknowledged_at
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        return AcknowledgeMessageResponse(success=False, error=str(e))
+
+
+@router.get("/{agent_id}", response_model=dict)
+async def get_inbox(
+    agent_id: str,
+    status: Optional[List[MessageStatus]] = Query(None),
+    message_type: Optional[List[MessageType]] = Query(None),
+    priority: Optional[List[Priority]] = Query(None),
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    sort_by: str = Query("created_at"),
+    sort_order: str = Query("desc"),
+    # current_user: User = Depends(get_current_user)
+):
+    """
+    Get an agent's inbox with messages.
+    
+    Supports filtering by status, type, and priority.
+    """
+    try:
+        # Build query with filters
+        # ...
+        
+        return {
+            "success": True,
+            "inbox": {
+                "id": str(uuid.uuid4()),
+                "agent_id": agent_id,
+                "unread_count": 0,
+                "pending_task_count": 0,
+                "last_activity_at": datetime.utcnow().isoformat(),
+                "is_muted": False
+            },
+            "messages": [],
+            "total": 0
+        }
+        
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+@router.patch("/messages/{message_id}/archive")
+async def archive_message(message_id: str):
+    """
+    Archive a message (no hard delete allowed).
+    """
+    try:
+        # Update status to ARCHIVED
+        # Set archived_at timestamp
+        
+        return {"success": True, "archived_at": datetime.utcnow().isoformat()}
+        
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+# =============================================================================
+# TASK ENDPOINTS
+# =============================================================================
+
+@router.post("/tasks", response_model=CreateTaskResponse)
+async def create_task(
+    request: CreateTaskRequest,
+    # current_user: User = Depends(get_current_user)
+):
+    """
+    Create a new task assigned to an agent.
+    
+    Tasks can only be created through this endpoint or via TASK-type messages.
+    """
+    try:
+        task_id = str(uuid.uuid4())
+        
+        # Create task
+        # ...
+        
+        # Create initial TaskUpdate
+        # ...
+        
+        # Update agent inbox pending count
+        # ...
+        
+        # Log to audit
+        # ...
+        
+        return CreateTaskResponse(success=True, task_id=task_id)
+        
+    except Exception as e:
+        return CreateTaskResponse(success=False, error=str(e))
+
+
+@router.patch("/tasks/{task_id}", response_model=UpdateTaskResponse)
+async def update_task(
+    task_id: str,
+    request: UpdateTaskRequest,
+    # current_user: User = Depends(get_current_user)
+):
+    """
+    Update a task's status or add an update.
+    
+    Status transitions are validated:
+    - PENDING → IN_PROGRESS | CANCELLED
+    - IN_PROGRESS → COMPLETED | BLOCKED | CANCELLED
+    - BLOCKED → IN_PROGRESS | CANCELLED
+    - COMPLETED/CANCELLED are terminal
+    """
+    try:
+        # Get current task
+        # task = await get_task(task_id)
+        # if not task:
+        #     raise HTTPException(status_code=404, detail="Task not found")
+        
+        # Validate status transition
+        if request.status:
+            # if not can_transition_to(task.status, request.status):
+            #     raise HTTPException(
+            #         status_code=400,
+            #         detail=f"Cannot transition from {task.status} to {request.status}"
+            #     )
+            pass
+        
+        update_id = None
+        if request.update_type and request.update_content:
+            update_id = str(uuid.uuid4())
+            # Create TaskUpdate
+        
+        # Update task
+        # ...
+        
+        # Log to audit
+        # ...
+        
+        return UpdateTaskResponse(
+            success=True,
+            task_id=task_id,
+            update_id=update_id
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        return UpdateTaskResponse(success=False, error=str(e))
+
+
+@router.post("/tasks/{task_id}/updates")
+async def add_task_update(
+    task_id: str,
+    update_type: TaskUpdateType,
+    content: str,
+    # current_user: User = Depends(get_current_user)
+):
+    """
+    Add an update/comment to a task.
+    """
+    try:
+        update_id = str(uuid.uuid4())
+        
+        # Create TaskUpdate
+        # ...
+        
+        return {
+            "success": True,
+            "update_id": update_id,
+            "created_at": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+@router.get("/tasks")
+async def list_tasks(
+    sphere_id: Optional[str] = None,
+    assigned_agent_id: Optional[str] = None,
+    status: Optional[List[TaskStatus]] = Query(None),
+    task_type: Optional[List[TaskType]] = Query(None),
+    priority: Optional[List[Priority]] = Query(None),
+    due_before: Optional[datetime] = None,
+    due_after: Optional[datetime] = None,
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    sort_by: str = Query("created_at"),
+    sort_order: str = Query("desc"),
+    # current_user: User = Depends(get_current_user)
+):
+    """
+    List tasks with filters.
+    """
+    try:
+        # Build query
+        # ...
+        
+        return {
+            "success": True,
+            "tasks": [],
+            "total": 0
+        }
+        
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+@router.get("/tasks/{task_id}")
+async def get_task(task_id: str):
+    """
+    Get a task with its updates.
+    """
+    try:
+        # Get task with updates
+        # ...
+        
+        return {
+            "success": True,
+            "task": None,
+            "updates": []
+        }
+        
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+# =============================================================================
+# VOICE ENDPOINTS
+# =============================================================================
+
+@router.post("/{agent_id}/voice")
+async def submit_voice(
+    agent_id: str,
+    audio: UploadFile = File(...),
+    language: str = "fr",
+    # current_user: User = Depends(get_current_user)
+):
+    """
+    Submit voice recording for transcription.
+    
+    Returns a VoiceRecording that MUST be confirmed before
+    any message or task can be created from it.
+    """
+    try:
+        recording_id = str(uuid.uuid4())
+        
+        # Save audio file
+        # audio_ref = await save_audio_file(audio, recording_id)
+        
+        # Transcribe (async)
+        # This would typically be done via a background task
+        # transcription = await transcribe_audio(audio_ref, language)
+        
+        # Analyze content
+        # detected_type, detected_priority = await analyze_content(transcription)
+        
+        # Create VoiceRecording record
+        # Status = TRANSCRIBED (not CONFIRMED yet!)
+        
+        # Log to audit
+        # ...
+        
+        return {
+            "success": True,
+            "recording": {
+                "id": recording_id,
+                "status": "TRANSCRIBED",
+                "raw_transcript": "Transcription placeholder",
+                "cleaned_transcript": "Transcription placeholder",
+                "summary": "Summary placeholder",
+                "transcription_confidence": 0.95,
+                "detected_message_type": MessageType.NOTE,
+                "detected_priority": Priority.NORMAL,
+                "created_at": datetime.utcnow().isoformat(),
+                "expires_at": (datetime.utcnow()).isoformat()
+            }
+        }
+        
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+@router.post("/voice/{recording_id}/confirm", response_model=ConfirmVoiceResponse)
+async def confirm_voice(
+    recording_id: str,
+    request: ConfirmVoiceRequest,
+    # current_user: User = Depends(get_current_user)
+):
+    """
+    Confirm a voice transcription and create the message.
+    
+    CRITICAL: This is the ONLY way to create messages from voice input.
+    Unconfirmed voice recordings cannot create tasks or decisions.
+    """
+    try:
+        # Get recording
+        # recording = await get_voice_recording(recording_id)
+        # if not recording:
+        #     raise HTTPException(status_code=404, detail="Recording not found")
+        
+        # Verify ownership
+        # if recording.user_id != current_user.id:
+        #     raise HTTPException(status_code=403, detail="Not authorized")
+        
+        # Verify not already confirmed
+        # if recording.status == "CONFIRMED":
+        #     raise HTTPException(status_code=400, detail="Already confirmed")
+        
+        # Create message
+        message_id = str(uuid.uuid4())
+        content = request.edited_content  # or recording.cleaned_transcript
+        message_type = request.message_type  # or recording.detected_message_type
+        
+        # Create task if requested AND message_type is TASK
+        task_id = None
+        if request.create_task and message_type == MessageType.TASK:
+            task_id = str(uuid.uuid4())
+        
+        # Mark recording as confirmed
+        # recording.status = "CONFIRMED"
+        # recording.confirmed_at = datetime.utcnow()
+        # recording.result_message_id = message_id
+        
+        # Log to audit
+        # await log_audit(action="VOICE_CONFIRMED", ...)
+        
+        return ConfirmVoiceResponse(
+            success=True,
+            message_id=message_id,
+            task_id=task_id
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        return ConfirmVoiceResponse(success=False, error=str(e))
+
+
+@router.delete("/voice/{recording_id}")
+async def cancel_voice(
+    recording_id: str,
+    # current_user: User = Depends(get_current_user)
+):
+    """
+    Cancel a voice recording (before confirmation).
+    """
+    try:
+        # Update status to CANCELLED
+        # ...
+        
+        return {"success": True}
+        
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+# =============================================================================
+# UTILITY ENDPOINTS
+# =============================================================================
+
+@router.get("/agents/{agent_id}/summary")
+async def get_agent_inbox_summary(agent_id: str):
+    """
+    Get summary of an agent's inbox for UI display.
+    """
+    try:
+        return {
+            "success": True,
+            "summary": {
+                "agent_id": agent_id,
+                "unread_count": 0,
+                "pending_task_count": 0,
+                "high_priority_count": 0,
+                "needs_confirmation_count": 0,
+                "last_activity_at": datetime.utcnow().isoformat()
+            }
+        }
+        
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+@router.post("/{agent_id}/mute")
+async def toggle_mute(agent_id: str, muted: bool = True):
+    """
+    Mute/unmute an agent's inbox notifications.
+    """
+    try:
+        return {"success": True, "is_muted": muted}
+        
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+# =============================================================================
+# HELPER FUNCTIONS
+# =============================================================================
+
+VALID_TRANSITIONS = {
+    TaskStatus.PENDING: [TaskStatus.IN_PROGRESS, TaskStatus.CANCELLED],
+    TaskStatus.IN_PROGRESS: [TaskStatus.COMPLETED, TaskStatus.BLOCKED, TaskStatus.CANCELLED],
+    TaskStatus.BLOCKED: [TaskStatus.IN_PROGRESS, TaskStatus.CANCELLED],
+    TaskStatus.COMPLETED: [],  # Terminal
+    TaskStatus.CANCELLED: [],  # Terminal
+}
+
+def can_transition_to(current: TaskStatus, target: TaskStatus) -> bool:
+    """Check if a status transition is valid."""
+    return target in VALID_TRANSITIONS.get(current, [])

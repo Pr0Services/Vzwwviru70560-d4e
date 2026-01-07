@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CHE·NU Universe Dashboard - SAFE · NON-AUTONOMOUS · REPRESENTATIONAL">
+  <meta name="theme-color" content="#1E1F22">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E◈%3C/text%3E%3C/svg%3E">
+  
+  <title>CHE·NU | Universe Dashboard</title>
+  
+  <!-- Preconnect to fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <style>
+    /* Critical CSS for loading state */
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #1E1F22;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    #root {
+      min-height: 100vh;
+    }
+    
+    /* Loading state */
+    .chenu-loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #1E1F22;
+      color: #D8B26A;
+    }
+    
+    .chenu-loader-logo {
+      font-size: 64px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .chenu-loader-text {
+      margin-top: 24px;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+    
+    .chenu-loader-subtitle {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #8D8371;
+      letter-spacing: 1px;
+    }
+    
+    .chenu-loader-bar {
+      margin-top: 32px;
+      width: 200px;
+      height: 4px;
+      background-color: #333;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    
+    .chenu-loader-progress {
+      width: 30%;
+      height: 100%;
+      background-color: #D8B26A;
+      border-radius: 2px;
+      animation: loading 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(0.95); }
+    }
+    
+    @keyframes loading {
+      0% { transform: translateX(-100%); }
+      50% { transform: translateX(200%); }
+      100% { transform: translateX(-100%); }
+    }
+    
+    /* Hide loader when app is ready */
+    .app-ready .chenu-loader {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <!-- Loading state shown before React mounts -->
+    <div class="chenu-loader">
+      <span class="chenu-loader-logo">◈</span>
+      <span class="chenu-loader-text">CHE·NU</span>
+      <span class="chenu-loader-subtitle">SAFE · NON-AUTONOMOUS · REPRESENTATIONAL</span>
+      <div class="chenu-loader-bar">
+        <div class="chenu-loader-progress"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Noscript fallback -->
+  <noscript>
+    <div style="
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #1E1F22;
+      color: #D8B26A;
+      text-align: center;
+      padding: 20px;
+    ">
+      <span style="font-size: 48px;">◈</span>
+      <h1 style="margin-top: 16px; font-size: 24px;">CHE·NU</h1>
+      <p style="margin-top: 8px; color: #8D8371; font-size: 14px;">
+        JavaScript is required to run the CHE·NU Universe Dashboard.
+      </p>
+    </div>
+  </noscript>
+  
+  <!-- Application bundle will be injected here by bundler -->
+  <script type="module" src="/src/index.tsx"></script>
+</body>
+</html>

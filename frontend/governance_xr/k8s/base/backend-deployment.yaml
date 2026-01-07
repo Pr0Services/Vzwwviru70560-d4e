@@ -1,0 +1,184 @@
+# ============================================================================
+# CHE·NU Backend Deployment
+# 
+# R&D COMPLIANCE: ✅
+# - Security context enforced
+# - Resource limits defined
+# - Health checks configured
+# - Audit logging enabled
+# ============================================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: chenu
+  labels:
+    app: backend
+    component: api
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+        component: api
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: chenu-backend
+      
+      # Security context for pod
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      
+      # Init container to wait for dependencies
+      initContainers:
+        - name: wait-for-postgres
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z postgres 5432; do echo waiting for postgres; sleep 2; done']
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+        
+        - name: wait-for-redis
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z redis 6379; do echo waiting for redis; sleep 2; done']
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+        
+        - name: run-migrations
+          image: chenu/backend:latest
+          command: ['alembic', 'upgrade', 'head']
+          envFrom:
+            - configMapRef:
+                name: chenu-config
+            - secretRef:
+                name: chenu-secrets
+          securityContext:
+            readOnlyRootFilesystem: false
+            allowPrivilegeEscalation: false
+      
+      containers:
+        - name: backend
+          image: chenu/backend:latest
+          imagePullPolicy: Always
+          
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          
+          # Environment from ConfigMap and Secrets
+          envFrom:
+            - configMapRef:
+                name: chenu-config
+            - secretRef:
+                name: chenu-secrets
+          
+          # Resource limits
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "2000m"
+              memory: "2Gi"
+          
+          # Security context for container
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          
+          # Volume mounts
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: logs
+              mountPath: /app/logs
+          
+          # Probes
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 30
+      
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: logs
+          emptyDir: {}
+      
+      # Image pull secrets
+      imagePullSecrets:
+        - name: chenu-registry-secret
+      
+      # Pod scheduling
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: backend
+                topologyKey: kubernetes.io/hostname
+      
+      # Tolerations for dedicated nodes (optional)
+      tolerations: []
+      
+      # Termination grace period
+      terminationGracePeriodSeconds: 30
+
+---
+# ============================================================================
+# Service Account for Backend
+# ============================================================================
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: chenu-backend
+  namespace: chenu
+  labels:
+    app: backend
+automountServiceAccountToken: false

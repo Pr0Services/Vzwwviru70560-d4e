@@ -1,0 +1,103 @@
+/**
+ * CHE·NU — UI Store (Zustand)
+ */
+
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
+interface UIStore {
+  // Theme
+  theme: 'light' | 'dark' | 'system';
+  setTheme: (theme: 'light' | 'dark' | 'system') => void;
+  
+  // Sidebar
+  sidebarOpen: boolean;
+  sidebarCollapsed: boolean;
+  toggleSidebar: () => void;
+  setSidebarCollapsed: (collapsed: boolean) => void;
+  
+  // Nova
+  novaOpen: boolean;
+  novaMinimized: boolean;
+  openNova: () => void;
+  closeNova: () => void;
+  toggleNova: () => void;
+  minimizeNova: () => void;
+  
+  // Modals
+  activeModal: string | null;
+  modalData: any;
+  openModal: (modalId: string, data?: any) => void;
+  closeModal: () => void;
+  
+  // Navigation
+  currentPath: string;
+  currentSphere: string | null;
+  setCurrentPath: (path: string) => void;
+  setCurrentSphere: (sphere: string | null) => void;
+  
+  // Search
+  searchOpen: boolean;
+  searchQuery: string;
+  toggleSearch: () => void;
+  setSearchQuery: (query: string) => void;
+  
+  // Notifications panel
+  notificationsPanelOpen: boolean;
+  toggleNotificationsPanel: () => void;
+}
+
+export const useUIStore = create<UIStore>()(
+  persist(
+    (set, get) => ({
+      // Theme
+      theme: 'dark',
+      setTheme: (theme) => set({ theme }),
+      
+      // Sidebar
+      sidebarOpen: true,
+      sidebarCollapsed: false,
+      toggleSidebar: () => set({ sidebarOpen: !get().sidebarOpen }),
+      setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
+      
+      // Nova
+      novaOpen: false,
+      novaMinimized: false,
+      openNova: () => set({ novaOpen: true, novaMinimized: false }),
+      closeNova: () => set({ novaOpen: false }),
+      toggleNova: () => set({ novaOpen: !get().novaOpen }),
+      minimizeNova: () => set({ novaMinimized: true }),
+      
+      // Modals
+      activeModal: null,
+      modalData: null,
+      openModal: (modalId, data) => set({ activeModal: modalId, modalData: data }),
+      closeModal: () => set({ activeModal: null, modalData: null }),
+      
+      // Navigation
+      currentPath: '/',
+      currentSphere: null,
+      setCurrentPath: (path) => set({ currentPath: path }),
+      setCurrentSphere: (sphere) => set({ currentSphere: sphere }),
+      
+      // Search
+      searchOpen: false,
+      searchQuery: '',
+      toggleSearch: () => set({ searchOpen: !get().searchOpen }),
+      setSearchQuery: (query) => set({ searchQuery: query }),
+      
+      // Notifications
+      notificationsPanelOpen: false,
+      toggleNotificationsPanel: () => set({ notificationsPanelOpen: !get().notificationsPanelOpen }),
+    }),
+    {
+      name: 'chenu-ui',
+      partialize: (state) => ({
+        theme: state.theme,
+        sidebarCollapsed: state.sidebarCollapsed,
+      }),
+    }
+  )
+);
+
+export default useUIStore;

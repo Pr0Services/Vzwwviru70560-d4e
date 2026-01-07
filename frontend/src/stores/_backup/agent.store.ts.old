@@ -1,0 +1,210 @@
+// =============================================================================
+// CHE·NU™ — AGENT STORE
+// Version Finale V51
+// =============================================================================
+
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+import { 
+  Agent, 
+  AgentStatus, 
+  AgentLevel, 
+  AgentFilter, 
+  AgentAction,
+  AgentMessage,
+  SphereId,
+} from '../types';
+import { AGENTS_DATA, getAgentById, getAgentsBySphere } from '../data/agents.data';
+
+interface AgentStore {
+  // State
+  agents: Agent[];
+  selectedAgentId: string | null;
+  activeAgentIds: string[];
+  pendingActions: AgentAction[];
+  messages: AgentMessage[];
+  filter: AgentFilter;
+  isLoading: boolean;
+  
+  // Actions - Selection
+  selectAgent: (agentId: string | null) => void;
+  activateAgent: (agentId: string) => void;
+  deactivateAgent: (agentId: string) => void;
+  
+  // Actions - Status
+  setAgentStatus: (agentId: string, status: AgentStatus) => void;
+  
+  // Actions - Filter
+  setFilter: (filter: Partial<AgentFilter>) => void;
+  clearFilter: () => void;
+  
+  // Actions - Actions queue
+  addPendingAction: (action: AgentAction) => void;
+  approveAction: (actionId: string, approvedBy: string) => void;
+  rejectAction: (actionId: string) => void;
+  clearPendingActions: () => void;
+  
+  // Actions - Messages
+  addMessage: (message: AgentMessage) => void;
+  markMessageRead: (messageId: string) => void;
+  clearMessages: () => void;
+  
+  // Computed
+  getFilteredAgents: () => Agent[];
+  getAgentsByLevel: (level: AgentLevel) => Agent[];
+  getAgentsForSphere: (sphereId: SphereId) => Agent[];
+  getActiveAgents: () => Agent[];
+  getUnreadMessageCount: () => number;
+  getPendingActionCount: () => number;
+}
+
+export const useAgentStore = create<AgentStore>()(
+  devtools(
+    (set, get) => ({
+      agents: AGENTS_DATA,
+      selectedAgentId: null,
+      activeAgentIds: [],
+      pendingActions: [],
+      messages: [],
+      filter: {},
+      isLoading: false,
+      
+      // Selection
+      selectAgent: (agentId) => set({ selectedAgentId: agentId }),
+      
+      activateAgent: (agentId) => {
+        const { activeAgentIds, agents } = get();
+        if (!activeAgentIds.includes(agentId)) {
+          set({ 
+            activeAgentIds: [...activeAgentIds, agentId],
+            agents: agents.map(a => 
+              a.id === agentId ? { ...a, status: 'idle' as AgentStatus } : a
+            ),
+          });
+        }
+      },
+      
+      deactivateAgent: (agentId) => {
+        const { activeAgentIds, agents } = get();
+        set({ 
+          activeAgentIds: activeAgentIds.filter(id => id !== agentId),
+          agents: agents.map(a => 
+            a.id === agentId ? { ...a, status: 'sleeping' as AgentStatus } : a
+          ),
+        });
+      },
+      
+      // Status
+      setAgentStatus: (agentId, status) => {
+        const { agents } = get();
+        set({
+          agents: agents.map(a => 
+            a.id === agentId ? { ...a, status } : a
+          ),
+        });
+      },
+      
+      // Filter
+      setFilter: (filter) => set({ filter: { ...get().filter, ...filter } }),
+      clearFilter: () => set({ filter: {} }),
+      
+      // Actions queue
+      addPendingAction: (action) => {
+        set({ pendingActions: [...get().pendingActions, action] });
+      },
+      
+      approveAction: (actionId, approvedBy) => {
+        const { pendingActions } = get();
+        set({
+          pendingActions: pendingActions.map(a =>
+            a.id === actionId 
+              ? { ...a, status: 'approved' as const, approvedBy }
+              : a
+          ),
+        });
+      },
+      
+      rejectAction: (actionId) => {
+        const { pendingActions } = get();
+        set({
+          pendingActions: pendingActions.map(a =>
+            a.id === actionId ? { ...a, status: 'rejected' as const } : a
+          ),
+        });
+      },
+      
+      clearPendingActions: () => set({ pendingActions: [] }),
+      
+      // Messages
+      addMessage: (message) => {
+        set({ messages: [message, ...get().messages].slice(0, 100) });
+      },
+      
+      markMessageRead: (messageId) => {
+        const { messages } = get();
+        set({
+          messages: messages.map(m =>
+            m.id === messageId ? { ...m, read: true } : m
+          ),
+        });
+      },
+      
+      clearMessages: () => set({ messages: [] }),
+      
+      // Computed
+      getFilteredAgents: () => {
+        const { agents, filter } = get();
+        return agents.filter(agent => {
+          if (filter.level?.length && !filter.level.includes(agent.level)) return false;
+          if (filter.type?.length && !filter.type.includes(agent.type)) return false;
+          if (filter.department?.length && !filter.department.includes(agent.department)) return false;
+          if (filter.status?.length && !filter.status.includes(agent.status)) return false;
+          if (filter.isCore !== undefined && agent.isCore !== filter.isCore) return false;
+          if (filter.search) {
+            const search = filter.search.toLowerCase();
+            if (!agent.name.toLowerCase().includes(search) &&
+                !agent.nameFr.toLowerCase().includes(search) &&
+                !agent.code.toLowerCase().includes(search)) {
+              return false;
+            }
+          }
+          return true;
+        });
+      },
+      
+      getAgentsByLevel: (level) => {
+        return get().agents.filter(a => a.level === level);
+      },
+      
+      getAgentsForSphere: (sphereId) => {
+        return get().agents.filter(a => a.sphereId === sphereId || a.sphereId === 'all');
+      },
+      
+      getActiveAgents: () => {
+        const { agents, activeAgentIds } = get();
+        return agents.filter(a => activeAgentIds.includes(a.id));
+      },
+      
+      getUnreadMessageCount: () => {
+        return get().messages.filter(m => !m.read).length;
+      },
+      
+      getPendingActionCount: () => {
+        return get().pendingActions.filter(a => a.status === 'pending').length;
+      },
+    }),
+    { name: 'AgentStore' }
+  )
+);
+
+// =============================================================================
+// SELECTORS
+// =============================================================================
+
+export const selectSelectedAgent = (state: AgentStore) => 
+  state.selectedAgentId ? getAgentById(state.selectedAgentId) : null;
+
+export const selectActiveAgentIds = (state: AgentStore) => state.activeAgentIds;
+export const selectPendingActions = (state: AgentStore) => state.pendingActions;
+export const selectMessages = (state: AgentStore) => state.messages;
+export const selectFilter = (state: AgentStore) => state.filter;

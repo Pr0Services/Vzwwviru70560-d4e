@@ -1,0 +1,397 @@
+// =============================================================================
+// CHE·NU™ — THREAD STORE
+// Version Finale V52
+// Zustand store for Thread (.chenu) management
+// =============================================================================
+
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
+import { 
+  Thread, 
+  ThreadStatus, 
+  ThreadPriority,
+  ThreadScope,
+  ThreadMessage,
+  ThreadDecision,
+  ThreadParticipant,
+  CreateThreadInput,
+  createThread,
+  estimateTokens,
+} from '../types/thread.types';
+import { SphereId } from '../types/sphere.types';
+
+// =============================================================================
+// STORE INTERFACE
+// =============================================================================
+
+interface ThreadStore {
+  // State
+  threads: Record<string, Thread>;
+  activeThreadId: string | null;
+  
+  // Getters
+  getThread: (id: string) => Thread | undefined;
+  getThreadsBySphere: (sphereId: SphereId) => Thread[];
+  getActiveThreads: () => Thread[];
+  getArchivedThreads: () => Thread[];
+  
+  // Actions
+  createNewThread: (input: CreateThreadInput, ownerId: string) => Thread;
+  setActiveThread: (id: string | null) => void;
+  
+  // Thread mutations
+  sendMessage: (threadId: string, content: string, sender: ThreadParticipant) => void;
+  makeDecision: (threadId: string, decision: Omit<ThreadDecision, 'id' | 'timestamp'>) => void;
+  updateStatus: (threadId: string, status: ThreadStatus) => void;
+  updatePriority: (threadId: string, priority: ThreadPriority) => void;
+  updateScope: (threadId: string, scope: ThreadScope) => void;
+  addParticipant: (threadId: string, participant: Omit<ThreadParticipant, 'joinedAt'>) => void;
+  removeParticipant: (threadId: string, participantId: string) => void;
+  adjustBudget: (threadId: string, budget: Partial<Thread['tokenBudget']>) => void;
+  addTag: (threadId: string, tag: string) => void;
+  removeTag: (threadId: string, tag: string) => void;
+  archiveThread: (threadId: string) => void;
+  deleteThread: (threadId: string) => void;
+  
+  // Utility
+  reset: () => void;
+}
+
+// =============================================================================
+// INITIAL STATE
+// =============================================================================
+
+const initialState = {
+  threads: {},
+  activeThreadId: null,
+};
+
+// =============================================================================
+// STORE IMPLEMENTATION
+// =============================================================================
+
+export const useThreadStore = create<ThreadStore>()(
+  devtools(
+    persist(
+      (set, get) => ({
+        ...initialState,
+        
+        // Getters
+        getThread: (id) => get().threads[id],
+        
+        getThreadsBySphere: (sphereId) => 
+          Object.values(get().threads).filter(t => t.sphereId === sphereId),
+        
+        getActiveThreads: () =>
+          Object.values(get().threads).filter(t => t.status === 'active'),
+        
+        getArchivedThreads: () =>
+          Object.values(get().threads).filter(t => t.status === 'archived'),
+        
+        // Create thread
+        createNewThread: (input, ownerId) => {
+          const thread = createThread(input, ownerId);
+          set((state) => ({
+            threads: { ...state.threads, [thread.id]: thread },
+            activeThreadId: thread.id,
+          }));
+          return thread;
+        },
+        
+        // Set active
+        setActiveThread: (id) => set({ activeThreadId: id }),
+        
+        // Send message
+        sendMessage: (threadId, content, sender) => {
+          const now = new Date().toISOString();
+          const tokenCount = estimateTokens(content);
+          
+          const message: ThreadMessage = {
+            id: `msg_${Date.now()}`,
+            timestamp: now,
+            sender,
+            content,
+            tokenCount,
+          };
+          
+          set((state) => {
+            const thread = state.threads[threadId];
+            if (!thread) return state;
+            
+            const newConsumed = thread.tokenBudget.consumed + tokenCount;
+            
+            return {
+              threads: {
+                ...state.threads,
+                [threadId]: {
+                  ...thread,
+                  messages: [...thread.messages, message],
+                  tokenBudget: {
+                    ...thread.tokenBudget,
+                    consumed: newConsumed,
+                    remaining: thread.tokenBudget.allocated - newConsumed,
+                  },
+                  metadata: {
+                    ...thread.metadata,
+                    updated: now,
+                    lastActivity: now,
+                    messageCount: thread.metadata.messageCount + 1,
+                    totalTokens: thread.metadata.totalTokens + tokenCount,
+                  },
+                },
+              },
+            };
+          });
+        },
+        
+        // Make decision
+        makeDecision: (threadId, decisionInput) => {
+          const now = new Date().toISOString();
+          
+          const decision: ThreadDecision = {
+            ...decisionInput,
+            id: `dec_${Date.now()}`,
+            timestamp: now,
+          };
+          
+          set((state) => {
+            const thread = state.threads[threadId];
+            if (!thread) return state;
+            
+            return {
+              threads: {
+                ...state.threads,
+                [threadId]: {
+                  ...thread,
+                  decisions: [...thread.decisions, decision],
+                  metadata: {
+                    ...thread.metadata,
+                    updated: now,
+                    lastActivity: now,
+                    decisionCount: thread.metadata.decisionCount + 1,
+                  },
+                },
+              },
+            };
+          });
+        },
+        
+        // Update status
+        updateStatus: (threadId, status) => {
+          const now = new Date().toISOString();
+          
+          set((state) => {
+            const thread = state.threads[threadId];
+            if (!thread) return state;
+            
+            return {
+              threads: {
+                ...state.threads,
+                [threadId]: {
+                  ...thread,
+                  status,
+                  metadata: {
+                    ...thread.metadata,
+                    updated: now,
+                  },
+                },
+              },
+            };
+          });
+        },
+        
+        // Update priority
+        updatePriority: (threadId, priority) => {
+          set((state) => {
+            const thread = state.threads[threadId];
+            if (!thread) return state;
+            
+            return {
+              threads: {
+                ...state.threads,
+                [threadId]: {
+                  ...thread,
+                  priority,
+                  metadata: {
+                    ...thread.metadata,
+                    updated: new Date().toISOString(),
+                  },
+                },
+              },
+            };
+          });
+        },
+        
+        // Update scope
+        updateScope: (threadId, scope) => {
+          set((state) => {
+            const thread = state.threads[threadId];
+            if (!thread) return state;
+            
+            return {
+              threads: {
+                ...state.threads,
+                [threadId]: {
+                  ...thread,
+                  scope,
+                  metadata: {
+                    ...thread.metadata,
+                    updated: new Date().toISOString(),
+                  },
+                },
+              },
+            };
+          });
+        },
+        
+        // Add participant
+        addParticipant: (threadId, participantInput) => {
+          const participant: ThreadParticipant = {
+            ...participantInput,
+            joinedAt: new Date().toISOString(),
+          };
+          
+          set((state) => {
+            const thread = state.threads[threadId];
+            if (!thread) return state;
+            
+            // Check if already participant
+            if (thread.participants.some(p => p.id === participant.id)) {
+              return state;
+            }
+            
+            return {
+              threads: {
+                ...state.threads,
+                [threadId]: {
+                  ...thread,
+                  participants: [...thread.participants, participant],
+                },
+              },
+            };
+          });
+        },
+        
+        // Remove participant
+        removeParticipant: (threadId, participantId) => {
+          set((state) => {
+            const thread = state.threads[threadId];
+            if (!thread) return state;
+            
+            // Cannot remove owner
+            if (thread.ownerId === participantId) return state;
+            
+            return {
+              threads: {
+                ...state.threads,
+                [threadId]: {
+                  ...thread,
+                  participants: thread.participants.filter(p => p.id !== participantId),
+                },
+              },
+            };
+          });
+        },
+        
+        // Adjust budget
+        adjustBudget: (threadId, budgetUpdate) => {
+          set((state) => {
+            const thread = state.threads[threadId];
+            if (!thread) return state;
+            
+            const newBudget = { ...thread.tokenBudget, ...budgetUpdate };
+            newBudget.remaining = newBudget.allocated - newBudget.consumed;
+            
+            return {
+              threads: {
+                ...state.threads,
+                [threadId]: {
+                  ...thread,
+                  tokenBudget: newBudget,
+                },
+              },
+            };
+          });
+        },
+        
+        // Add tag
+        addTag: (threadId, tag) => {
+          set((state) => {
+            const thread = state.threads[threadId];
+            if (!thread || thread.tags.includes(tag)) return state;
+            
+            return {
+              threads: {
+                ...state.threads,
+                [threadId]: {
+                  ...thread,
+                  tags: [...thread.tags, tag],
+                },
+              },
+            };
+          });
+        },
+        
+        // Remove tag
+        removeTag: (threadId, tag) => {
+          set((state) => {
+            const thread = state.threads[threadId];
+            if (!thread) return state;
+            
+            return {
+              threads: {
+                ...state.threads,
+                [threadId]: {
+                  ...thread,
+                  tags: thread.tags.filter(t => t !== tag),
+                },
+              },
+            };
+          });
+        },
+        
+        // Archive
+        archiveThread: (threadId) => {
+          get().updateStatus(threadId, 'archived');
+        },
+        
+        // Delete
+        deleteThread: (threadId) => {
+          set((state) => {
+            const { [threadId]: removed, ...remaining } = state.threads;
+            return {
+              threads: remaining,
+              activeThreadId: state.activeThreadId === threadId ? null : state.activeThreadId,
+            };
+          });
+        },
+        
+        // Reset
+        reset: () => set(initialState),
+      }),
+      {
+        name: 'chenu-thread-storage',
+        partialize: (state) => ({
+          threads: state.threads,
+        }),
+      }
+    ),
+    { name: 'CHE·NU Threads' }
+  )
+);
+
+// =============================================================================
+// SELECTORS
+// =============================================================================
+
+export const selectActiveThread = (state: ThreadStore) => 
+  state.activeThreadId ? state.threads[state.activeThreadId] : null;
+
+export const selectThreadCount = (state: ThreadStore) => 
+  Object.keys(state.threads).length;
+
+export const selectActiveThreadCount = (state: ThreadStore) =>
+  Object.values(state.threads).filter(t => t.status === 'active').length;
+
+export const selectTotalTokensConsumed = (state: ThreadStore) =>
+  Object.values(state.threads).reduce((sum, t) => sum + t.tokenBudget.consumed, 0);

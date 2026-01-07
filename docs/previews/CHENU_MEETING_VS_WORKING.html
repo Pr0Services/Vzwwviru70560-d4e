@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHE·NU™ — Meeting vs Working Session</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════════════
+       CHE·NU™ — COLLABORATION SPACE
+       MEETING vs WORKING SESSION
+       
+       🎯 OBJECTIF: En 1 seconde, sans lire:
+       - Meeting = "on décide"
+       - Working Session = "on travaille"
+       
+       🧮 RÈGLE: Working Session = Meeting + 1 cran luminosité + 1 cran espace
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    :root {
+      /* === GLOBAL === */
+      --bg-root: #1B1F23;
+      --bg-root-deeper: '#181C20';
+      --text-primary: #E6E8EA;
+      --text-secondary: #B8BDC3;
+      --text-muted: #8B9096;
+      --gold: #BFAE7A;
+      --gold-light: #D4C89A;
+      --cyan: #6EAFC4;
+      --green: #6FAF9A;
+      --error: #C47070;
+      --warning: #C4A060;
+      
+      /* === MEETING — "TABLE DE DÉCISION" === */
+      --meeting-bg: #2A3036;
+      --meeting-surface: #2F363D;
+      --meeting-surface-focus: #353D46;
+      --meeting-radius: 10px;
+      --meeting-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+      --meeting-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+      --meeting-border: rgba(255, 255, 255, 0.035);
+      --meeting-gap: 12px;
+      --meeting-padding: 16px;
+      
+      /* === WORKING SESSION — "ATELIER DE TRAVAIL" === */
+      --work-bg: #2E353D;
+      --work-surface: #353D46;          /* +1 cran */
+      --work-surface-focus: #3C4650;
+      --work-radius: 14px;
+      --work-shadow: 0 10px 28px rgba(0, 0, 0, 0.30);
+      --work-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+      --work-border: rgba(255, 255, 255, 0.05);
+      --work-gap: 20px;
+      --work-padding: 24px;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: linear-gradient(180deg, #181C20, var(--bg-root));
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    
+    .container { max-width: 1400px; margin: 0 auto; padding: 40px 24px; }
+    
+    /* Header */
+    .header { text-align: center; margin-bottom: 48px; }
+    .header h1 { font-size: 32px; font-weight: 700; color: var(--gold); margin-bottom: 8px; }
+    .header .subtitle { font-size: 16px; color: var(--text-secondary); margin-bottom: 20px; }
+    .header .badge-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .header .badge {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .header .badge.meeting {
+      background-color: var(--meeting-surface);
+      color: var(--cyan);
+      border: 1px solid var(--meeting-border);
+    }
+    .header .badge.work {
+      background-color: var(--work-surface);
+      color: var(--gold);
+      border: 1px solid var(--work-border);
+    }
+    
+    /* Comparison Grid */
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-bottom: 48px;
+    }
+    
+    @media (max-width: 900px) {
+      .comparison { grid-template-columns: 1fr; }
+    }
+    
+    /* Zone Headers */
+    .zone-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+    }
+    .zone-header .icon { font-size: 24px; }
+    .zone-header h2 { font-size: 18px; font-weight: 600; }
+    .zone-header .tag {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .zone-header .meta {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       MEETING ZONE — "TABLE DE DÉCISION"
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .meeting-zone {
+      background-color: var(--meeting-bg);
+      border-radius: 16px;
+      padding: 20px;
+      border: 1px solid var(--meeting-border);
+    }
+    
+    .meeting-zone .zone-header {
+      border-bottom: 1px solid var(--meeting-border);
+    }
+    
+    .meeting-zone .zone-header h2 { color: var(--cyan); }
+    .meeting-zone .zone-header .tag {
+      background-color: var(--cyan);
+      color: var(--bg-root);
+    }
+    
+    .meeting-zone .surface {
+      background-color: var(--meeting-surface);
+      border-radius: var(--meeting-radius);
+      border: 1px solid var(--meeting-border);
+      box-shadow: var(--meeting-shadow-inset), var(--meeting-shadow);
+      padding: var(--meeting-padding);
+      margin-bottom: var(--meeting-gap);
+      transition: background-color 0.15s ease;
+    }
+    
+    .meeting-zone .surface:hover {
+      background-color: var(--meeting-surface-focus);
+    }
+    
+    .meeting-zone .surface:last-child {
+      margin-bottom: 0;
+    }
+    
+    /* Meeting Sections (structured) */
+    .meeting-section {
+      margin-bottom: var(--meeting-gap);
+    }
+    
+    .meeting-section:last-child {
+      margin-bottom: 0;
+    }
+    
+    .meeting-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--meeting-border);
+    }
+    
+    .meeting-section-content {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+    
+    /* Decision Block (distinct) */
+    .decision-block {
+      background-color: rgba(110, 175, 196, 0.08);
+      border-left: 3px solid var(--cyan);
+      padding: 12px 14px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 8px;
+    }
+    
+    .decision-block .label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    
+    .decision-block .text {
+      font-size: 13px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    
+    /* Meeting Agenda (dense) */
+    .meeting-agenda {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    
+    .agenda-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      background-color: rgba(255, 255, 255, 0.02);
+      border-radius: 6px;
+      font-size: 12px;
+    }
+    
+    .agenda-item .number {
+      width: 20px;
+      height: 20px;
+      background-color: var(--cyan);
+      color: var(--bg-root);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    
+    .agenda-item .time {
+      margin-left: auto;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       WORKING SESSION ZONE — "ATELIER DE TRAVAIL"
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .work-zone {
+      background-color: var(--work-bg);
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid var(--work-border);
+    }
+    
+    .work-zone .zone-header {
+      border-bottom: 1px solid var(--work-border);
+      margin-bottom: 20px;
+    }
+    
+    .work-zone .zone-header h2 { color: var(--gold); }
+    .work-zone .zone-header .tag {
+      background-color: var(--gold);
+      color: var(--bg-root);
+    }
+    
+    .work-zone .surface {
+      background-color: var(--work-surface);
+      border-radius: var(--work-radius);
+      border: 1px solid var(--work-border);
+      box-shadow: var(--work-shadow-inset), var(--work-shadow);
+      padding: var(--work-padding);
+      margin-bottom: var(--work-gap);
+      transition: all 0.2s ease;
+    }
+    
+    .work-zone .surface:hover {
+      background-color: var(--work-surface-focus);
+      transform: translateY(-2px);
+    }
+    
+    .work-zone .surface:last-child {
+      margin-bottom: 0;
+    }
+    
+    /* Work Editor (airy) */
+    .work-editor {
+      min-height: 140px;
+    }
+    
+    .work-editor .title {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+    }
+    
+    .work-editor .content {
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--text-secondary);
+      line-height: 1.9;
+    }
+    
+    .work-editor .content p {
+      margin-bottom: 12px;
+    }
+    
+    .work-editor .content p:last-child {
+      margin-bottom: 0;
+    }
+    
+    /* Work Threads (spacious) */
+    .work-threads {
+      display: flex;
+      flex-direction: column;
+      gap: var(--work-gap);
+    }
+    
+    .work-thread {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px;
+      background-color: rgba(255, 255, 255, 0.02);
+      border-radius: 10px;
+      border: 1px solid var(--work-border);
+    }
+    
+    .work-thread .icon {
+      font-size: 20px;
+      margin-top: 2px;
+    }
+    
+    .work-thread .content {
+      flex: 1;
+    }
+    
+    .work-thread .title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    
+    .work-thread .desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    
+    .work-thread .status {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    
+    .work-thread .status.active {
+      background-color: rgba(111, 175, 154, 0.15);
+      color: var(--green);
+    }
+    
+    .work-thread .status.draft {
+      background-color: rgba(191, 174, 122, 0.15);
+      color: var(--gold);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       INFO SECTIONS
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .info-section {
+      margin-bottom: 48px;
+    }
+    
+    .info-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .info-title .number {
+      width: 32px;
+      height: 32px;
+      background-color: var(--gold);
+      color: var(--bg-root);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    
+    /* Comparison Cards */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    
+    @media (max-width: 768px) {
+      .compare-grid { grid-template-columns: 1fr; }
+    }
+    
+    .compare-card {
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    
+    .compare-card.meeting {
+      background-color: var(--meeting-bg);
+    }
+    
+    .compare-card.work {
+      background-color: var(--work-bg);
+    }
+    
+    .compare-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .compare-card.meeting h3 { color: var(--cyan); }
+    .compare-card.work h3 { color: var(--gold); }
+    
+    .compare-card ul {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .compare-card li {
+      font-size: 13px;
+      color: var(--text-secondary);
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .compare-card li:last-child {
+      border-bottom: none;
+    }
+    
+    .compare-card li .check {
+      color: var(--green);
+    }
+    
+    /* Tokens Table */
+    .tokens-table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: var(--meeting-surface);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .tokens-table th,
+    .tokens-table td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    
+    .tokens-table th {
+      background-color: var(--meeting-surface-focus);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .tokens-table td {
+      font-size: 13px;
+    }
+    
+    .tokens-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .color-swatch {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      vertical-align: middle;
+      margin-right: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    
+    .code {
+      font-family: 'SF Mono', monospace;
+      font-size: 12px;
+      color: var(--cyan);
+      background-color: var(--bg-root);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    
+    /* Formula */
+    .formula {
+      background-color: var(--meeting-surface);
+      border-radius: 12px;
+      padding: 32px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      margin-bottom: 24px;
+    }
+    
+    .formula h3 {
+      font-size: 14px;
+      color: var(--gold);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .formula .equation {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-family: 'SF Mono', monospace;
+    }
+    
+    .formula .note {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 12px;
+    }
+    
+    /* Test Section */
+    .test-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    
+    @media (max-width: 768px) {
+      .test-grid { grid-template-columns: 1fr; }
+    }
+    
+    .test-card {
+      background-color: var(--meeting-surface);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    
+    .test-card .emoji { font-size: 36px; margin-bottom: 12px; }
+    .test-card .title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+    .test-card .desc { font-size: 12px; color: var(--text-muted); }
+    .test-card.success { border-color: var(--green); }
+    .test-card.success .title { color: var(--green); }
+    
+    /* Meeting Types Canon */
+    .meeting-types {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    
+    @media (max-width: 900px) {
+      .meeting-types { grid-template-columns: repeat(2, 1fr); }
+    }
+    
+    .meeting-type {
+      background-color: var(--meeting-surface);
+      border-radius: 10px;
+      padding: 20px;
+      border: 1px solid var(--meeting-border);
+    }
+    
+    .meeting-type .icon {
+      font-size: 28px;
+      margin-bottom: 12px;
+    }
+    
+    .meeting-type .name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+    
+    .meeting-type .intention {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    
+    .meeting-type .output {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    
+    .meeting-type .output.decisions {
+      background-color: rgba(110, 175, 196, 0.15);
+      color: var(--cyan);
+    }
+    
+    .meeting-type .output.notes {
+      background-color: rgba(191, 174, 122, 0.15);
+      color: var(--gold);
+    }
+    
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 40px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      margin-top: 48px;
+    }
+    .footer p { color: var(--text-muted); font-size: 14px; }
+    .footer .brand { color: var(--gold); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>✧ CHE·NU™ Collaboration Space</h1>
+      <p class="subtitle">Meeting vs Working Session — Différenciation cognitive</p>
+      <div class="badge-row">
+        <span class="badge meeting">🤝 Meeting = Décider</span>
+        <span class="badge work">🔧 Working = Produire</span>
+      </div>
+    </header>
+
+    <!-- Live Comparison -->
+    <div class="comparison">
+      <!-- MEETING -->
+      <div class="meeting-zone">
+        <div class="zone-header">
+          <span class="icon">🤝</span>
+          <h2>Decision Meeting</h2>
+          <span class="tag">Décider</span>
+          <span class="meta">45 min • 4 participants</span>
+        </div>
+        
+        <!-- Agenda (structured, dense) -->
+        <div class="surface">
+          <div class="meeting-section">
+            <div class="meeting-section-title">Agenda</div>
+            <div class="meeting-agenda">
+              <div class="agenda-item">
+                <span class="number">1</span>
+                <span>Contexte V50</span>
+                <span class="time">5 min</span>
+              </div>
+              <div class="agenda-item">
+                <span class="number">2</span>
+                <span>Options architecture</span>
+                <span class="time">15 min</span>
+              </div>
+              <div class="agenda-item">
+                <span class="number">3</span>
+                <span>Décision finale</span>
+                <span class="time">10 min</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Decision (distinct block) -->
+        <div class="surface">
+          <div class="meeting-section">
+            <div class="meeting-section-title">Décision</div>
+            <div class="meeting-section-content">
+              Architecture retenue pour la différenciation des espaces cognitifs.
+            </div>
+            <div class="decision-block">
+              <div class="label">✓ Décision validée</div>
+              <div class="text">Implémenter la hiérarchie Dashboard → Bureau → Meeting/Working</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- WORKING SESSION -->
+      <div class="work-zone">
+        <div class="zone-header">
+          <span class="icon">🔧</span>
+          <h2>Working Session</h2>
+          <span class="tag">Produire</span>
+          <span class="meta">En cours • 2h30</span>
+        </div>
+        
+        <!-- Editor (airy, light typography) -->
+        <div class="surface work-editor">
+          <div class="title">Thread: UI Color Canon</div>
+          <div class="content">
+            <p>Exploration des tokens de couleur pour la différenciation Meeting vs Working Session. 
+            L'objectif est de créer une distinction immédiate sans lecture.</p>
+            <p>Le meeting doit donner envie de conclure rapidement, 
+            la working session doit donner envie de rester et construire...</p>
+          </div>
+        </div>
+        
+        <!-- Threads (spacious) -->
+        <div class="work-threads">
+          <div class="work-thread">
+            <span class="icon">📝</span>
+            <div class="content">
+              <div class="title">Notes de recherche</div>
+              <div class="desc">Documentation des patterns cognitifs</div>
+            </div>
+            <span class="status active">Actif</span>
+          </div>
+          <div class="work-thread">
+            <span class="icon">📄</span>
+            <div class="content">
+              <div class="title">Draft tokens CSS</div>
+              <div class="desc">Variables et valeurs candidates</div>
+            </div>
+            <span class="status draft">Draft</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Meeting Types Canon -->
+    <section class="info-section">
+      <h2 class="info-title">
+        <span class="number">📋</span>
+        Types de Meetings (Canon)
+      </h2>
+      
+      <div class="meeting-types">
+        <div class="meeting-type">
+          <div class="icon">🎯</div>
+          <div class="name">Alignment</div>
+          <div class="intention">Aligner les compréhensions</div>
+          <span class="output notes">Notes</span>
+        </div>
+        <div class="meeting-type">
+          <div class="icon">⚖️</div>
+          <div class="name">Decision</div>
+          <div class="intention">Trancher, valider, choisir</div>
+          <span class="output decisions">Décisions</span>
+        </div>
+        <div class="meeting-type">
+          <div class="icon">🔧</div>
+          <div class="name">Working</div>
+          <div class="intention">Travailler en temps réel</div>
+          <span class="output notes">Outputs</span>
+        </div>
+        <div class="meeting-type">
+          <div class="icon">🔄</div>
+          <div class="name">Review</div>
+          <div class="intention">Analyser, améliorer</div>
+          <span class="output notes">Learnings</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rules Section -->
+    <section class="info-section">
+      <h2 class="info-title">
+        <span class="number">1</span>
+        Différences visuelles
+      </h2>
+      
+      <div class="compare-grid">
+        <div class="compare-card meeting">
+          <h3>🤝 Meeting — Table de décision</h3>
+          <ul>
+            <li><span class="check">✓</span> Surfaces plus sombres</li>
+            <li><span class="check">✓</span> Coins stricts (10px)</li>
+            <li><span class="check">✓</span> Sections délimitées</li>
+            <li><span class="check">✓</span> Espacements serrés (12px)</li>
+            <li><span class="check">✓</span> Typographie medium/regular</li>
+            <li><span class="check">✓</span> Aucun glow, aucune animation</li>
+          </ul>
+        </div>
+        
+        <div class="compare-card work">
+          <h3>🔧 Working — Atelier de travail</h3>
+          <ul>
+            <li><span class="check">✓</span> Surfaces +1 cran luminosité</li>
+            <li><span class="check">✓</span> Coins doux (14px)</li>
+            <li><span class="check">✓</span> Moins de séparateurs</li>
+            <li><span class="check">✓</span> Espacements aérés (20px)</li>
+            <li><span class="check">✓</span> Typographie regular/light</li>
+            <li><span class="check">✓</span> Transitions lentes</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tokens Section -->
+    <section class="info-section">
+      <h2 class="info-title">
+        <span class="number">2</span>
+        Tokens CSS
+      </h2>
+      
+      <div class="formula">
+        <h3>🧮 Règle mathématique</h3>
+        <div class="equation">Working = Meeting + 1 cran lum + 1 cran espace − 1 cran structure</div>
+        <div class="note">Si tu vois l'inverse → c'est mauvais</div>
+      </div>
+      
+      <table class="tokens-table">
+        <thead>
+          <tr>
+            <th>Token</th>
+            <th>Meeting</th>
+            <th>Working Session</th>
+            <th>Delta</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Background</td>
+            <td><span class="color-swatch" style="background: #2A3036;"></span><span class="code">#2A3036</span></td>
+            <td><span class="color-swatch" style="background: #2E353D;"></span><span class="code">#2E353D</span></td>
+            <td style="color: var(--text-muted);">Working plus clair</td>
+          </tr>
+          <tr>
+            <td>Surface</td>
+            <td><span class="color-swatch" style="background: #2F363D;"></span><span class="code">#2F363D</span></td>
+            <td><span class="color-swatch" style="background: #353D46;"></span><span class="code">#353D46</span></td>
+            <td style="color: var(--green);">+1 cran luminosité</td>
+          </tr>
+          <tr>
+            <td>Border Radius</td>
+            <td><span class="code">10px</span></td>
+            <td><span class="code">14px</span></td>
+            <td style="color: var(--text-muted);">Working plus doux</td>
+          </tr>
+          <tr>
+            <td>Gap</td>
+            <td><span class="code">12px</span></td>
+            <td><span class="code">20px</span></td>
+            <td style="color: var(--text-muted);">Working respire</td>
+          </tr>
+          <tr>
+            <td>Shadow</td>
+            <td><span class="code">0 6px 16px</span></td>
+            <td><span class="code">0 10px 28px</span></td>
+            <td style="color: var(--text-muted);">Working flotte</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Test Section -->
+    <section class="info-section">
+      <h2 class="info-title">
+        <span class="number">✓</span>
+        Test en 30 secondes
+      </h2>
+      
+      <div class="test-grid">
+        <div class="test-card success">
+          <div class="emoji">🤝</div>
+          <div class="title">Ouvre un Meeting</div>
+          <div class="desc">Envie de conclure rapidement ? → ✅</div>
+        </div>
+        <div class="test-card success">
+          <div class="emoji">🔧</div>
+          <div class="title">Ouvre une Working Session</div>
+          <div class="desc">Envie d'écrire / construire ? → ✅</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Notes vs Decisions -->
+    <section class="info-section">
+      <h2 class="info-title">
+        <span class="number">📝</span>
+        Notes vs Décisions (Séparation stricte)
+      </h2>
+      
+      <div class="compare-grid">
+        <div class="compare-card meeting">
+          <h3>📝 Notes</h3>
+          <ul>
+            <li><span class="check">→</span> Observations</li>
+            <li><span class="check">→</span> Discussions</li>
+            <li><span class="check">→</span> Idées, brouillons</li>
+            <li><span class="check">→</span> Questions ouvertes</li>
+            <li><span class="check">→</span> Évolutives après meeting</li>
+          </ul>
+        </div>
+        
+        <div class="compare-card work">
+          <h3>✓ Décisions</h3>
+          <ul>
+            <li><span class="check">→</span> Choix validés</li>
+            <li><span class="check">→</span> Orientations officielles</li>
+            <li><span class="check">→</span> Règles adoptées</li>
+            <li><span class="check">→</span> Engagements pris</li>
+            <li><span class="check">→</span> Figées après validation</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="formula" style="margin-top: 24px; border-left: 3px solid var(--error);">
+        <h3 style="color: var(--error);">⚠️ Règle absolue</h3>
+        <div class="equation" style="font-size: 16px;">Une décision NE DOIT JAMAIS être noyée dans les notes</div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p><span class="brand">CHE·NU™ V50</span> — Collaboration Space Canon</p>
+      <p style="margin-top: 8px; font-size: 12px;">
+        Sans lire un label: Meeting = "on décide" • Working Session = "on travaille"
+      </p>
+    </footer>
+  </div>
+</body>
+</html>

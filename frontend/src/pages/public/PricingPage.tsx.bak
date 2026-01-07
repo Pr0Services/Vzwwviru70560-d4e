@@ -1,0 +1,472 @@
+/**
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║                    CHE·NU™ — PRICING PAGE                                    ║
+ * ║                    Grille tarifaire officielle                               ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ */
+
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { 
+  Check, X, Brain, Users, Building2, Building, 
+  Sparkles, ChevronRight, HelpCircle 
+} from 'lucide-react';
+
+// Types
+interface PricingTier {
+  id: string;
+  name: string;
+  price: number;
+  billing: string;
+  description: string;
+  queries: string;
+  storage: string;
+  agents: string;
+  spheres: number;
+  users?: string;
+  features: string[];
+  highlighted?: boolean;
+  icon: React.ReactNode;
+}
+
+// Pricing Data
+const individualTiers: PricingTier[] = [
+  {
+    id: 'free',
+    name: 'Découverte',
+    price: 0,
+    billing: 'Gratuit pour toujours',
+    description: 'Parfait pour découvrir CHE·NU',
+    queries: '75 requêtes/mois',
+    storage: '1 GB',
+    agents: '1 agent',
+    spheres: 3,
+    icon: <Sparkles className="w-6 h-6" />,
+    features: [
+      'Accès à Nova (assistant IA)',
+      '3 sphères actives',
+      'Threads de base',
+      'Support communautaire',
+    ],
+  },
+  {
+    id: 'base',
+    name: 'Base',
+    price: 9.99,
+    billing: '/mois',
+    description: 'Pour les particuliers et freelances',
+    queries: '200 requêtes/mois',
+    storage: '5 GB',
+    agents: '3 agents',
+    spheres: 6,
+    icon: <Brain className="w-6 h-6" />,
+    features: [
+      'Tout Découverte +',
+      '6 sphères actives',
+      'Threads illimités',
+      'Export PDF/DOCX',
+      'Intégrations basiques',
+      'Support email',
+    ],
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    price: 39.99,
+    billing: '/mois',
+    description: 'Pour les professionnels exigeants',
+    queries: '1,000 requêtes/mois',
+    storage: '25 GB',
+    agents: '10 agents',
+    spheres: 9,
+    highlighted: true,
+    icon: <Users className="w-6 h-6" />,
+    features: [
+      'Tout Base +',
+      '9 sphères (toutes)',
+      'Meetings AI',
+      'Orchestrateur avancé',
+      'Accès API',
+      'Intégrations complètes',
+      'Support prioritaire',
+    ],
+  },
+];
+
+const enterpriseTiers: PricingTier[] = [
+  {
+    id: 'team',
+    name: 'Team',
+    price: 99,
+    billing: '/mois',
+    description: 'Petites équipes (5-15 users)',
+    queries: '5,000 requêtes/mois',
+    storage: '100 GB',
+    agents: '25 agents',
+    spheres: 9,
+    users: 'Jusqu\'à 15 utilisateurs',
+    icon: <Users className="w-6 h-6" />,
+    features: [
+      'Tout Pro +',
+      '15 utilisateurs inclus',
+      'Admin console basique',
+      'Rapports d\'utilisation',
+      'Partage d\'agents',
+    ],
+  },
+  {
+    id: 'business',
+    name: 'Business',
+    price: 299,
+    billing: '/mois',
+    description: 'PME (15-50 users)',
+    queries: '20,000 requêtes/mois',
+    storage: '500 GB',
+    agents: '100 agents',
+    spheres: 9,
+    users: 'Jusqu\'à 50 utilisateurs',
+    highlighted: true,
+    icon: <Building2 className="w-6 h-6" />,
+    features: [
+      'Tout Team +',
+      '50 utilisateurs inclus',
+      'SSO basique',
+      'Admin console avancée',
+      'Audit logs',
+      'SLA 99.5%',
+      'Account manager',
+    ],
+  },
+  {
+    id: 'enterprise',
+    name: 'Enterprise',
+    price: 599,
+    billing: '/mois',
+    description: 'Grandes entreprises (50-200 users)',
+    queries: '75,000 requêtes/mois',
+    storage: '2 TB',
+    agents: '500 agents',
+    spheres: 9,
+    users: 'Jusqu\'à 200 utilisateurs',
+    icon: <Building className="w-6 h-6" />,
+    features: [
+      'Tout Business +',
+      '200 utilisateurs inclus',
+      'SSO / SAML complet',
+      'API illimitée',
+      'Intégrations custom',
+      'SLA 99.9%',
+      'Support dédié',
+      'Training inclus',
+    ],
+  },
+  {
+    id: 'mega',
+    name: 'Mega Enterprise',
+    price: 999,
+    billing: '/mois',
+    description: 'Méga-entreprises (200+ users)',
+    queries: '200,000 requêtes/mois',
+    storage: '10 TB',
+    agents: 'Illimités',
+    spheres: 9,
+    users: 'Utilisateurs illimités',
+    icon: <Building className="w-6 h-6" />,
+    features: [
+      'Tout Enterprise +',
+      'Utilisateurs illimités',
+      'On-premise disponible',
+      'White-label option',
+      'Custom SLA',
+      'Infrastructure dédiée',
+      'Support 24/7',
+      'Business reviews trimestriels',
+    ],
+  },
+];
+
+// Price Card Component
+const PriceCard: React.FC<{ tier: PricingTier }> = ({ tier }) => {
+  const isHighlighted = tier.highlighted;
+  
+  return (
+    <div className={`
+      relative p-8 rounded-2xl transition-all duration-300
+      ${isHighlighted 
+        ? 'bg-gradient-to-b from-[#D8B26A]/20 to-[#1E1F22] border-2 border-[#D8B26A] scale-105 shadow-2xl shadow-[#D8B26A]/20' 
+        : 'bg-[#1E1F22] border border-[#8D8371]/30 hover:border-[#D8B26A]/50'}
+    `}>
+      {isHighlighted && (
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-[#D8B26A] text-[#1E1F22] text-sm font-bold rounded-full">
+          POPULAIRE
+        </div>
+      )}
+      
+      <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4
+        ${isHighlighted ? 'bg-[#D8B26A]/30 text-[#D8B26A]' : 'bg-[#3F7249]/30 text-[#3EB4A2]'}
+      `}>
+        {tier.icon}
+      </div>
+      
+      <h3 className="text-2xl font-bold text-white mb-2">{tier.name}</h3>
+      <p className="text-[#E9E4D6]/60 text-sm mb-4">{tier.description}</p>
+      
+      <div className="mb-6">
+        {tier.price === 0 ? (
+          <span className="text-4xl font-bold text-[#3EB4A2]">GRATUIT</span>
+        ) : (
+          <>
+            <span className="text-4xl font-bold text-white">${tier.price}</span>
+            <span className="text-[#E9E4D6]/60">{tier.billing}</span>
+          </>
+        )}
+      </div>
+      
+      {/* Key Metrics */}
+      <div className="space-y-3 mb-6 pb-6 border-b border-[#8D8371]/20">
+        <div className="flex justify-between text-sm">
+          <span className="text-[#E9E4D6]/60">Requêtes</span>
+          <span className="text-white font-medium">{tier.queries}</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-[#E9E4D6]/60">Stockage</span>
+          <span className="text-white font-medium">{tier.storage}</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-[#E9E4D6]/60">Agents</span>
+          <span className="text-white font-medium">{tier.agents}</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-[#E9E4D6]/60">Sphères</span>
+          <span className="text-white font-medium">{tier.spheres}</span>
+        </div>
+        {tier.users && (
+          <div className="flex justify-between text-sm">
+            <span className="text-[#E9E4D6]/60">Utilisateurs</span>
+            <span className="text-white font-medium">{tier.users}</span>
+          </div>
+        )}
+      </div>
+      
+      {/* Features */}
+      <ul className="space-y-3 mb-8">
+        {tier.features.map((feature, idx) => (
+          <li key={idx} className="flex items-start gap-3 text-sm">
+            <Check className="w-5 h-5 text-[#3EB4A2] shrink-0 mt-0.5" />
+            <span className="text-[#E9E4D6]/80">{feature}</span>
+          </li>
+        ))}
+      </ul>
+      
+      {/* CTA Button */}
+      <Link
+        to={tier.price === 0 ? '/signup' : `/signup?plan=${tier.id}`}
+        className={`
+          w-full py-3 rounded-xl font-semibold text-center block transition
+          ${isHighlighted 
+            ? 'bg-[#D8B26A] text-[#1E1F22] hover:bg-[#E9E4D6]' 
+            : 'bg-[#3F7249] text-white hover:bg-[#3EB4A2]'}
+        `}
+      >
+        {tier.price === 0 ? 'Commencer gratuitement' : 'Choisir ce plan'}
+      </Link>
+    </div>
+  );
+};
+
+// Main Component
+export const PricingPage: React.FC = () => {
+  const [showAnnual, setShowAnnual] = useState(false);
+  
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#1E1F22] to-[#2F4C39]">
+      {/* Navigation - Same as Landing */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#1E1F22]/90 backdrop-blur-md border-b border-[#D8B26A]/20">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#D8B26A] to-[#7A593A] flex items-center justify-center">
+              <span className="text-white font-bold text-lg">C</span>
+            </div>
+            <span className="text-2xl font-bold text-white">
+              CHE<span className="text-[#D8B26A]">·</span>NU
+            </span>
+          </Link>
+          
+          <div className="flex items-center gap-4">
+            <Link to="/login" className="text-[#E9E4D6] hover:text-[#D8B26A] transition">
+              Connexion
+            </Link>
+            <Link to="/signup" className="px-6 py-2 bg-[#D8B26A] text-[#1E1F22] font-semibold rounded-lg hover:bg-[#E9E4D6] transition">
+              Commencer
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* Header */}
+      <section className="pt-32 pb-12 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-5xl font-bold text-white mb-6">
+            Tarifs simples et transparents
+          </h1>
+          <p className="text-xl text-[#E9E4D6]/70 mb-8">
+            Choisissez le plan qui correspond à vos besoins. 
+            Commencez gratuitement, évoluez quand vous êtes prêt.
+          </p>
+          
+          {/* Toggle Annual/Monthly */}
+          <div className="inline-flex items-center gap-4 p-2 bg-[#1E1F22] rounded-xl">
+            <button
+              onClick={() => setShowAnnual(false)}
+              className={`px-6 py-2 rounded-lg font-medium transition ${
+                !showAnnual ? 'bg-[#D8B26A] text-[#1E1F22]' : 'text-[#E9E4D6]/60 hover:text-white'
+              }`}
+            >
+              Mensuel
+            </button>
+            <button
+              onClick={() => setShowAnnual(true)}
+              className={`px-6 py-2 rounded-lg font-medium transition flex items-center gap-2 ${
+                showAnnual ? 'bg-[#D8B26A] text-[#1E1F22]' : 'text-[#E9E4D6]/60 hover:text-white'
+              }`}
+            >
+              Annuel
+              <span className="text-xs bg-[#3EB4A2] text-white px-2 py-0.5 rounded">-20%</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Individual Plans */}
+      <section className="py-12 px-6">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-2xl font-bold text-white mb-8 text-center">
+            👤 Pour les particuliers
+          </h2>
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {individualTiers.map(tier => (
+              <PriceCard key={tier.id} tier={{
+                ...tier,
+                price: showAnnual && tier.price > 0 ? Math.round(tier.price * 0.8 * 100) / 100 : tier.price,
+                billing: showAnnual && tier.price > 0 ? '/mois (facturé annuellement)' : tier.billing
+              }} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Enterprise Plans */}
+      <section className="py-12 px-6 bg-[#1E1F22]/50">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-2xl font-bold text-white mb-8 text-center">
+            🏢 Pour les entreprises
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {enterpriseTiers.map(tier => (
+              <PriceCard key={tier.id} tier={{
+                ...tier,
+                price: showAnnual ? Math.round(tier.price * 0.8) : tier.price,
+                billing: showAnnual ? '/mois (facturé annuellement)' : tier.billing
+              }} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Comparison Table */}
+      <section className="py-16 px-6">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold text-white mb-8 text-center">
+            Comparer les plans
+          </h2>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-[#8D8371]/30">
+                  <th className="py-4 px-4 text-left text-[#E9E4D6]/60 font-medium">Fonctionnalité</th>
+                  <th className="py-4 px-4 text-center text-[#E9E4D6]">Découverte</th>
+                  <th className="py-4 px-4 text-center text-[#E9E4D6]">Base</th>
+                  <th className="py-4 px-4 text-center text-[#D8B26A]">Pro</th>
+                  <th className="py-4 px-4 text-center text-[#E9E4D6]">Enterprise</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  ['Prix', 'Gratuit', '$9.99', '$39.99', '$99-999'],
+                  ['Requêtes/mois', '75', '200', '1,000', '5K-200K'],
+                  ['Sphères', '3', '6', '9', '9'],
+                  ['Agents', '1', '3', '10', '25-∞'],
+                  ['Nova (Assistant)', true, true, true, true],
+                  ['Threads persistants', 'Limité', true, true, true],
+                  ['Export documents', false, true, true, true],
+                  ['Meetings AI', false, false, true, true],
+                  ['Accès API', false, false, true, true],
+                  ['SSO / SAML', false, false, false, true],
+                  ['Support dédié', false, false, false, true],
+                ].map((row, idx) => (
+                  <tr key={idx} className="border-b border-[#8D8371]/20">
+                    <td className="py-4 px-4 text-[#E9E4D6]">{row[0]}</td>
+                    {row.slice(1).map((cell, cellIdx) => (
+                      <td key={cellIdx} className="py-4 px-4 text-center">
+                        {typeof cell === 'boolean' ? (
+                          cell ? (
+                            <Check className="w-5 h-5 text-[#3EB4A2] mx-auto" />
+                          ) : (
+                            <X className="w-5 h-5 text-[#8D8371]/50 mx-auto" />
+                          )
+                        ) : (
+                          <span className={cellIdx === 2 ? 'text-[#D8B26A] font-medium' : 'text-[#E9E4D6]/80'}>
+                            {cell}
+                          </span>
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Preview */}
+      <section className="py-16 px-6 bg-[#1E1F22]">
+        <div className="max-w-3xl mx-auto text-center">
+          <HelpCircle className="w-12 h-12 text-[#D8B26A] mx-auto mb-6" />
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Des questions?
+          </h2>
+          <p className="text-[#E9E4D6]/70 mb-8">
+            Consultez notre FAQ ou contactez notre équipe.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              to="/faq"
+              className="px-8 py-3 bg-[#3F7249] text-white font-semibold rounded-xl hover:bg-[#3EB4A2] transition"
+            >
+              Voir la FAQ
+            </Link>
+            <Link
+              to="/contact"
+              className="px-8 py-3 border border-[#D8B26A] text-[#D8B26A] font-semibold rounded-xl hover:bg-[#D8B26A]/10 transition"
+            >
+              Nous contacter
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 px-6 bg-[#1E1F22] border-t border-[#D8B26A]/20">
+        <div className="max-w-7xl mx-auto text-center">
+          <p className="text-[#E9E4D6]/40 text-sm">
+            © 2025 CHE·NU™. Tous droits réservés. | Gouvernance {'>'} Exécution
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default PricingPage;

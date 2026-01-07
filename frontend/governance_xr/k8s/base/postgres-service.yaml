@@ -1,0 +1,22 @@
+# ============================================================================
+# CHE·NU PostgreSQL Service
+# ============================================================================
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: chenu
+  labels:
+    app: postgres
+    component: database
+spec:
+  type: ClusterIP
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres
+      protocol: TCP
+  selector:
+    app: postgres
+  clusterIP: None  # Headless service for StatefulSet

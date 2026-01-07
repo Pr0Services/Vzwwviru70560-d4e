@@ -1,0 +1,33 @@
+{
+  "version": "75.0",
+  "codename": "CANON COMPLETE",
+  "date": "2026-01-07",
+  "status": "PRODUCTION_READY",
+  "previous_version": "71.0",
+  "statistics": {
+    "total_python_files": 468,
+    "total_typescript_files": 2666,
+    "total_documentation_files": 329,
+    "total_verticals": 14,
+    "total_v75_modules": 5
+  },
+  "v75_modules": [
+    "StagiaireEngine",
+    "ProfesseurEngine",
+    "CanonEngine",
+    "CatalogEngine",
+    "ScenarioLockEngine"
+  ],
+  "verticals": [
+    "BUSINESS_CRM_V68", "COMMUNITY_V68", "COMPLIANCE_V68", "CONSTRUCTION_V68",
+    "CREATIVE_STUDIO_V68", "EDUCATION_V68", "ENTERTAINMENT_V68", "HR_V68",
+    "MARKETING_V68", "PERSONAL_PRODUCTIVITY_V68", "PROJECT_MGMT_V68",
+    "REAL_ESTATE_V68", "SOCIAL_V68", "TEAM_COLLAB_V68"
+  ],
+  "governance": {
+    "rd_rules": 7,
+    "golden_flows": ["GF-1", "GF-2", "GF-3"],
+    "checkpoint": "HTTP_423",
+    "identity_boundary": "HTTP_403"
+  }
+}

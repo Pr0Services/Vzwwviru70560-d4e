@@ -1,0 +1,335 @@
+// ═══════════════════════════════════════════════════════════════════════════════
+// CHE·NU — AGENT INBOX SYSTEM
+// Prisma Schema - Database Layer
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// =============================================================================
+// ENUMS
+// =============================================================================
+
+enum SenderType {
+  USER
+  AGENT
+  SYSTEM
+}
+
+enum MessageType {
+  TASK
+  NOTE
+  COMMENT
+  QUESTION
+  DECISION
+  VOICE_TRANSCRIPT
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  CRITICAL
+}
+
+enum MessageStatus {
+  NEW
+  READ
+  ACKNOWLEDGED
+  ARCHIVED
+}
+
+enum TaskType {
+  EXECUTE
+  ANALYZE
+  REVIEW
+  DECIDE
+  RESEARCH
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  BLOCKED
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskUpdateType {
+  STATUS_CHANGE
+  COMMENT
+  RESULT
+  BLOCKER
+}
+
+// =============================================================================
+// AGENT INBOX
+// =============================================================================
+
+/// Every agent has exactly ONE inbox per sphere
+model AgentInbox {
+  id              String    @id @default(uuid())
+  sphereId        String    @map("sphere_id")
+  agentId         String    @map("agent_id")
+  
+  // Cached counts for UI performance
+  unreadCount     Int       @default(0) @map("unread_count")
+  pendingTaskCount Int      @default(0) @map("pending_task_count")
+  
+  // State
+  lastActivityAt  DateTime  @default(now()) @map("last_activity_at")
+  isMuted         Boolean   @default(false) @map("is_muted")
+  
+  // Timestamps
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  
+  // Relations
+  sphere          Sphere    @relation(fields: [sphereId], references: [id])
+  agent           AgentInstance @relation(fields: [agentId], references: [id])
+  messages        InboxMessage[]
+  
+  // Constraints
+  @@unique([sphereId, agentId])
+  @@index([agentId])
+  @@index([lastActivityAt])
+  @@map("agent_inboxes")
+}
+
+// =============================================================================
+// INBOX MESSAGE
+// =============================================================================
+
+/// All communication flows through messages
+model InboxMessage {
+  id                      String        @id @default(uuid())
+  inboxId                 String        @map("inbox_id")
+  
+  // Sender identification
+  senderType              SenderType    @map("sender_type")
+  senderId                String        @map("sender_id")
+  
+  // Classification
+  messageType             MessageType   @map("message_type")
+  priority                Priority      @default(NORMAL)
+  
+  // Content
+  contentText             String        @map("content_text") @db.Text
+  contentSummary          String?       @map("content_summary") @db.Text
+  
+  // Voice-specific fields
+  voiceFileRef            String?       @map("voice_file_ref")
+  transcriptionConfidence Float?        @map("transcription_confidence")
+  requiresConfirmation    Boolean       @default(false) @map("requires_confirmation")
+  confirmedAt             DateTime?     @map("confirmed_at")
+  confirmedBy             String?       @map("confirmed_by")
+  
+  // Relations to other entities
+  relatedTaskId           String?       @map("related_task_id")
+  relatedDecisionId       String?       @map("related_decision_id")
+  
+  // Threading
+  parentMessageId         String?       @map("parent_message_id")
+  threadId                String?       @map("thread_id")
+  
+  // Status tracking
+  status                  MessageStatus @default(NEW)
+  acknowledgedAt          DateTime?     @map("acknowledged_at")
+  acknowledgedBy          String?       @map("acknowledged_by")
+  
+  // Timestamps
+  createdAt               DateTime      @default(now()) @map("created_at")
+  updatedAt               DateTime      @updatedAt @map("updated_at")
+  archivedAt              DateTime?     @map("archived_at")
+  
+  // Relations
+  inbox                   AgentInbox    @relation(fields: [inboxId], references: [id])
+  relatedTask             Task?         @relation(fields: [relatedTaskId], references: [id])
+  parentMessage           InboxMessage? @relation("MessageThread", fields: [parentMessageId], references: [id])
+  replies                 InboxMessage[] @relation("MessageThread")
+  
+  // Indexes
+  @@index([inboxId, status])
+  @@index([inboxId, createdAt])
+  @@index([messageType])
+  @@index([priority])
+  @@index([threadId])
+  @@index([relatedTaskId])
+  @@map("inbox_messages")
+}
+
+// =============================================================================
+// TASK
+// =============================================================================
+
+/// Actionable work items assigned to agents
+model Task {
+  id                String      @id @default(uuid())
+  sphereId          String      @map("sphere_id")
+  
+  // Assignment
+  assignedAgentId   String      @map("assigned_agent_id")
+  createdByType     SenderType  @map("created_by_type")
+  createdById       String      @map("created_by_id")
+  
+  // Content
+  title             String      @db.VarChar(255)
+  description       String      @db.Text
+  
+  // Classification
+  taskType          TaskType    @map("task_type")
+  priority          Priority    @default(NORMAL)
+  
+  // Status
+  status            TaskStatus  @default(PENDING)
+  blockedReason     String?     @map("blocked_reason") @db.Text
+  
+  // Result
+  result            String?     @db.Text
+  resultArtifacts   Json?       @map("result_artifacts")
+  
+  // Timing
+  dueAt             DateTime?   @map("due_at")
+  startedAt         DateTime?   @map("started_at")
+  completedAt       DateTime?   @map("completed_at")
+  
+  // Timestamps
+  createdAt         DateTime    @default(now()) @map("created_at")
+  updatedAt         DateTime    @updatedAt @map("updated_at")
+  archivedAt        DateTime?   @map("archived_at")
+  
+  // Relations
+  sphere            Sphere      @relation(fields: [sphereId], references: [id])
+  assignedAgent     AgentInstance @relation(fields: [assignedAgentId], references: [id])
+  updates           TaskUpdate[]
+  messages          InboxMessage[]
+  sourceMessage     InboxMessage? @relation("TaskSourceMessage")
+  
+  // Indexes
+  @@index([sphereId])
+  @@index([assignedAgentId])
+  @@index([status])
+  @@index([priority])
+  @@index([dueAt])
+  @@index([createdAt])
+  @@map("tasks")
+}
+
+// =============================================================================
+// TASK UPDATE
+// =============================================================================
+
+/// Audit trail for all task changes
+model TaskUpdate {
+  id          String          @id @default(uuid())
+  taskId      String          @map("task_id")
+  
+  // Actor
+  actorType   SenderType      @map("actor_type")
+  actorId     String          @map("actor_id")
+  
+  // Change details
+  updateType  TaskUpdateType  @map("update_type")
+  content     String          @db.Text
+  
+  // For status changes
+  previousStatus TaskStatus?  @map("previous_status")
+  newStatus      TaskStatus?  @map("new_status")
+  
+  // Metadata
+  metadata    Json?
+  
+  // Timestamp
+  createdAt   DateTime        @default(now()) @map("created_at")
+  
+  // Relations
+  task        Task            @relation(fields: [taskId], references: [id])
+  
+  // Indexes
+  @@index([taskId])
+  @@index([createdAt])
+  @@index([updateType])
+  @@map("task_updates")
+}
+
+// =============================================================================
+// VOICE RECORDING (Temporary storage)
+// =============================================================================
+
+/// Temporary storage for voice recordings before confirmation
+model VoiceRecording {
+  id                      String    @id @default(uuid())
+  
+  // Recording details
+  userId                  String    @map("user_id")
+  targetAgentId           String    @map("target_agent_id")
+  
+  // Audio
+  audioFileRef            String    @map("audio_file_ref")
+  durationSeconds         Float     @map("duration_seconds")
+  
+  // Transcription
+  rawTranscript           String?   @map("raw_transcript") @db.Text
+  cleanedTranscript       String?   @map("cleaned_transcript") @db.Text
+  summary                 String?   @db.Text
+  transcriptionConfidence Float?    @map("transcription_confidence")
+  
+  // AI Analysis
+  detectedMessageType     MessageType? @map("detected_message_type")
+  detectedPriority        Priority?    @map("detected_priority")
+  extractedEntities       Json?        @map("extracted_entities")
+  
+  // Status
+  status                  String    @default("PENDING") // PENDING | TRANSCRIBED | CONFIRMED | CANCELLED | EXPIRED
+  
+  // Confirmation
+  confirmedAt             DateTime? @map("confirmed_at")
+  resultMessageId         String?   @map("result_message_id")
+  
+  // Timestamps
+  createdAt               DateTime  @default(now()) @map("created_at")
+  expiresAt               DateTime  @map("expires_at") // 90 days from creation
+  
+  // Indexes
+  @@index([userId])
+  @@index([targetAgentId])
+  @@index([status])
+  @@index([expiresAt])
+  @@map("voice_recordings")
+}
+
+// =============================================================================
+// AUDIT LOG
+// =============================================================================
+
+/// Complete audit trail for all inbox operations
+model InboxAuditLog {
+  id          String    @id @default(uuid())
+  
+  // What happened
+  action      String    // MESSAGE_CREATED | MESSAGE_READ | MESSAGE_ACKNOWLEDGED | 
+                        // TASK_CREATED | TASK_UPDATED | VOICE_RECORDED | VOICE_CONFIRMED
+  
+  // Who did it
+  actorType   SenderType @map("actor_type")
+  actorId     String     @map("actor_id")
+  
+  // What was affected
+  entityType  String     @map("entity_type") // INBOX | MESSAGE | TASK | VOICE
+  entityId    String     @map("entity_id")
+  
+  // Details
+  details     Json?
+  
+  // Context
+  sphereId    String?    @map("sphere_id")
+  agentId     String?    @map("agent_id")
+  
+  // Timestamp
+  createdAt   DateTime   @default(now()) @map("created_at")
+  
+  // Indexes
+  @@index([entityType, entityId])
+  @@index([actorType, actorId])
+  @@index([action])
+  @@index([createdAt])
+  @@index([sphereId])
+  @@map("inbox_audit_logs")
+}

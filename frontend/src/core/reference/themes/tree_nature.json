@@ -1,0 +1,96 @@
+{
+  "$schema": "chenu://theme/v1",
+  "id": "tree_nature",
+  "name": "Tree of Nature",
+  "mode": "dark",
+  
+  "colors": {
+    "background": "#0A0E0A",
+    "surface": "#121812",
+    "surfaceHover": "#1A241A",
+    "border": "#2A3A2A",
+    "borderLight": "#3A4A3A",
+    
+    "text": "#E8F0E8",
+    "textSecondary": "#B8C8B8",
+    "textMuted": "#788878",
+    
+    "primary": "#4A7C4A",
+    "primaryHover": "#5A8C5A",
+    "secondary": "#D8B26A",
+    "secondaryHover": "#E8C27A",
+    "accent": "#6B8E6B",
+    
+    "success": "#4CAF50",
+    "warning": "#FFA726",
+    "error": "#EF5350",
+    "info": "#42A5F5"
+  },
+  
+  "typography": {
+    "fontFamily": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+    "fontFamilyMono": "'JetBrains Mono', monospace",
+    "fontSizes": {
+      "xs": "0.75rem",
+      "sm": "0.875rem",
+      "md": "1rem",
+      "lg": "1.125rem",
+      "xl": "1.25rem",
+      "2xl": "1.5rem",
+      "3xl": "2rem"
+    },
+    "fontWeights": {
+      "normal": 400,
+      "medium": 500,
+      "bold": 700
+    },
+    "lineHeights": {
+      "tight": 1.25,
+      "normal": 1.5,
+      "relaxed": 1.75
+    }
+  },
+  
+  "spacing": {
+    "unit": 4,
+    "scale": {
+      "xs": 4,
+      "sm": 8,
+      "md": 16,
+      "lg": 24,
+      "xl": 32,
+      "2xl": 48
+    }
+  },
+  
+  "radius": {
+    "none": "0",
+    "sm": "4px",
+    "md": "8px",
+    "lg": "12px",
+    "xl": "16px",
+    "full": "9999px"
+  },
+  
+  "shadows": {
+    "none": "none",
+    "sm": "0 1px 2px rgba(0, 0, 0, 0.3)",
+    "md": "0 4px 6px rgba(0, 0, 0, 0.4)",
+    "lg": "0 10px 15px rgba(0, 0, 0, 0.5)",
+    "xl": "0 20px 25px rgba(0, 0, 0, 0.6)",
+    "glow": "0 0 20px rgba(74, 124, 74, 0.4)"
+  },
+  
+  "animations": {
+    "durations": {
+      "fast": 150,
+      "normal": 300,
+      "slow": 500
+    },
+    "easings": {
+      "default": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "bounce": "cubic-bezier(0.68, -0.55, 0.265, 1.55)",
+      "smooth": "cubic-bezier(0.4, 0, 0.6, 1)"
+    }
+  }
+}

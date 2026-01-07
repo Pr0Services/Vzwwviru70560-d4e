@@ -1,0 +1,266 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+ * CHE·NU — DESIGN TOKENS (CSS CUSTOM PROPERTIES)
+ * CANONICAL DESIGN SYSTEM
+ * 
+ * Usage:
+ *   Import at root level: @import 'design-tokens.css';
+ *   Use variables: var(--color-bg-primary)
+ * ═══════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ═══════════════════════════════════════════════════════════════════════════
+   * COLOR SYSTEM
+   * ═══════════════════════════════════════════════════════════════════════════ */
+
+  /* Background Colors (neutral, low contrast) */
+  --color-bg-primary: #0F1216;
+  --color-bg-secondary: #151A21;
+  --color-bg-elevated: #1B2230;
+  --color-bg-hover: #232B3A;
+  --color-bg-active: #2A3447;
+
+  /* Text Colors */
+  --color-text-primary: #E6EAF0;
+  --color-text-secondary: #AEB6C3;
+  --color-text-muted: #7A8496;
+  --color-text-disabled: #525B6B;
+
+  /* Accent Colors (use sparingly - ONE per screen max) */
+  --color-accent-focus: #5DA9FF;
+  --color-accent-focus-hover: #7DBBFF;
+  --color-accent-focus-active: #4D99EF;
+  
+  --color-accent-success: #4CAF88;
+  --color-accent-success-hover: #5CC09A;
+  --color-accent-success-active: #3C9F78;
+  
+  --color-accent-warning: #F5C26B;
+  --color-accent-warning-hover: #F7CE85;
+  --color-accent-warning-active: #E5B25B;
+  
+  --color-accent-danger: #E06C75;
+  --color-accent-danger-hover: #E88088;
+  --color-accent-danger-active: #D05C65;
+
+  /* Border Colors */
+  --color-border-subtle: rgba(255, 255, 255, 0.06);
+  --color-border-default: rgba(255, 255, 255, 0.1);
+  --color-border-strong: rgba(255, 255, 255, 0.15);
+  --color-border-focus: var(--color-accent-focus);
+
+  /* Shadow (for elevation) */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.6);
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+   * TYPOGRAPHY
+   * ═══════════════════════════════════════════════════════════════════════════ */
+
+  /* Font Family */
+  --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+
+  /* Font Sizes */
+  --font-size-title: 1.375rem;      /* 22px */
+  --font-size-section: 1.0625rem;   /* 17px */
+  --font-size-body: 0.9375rem;      /* 15px */
+  --font-size-metadata: 0.8125rem;  /* 13px */
+  --font-size-micro: 0.6875rem;     /* 11px */
+
+  /* Font Weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.45;
+  --line-height-relaxed: 1.6;
+
+  /* Letter Spacing */
+  --letter-spacing-tight: -0.01em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+   * SPACING
+   * Base unit: 8px
+   * ═══════════════════════════════════════════════════════════════════════════ */
+
+  --space-unit: 8px;
+  
+  --space-xs: 4px;   /* 0.5 units */
+  --space-s: 8px;    /* 1 unit */
+  --space-m: 16px;   /* 2 units */
+  --space-l: 24px;   /* 3 units */
+  --space-xl: 32px;  /* 4 units */
+  --space-2xl: 48px; /* 6 units */
+  --space-3xl: 64px; /* 8 units */
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+   * BORDER RADIUS
+   * ═══════════════════════════════════════════════════════════════════════════ */
+
+  --radius-xs: 4px;
+  --radius-s: 6px;
+  --radius-m: 8px;
+  --radius-l: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-full: 9999px;
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+   * ANIMATION & MOTION
+   * ═══════════════════════════════════════════════════════════════════════════ */
+
+  /* Duration */
+  --duration-instant: 50ms;
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+  --duration-slower: 400ms;
+  --duration-slowest: 600ms;
+
+  /* Easing */
+  --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-in: cubic-bezier(0.32, 0, 0.67, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-linear: linear;
+
+  /* Transitions */
+  --transition-fast: var(--duration-fast) var(--ease-out);
+  --transition-normal: var(--duration-normal) var(--ease-out);
+  --transition-slow: var(--duration-slow) var(--ease-out);
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+   * Z-INDEX SCALE
+   * ═══════════════════════════════════════════════════════════════════════════ */
+
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-modal-backdrop: 400;
+  --z-modal: 500;
+  --z-popover: 600;
+  --z-tooltip: 700;
+  --z-toast: 800;
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+   * COMPONENT TOKENS
+   * ═══════════════════════════════════════════════════════════════════════════ */
+
+  /* Button */
+  --btn-padding-x: var(--space-m);
+  --btn-padding-y: var(--space-s);
+  --btn-radius: var(--radius-m);
+  --btn-font-size: var(--font-size-body);
+  --btn-font-weight: var(--font-weight-medium);
+
+  /* Card */
+  --card-padding: var(--space-m);
+  --card-radius: var(--radius-xl);
+  --card-bg: var(--color-bg-secondary);
+  --card-border: var(--color-border-subtle);
+
+  /* Input */
+  --input-padding-x: var(--space-m);
+  --input-padding-y: var(--space-s);
+  --input-radius: var(--radius-m);
+  --input-bg: var(--color-bg-primary);
+  --input-border: var(--color-border-default);
+  --input-focus-border: var(--color-accent-focus);
+
+  /* Panel */
+  --panel-padding: var(--space-l);
+  --panel-radius: var(--radius-xl);
+  --panel-shadow: var(--shadow-md);
+
+  /* Sidebar */
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 64px;
+
+  /* Topbar */
+  --topbar-height: 56px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+ * DARK MODE (default)
+ * Already dark by default. Light mode tokens for future reference.
+ * ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* @media (prefers-color-scheme: light) {
+  :root {
+    --color-bg-primary: #FAFBFC;
+    --color-bg-secondary: #F3F4F6;
+    --color-bg-elevated: #FFFFFF;
+    --color-text-primary: #1A1A1A;
+    --color-text-secondary: #525252;
+    --color-text-muted: #737373;
+  }
+} */
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+ * ACCESSIBILITY: Reduced Motion
+ * ═══════════════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-instant: 0ms;
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+    --duration-slow: 0ms;
+    --duration-slower: 0ms;
+    --duration-slowest: 0ms;
+  }
+  
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+ * BASE STYLES
+ * ═══════════════════════════════════════════════════════════════════════════════ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
+}
+
+/* Focus visible for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--color-accent-focus);
+  outline-offset: 2px;
+}
+
+/* Selection */
+::selection {
+  background-color: rgba(93, 169, 255, 0.3);
+  color: var(--color-text-primary);
+}

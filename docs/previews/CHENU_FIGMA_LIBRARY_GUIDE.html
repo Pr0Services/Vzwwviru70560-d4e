@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHE·NU™ — Figma Library Creation Guide</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-root: #1F2429;
+      --bg-dashboard: #242A30;
+      --surface-dashboard: #2A3138;
+      --surface-collaboration: #2D343C;
+      --surface-focus: #39424A;
+      
+      --text-primary: #E2E5E8;
+      --text-secondary: #B5BBC2;
+      --text-muted: #8E949B;
+      
+      --accent-soft: rgba(191,174,122,0.35);
+      --border-subtle: rgba(255,255,255,0.04);
+      
+      --gold: #BFAE7A;
+      --cyan: #6EAFC4;
+      --green: #6FAF9A;
+      --red: #C47070;
+      
+      --font-primary: 'Inter', system-ui, sans-serif;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: var(--font-primary);
+      font-size: 14px;
+      line-height: 1.6;
+      background: linear-gradient(180deg, #181C20, var(--bg-root));
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+    
+    .container { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+    
+    .header { text-align: center; margin-bottom: 48px; }
+    .header h1 { font-size: 22px; font-weight: 500; color: var(--gold); margin-bottom: 8px; }
+    .header .subtitle { font-size: 16px; color: var(--text-secondary); margin-bottom: 16px; }
+    .header .badge {
+      display: inline-block;
+      padding: 6px 16px;
+      background-color: rgba(111, 175, 154, 0.15);
+      border: 1px solid rgba(111, 175, 154, 0.3);
+      border-radius: 20px;
+      font-size: 12px;
+      color: var(--green);
+      font-weight: 500;
+    }
+    
+    .section { margin-bottom: 40px; }
+    .section-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* Pages List */
+    .pages-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    
+    @media (max-width: 768px) {
+      .pages-list { grid-template-columns: 1fr; }
+    }
+    
+    .page-item {
+      background-color: var(--surface-dashboard);
+      border-radius: 8px;
+      padding: 12px 16px;
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .page-item .num {
+      font-size: 11px;
+      color: var(--cyan);
+      background-color: rgba(110, 175, 196, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    
+    .page-item .name {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    
+    /* Color Styles */
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+    }
+    
+    .color-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background-color: var(--surface-dashboard);
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+    }
+    
+    .color-swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.1);
+      flex-shrink: 0;
+    }
+    
+    .color-info {
+      flex: 1;
+    }
+    
+    .color-info .name {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+    
+    .color-info .value {
+      font-size: 10px;
+      font-family: monospace;
+      color: var(--text-muted);
+    }
+    
+    /* Typography Styles */
+    .typo-table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: var(--surface-dashboard);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    .typo-table th,
+    .typo-table td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    
+    .typo-table th {
+      background-color: var(--surface-focus);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+    
+    .typo-table td {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    
+    .typo-table tr:last-child td { border-bottom: none; }
+    
+    .style-name {
+      font-size: 12px;
+      color: var(--gold);
+      background-color: rgba(191, 174, 122, 0.1);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    
+    /* Components List */
+    .components-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    
+    @media (max-width: 600px) {
+      .components-grid { grid-template-columns: 1fr; }
+    }
+    
+    .component-group {
+      background-color: var(--surface-dashboard);
+      border-radius: 10px;
+      padding: 16px;
+      border: 1px solid var(--border-subtle);
+    }
+    
+    .component-group h4 {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--cyan);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+    
+    .component-group ul {
+      list-style: none;
+    }
+    
+    .component-group li {
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .component-group li::before {
+      content: '→';
+      color: var(--text-muted);
+    }
+    
+    /* Do & Don't */
+    .dodont-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    
+    @media (max-width: 600px) {
+      .dodont-grid { grid-template-columns: 1fr; }
+    }
+    
+    .dodont-card {
+      padding: 16px;
+      border-radius: 10px;
+      border: 1px solid;
+    }
+    
+    .dodont-card.dont {
+      background-color: rgba(196, 112, 112, 0.08);
+      border-color: rgba(196, 112, 112, 0.2);
+    }
+    
+    .dodont-card.do {
+      background-color: rgba(111, 175, 154, 0.08);
+      border-color: rgba(111, 175, 154, 0.2);
+    }
+    
+    .dodont-card h5 {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .dodont-card.dont h5 { color: var(--red); }
+    .dodont-card.do h5 { color: var(--green); }
+    
+    .dodont-card ul { list-style: none; }
+    .dodont-card li {
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding: 3px 0;
+    }
+    
+    /* Checklist */
+    .checklist {
+      background-color: var(--surface-dashboard);
+      border-radius: 10px;
+      padding: 16px;
+      border: 1px solid var(--border-subtle);
+    }
+    
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    
+    .checkbox {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--text-muted);
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    
+    /* Rules */
+    .rules-card {
+      background-color: rgba(191, 174, 122, 0.08);
+      border: 1px solid rgba(191, 174, 122, 0.2);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    
+    .rules-card h5 {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+    
+    .rules-card p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    
+    .rules-card code {
+      font-family: monospace;
+      font-size: 11px;
+      background-color: rgba(0,0,0,0.2);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--cyan);
+    }
+    
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 32px 0;
+      border-top: 1px solid var(--border-subtle);
+      margin-top: 40px;
+    }
+    
+    .footer p { font-size: 13px; color: var(--text-muted); }
+    .footer .brand { color: var(--gold); font-weight: 500; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>✧ CHE·NU™ Figma Library Guide</h1>
+      <p class="subtitle">Design Kit v4 — Creation Procedure</p>
+      <span class="badge">FINAL — DO NOT MODIFY</span>
+    </header>
+
+    <!-- Checklist -->
+    <section class="section">
+      <h2 class="section-title">📋 Checklist Rapide</h2>
+      <div class="checklist">
+        <div class="checklist-item"><span class="checkbox"></span> Fichier Figma créé avec 9 pages</div>
+        <div class="checklist-item"><span class="checkbox"></span> 14 Color Styles créés</div>
+        <div class="checklist-item"><span class="checkbox"></span> 5 Text Styles créés</div>
+        <div class="checklist-item"><span class="checkbox"></span> Spacing Scale documentée</div>
+        <div class="checklist-item"><span class="checkbox"></span> Core Components publiés</div>
+        <div class="checklist-item"><span class="checkbox"></span> Specialized Components publiés</div>
+        <div class="checklist-item"><span class="checkbox"></span> Agent UI Components publiés</div>
+        <div class="checklist-item"><span class="checkbox"></span> Page Do & Don't complète</div>
+        <div class="checklist-item"><span class="checkbox"></span> Library publiée</div>
+      </div>
+    </section>
+
+    <!-- Pages -->
+    <section class="section">
+      <h2 class="section-title">🧱 Pages Figma</h2>
+      <div class="pages-list">
+        <div class="page-item"><span class="num">01</span><span class="name">Foundations</span></div>
+        <div class="page-item"><span class="num">02</span><span class="name">Typography</span></div>
+        <div class="page-item"><span class="num">03</span><span class="name">Colors</span></div>
+        <div class="page-item"><span class="num">04</span><span class="name">Spacing & Radius</span></div>
+        <div class="page-item"><span class="num">05</span><span class="name">Core Components</span></div>
+        <div class="page-item"><span class="num">06</span><span class="name">Specialized Components</span></div>
+        <div class="page-item"><span class="num">07</span><span class="name">Agent UI</span></div>
+        <div class="page-item"><span class="num">08</span><span class="name">Layouts</span></div>
+        <div class="page-item"><span class="num">09</span><span class="name">Do & Dont</span></div>
+      </div>
+    </section>
+
+    <!-- Colors -->
+    <section class="section">
+      <h2 class="section-title">🎨 Color Styles (14 styles)</h2>
+      <div class="color-grid">
+        <div class="color-item">
+          <div class="color-swatch" style="background: #1F2429;"></div>
+          <div class="color-info"><div class="name">BG / Root</div><div class="value">#1F2429</div></div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background: #242A30;"></div>
+          <div class="color-info"><div class="name">BG / Dashboard</div><div class="value">#242A30</div></div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background: #20262C;"></div>
+          <div class="color-info"><div class="name">BG / Collaboration</div><div class="value">#20262C</div></div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background: #2A3138;"></div>
+          <div class="color-info"><div class="name">Surface / Dashboard</div><div class="value">#2A3138</div></div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background: #2D343C;"></div>
+          <div class="color-info"><div class="name">Surface / Collaboration</div><div class="value">#2D343C</div></div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background: #323A42;"></div>
+          <div class="color-info"><div class="name">Surface / Workspace</div><div class="value">#323A42</div></div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background: #39424A;"></div>
+          <div class="color-info"><div class="name">Surface / Focus</div><div class="value">#39424A</div></div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background: #E2E5E8;"></div>
+          <div class="color-info"><div class="name">Text / Primary</div><div class="value">#E2E5E8</div></div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background: #B5BBC2;"></div>
+          <div class="color-info"><div class="name">Text / Secondary</div><div class="value">#B5BBC2</div></div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background: #8E949B;"></div>
+          <div class="color-info"><div class="name">Text / Muted</div><div class="value">#8E949B</div></div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background: rgba(191,174,122,0.35);"></div>
+          <div class="color-info"><div class="name">Accent / Soft</div><div class="value">rgba(191,174,122,0.35)</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Typography -->
+    <section class="section">
+      <h2 class="section-title">✍️ Text Styles (5 styles)</h2>
+      <table class="typo-table">
+        <thead>
+          <tr>
+            <th>Figma Style</th>
+            <th>Size</th>
+            <th>Weight</th>
+            <th>Line Height</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="style-name">Title / XL</span></td>
+            <td>22px</td>
+            <td>Medium (500)</td>
+            <td>1.3</td>
+          </tr>
+          <tr>
+            <td><span class="style-name">Title / Base</span></td>
+            <td>18px</td>
+            <td>Medium (500)</td>
+            <td>1.35</td>
+          </tr>
+          <tr>
+            <td><span class="style-name">Section</span></td>
+            <td>16px</td>
+            <td>Medium (500)</td>
+            <td>1.4</td>
+          </tr>
+          <tr>
+            <td><span class="style-name">Body / Base</span></td>
+            <td>14px</td>
+            <td>Regular (400)</td>
+            <td>1.6</td>
+          </tr>
+          <tr>
+            <td><span class="style-name">Meta</span></td>
+            <td>12px</td>
+            <td>Regular (400)</td>
+            <td>1.45</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Components -->
+    <section class="section">
+      <h2 class="section-title">🧩 Components</h2>
+      <div class="components-grid">
+        <div class="component-group">
+          <h4>Core Components</h4>
+          <ul>
+            <li>Button / Primary (rare)</li>
+            <li>Button / Secondary</li>
+            <li>Button / Ghost</li>
+            <li>Surface / Card</li>
+            <li>Surface / Section</li>
+            <li>List / Vertical</li>
+            <li>Modal / Confirmation</li>
+          </ul>
+        </div>
+        <div class="component-group">
+          <h4>Specialized Components</h4>
+          <ul>
+            <li>Decision Block</li>
+            <li>Decision Timeline Item</li>
+            <li>Topic List Item</li>
+            <li>Impact Map Node</li>
+            <li>Meeting Template Section</li>
+          </ul>
+        </div>
+        <div class="component-group">
+          <h4>Agent UI Components</h4>
+          <ul>
+            <li>Agent Message Block</li>
+            <li>Agent Suggestion</li>
+            <li>Agent Indicator</li>
+          </ul>
+        </div>
+        <div class="component-group">
+          <h4>Component States</h4>
+          <ul>
+            <li>Default ✓</li>
+            <li>Hover ✓</li>
+            <li>Disabled ✓</li>
+            <li>Read-only (si applicable)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Do & Don't -->
+    <section class="section">
+      <h2 class="section-title">🚫 Do & Don't</h2>
+      <div class="dodont-grid">
+        <div class="dodont-card dont">
+          <h5>❌ DON'T</h5>
+          <ul>
+            <li>Trop de badges</li>
+            <li>Contraste excessif</li>
+            <li>Agent trop visible</li>
+            <li>Bold généralisé</li>
+            <li>Couleurs custom</li>
+            <li>Spacing manuel</li>
+            <li>Modal agent</li>
+            <li>Animation agent</li>
+            <li>Border-left décision</li>
+          </ul>
+        </div>
+        <div class="dodont-card do">
+          <h5>✅ DO</h5>
+          <ul>
+            <li>Texte simple</li>
+            <li>Contraste subtil</li>
+            <li>Agent discret</li>
+            <li>Poids via styles</li>
+            <li>Couleurs du système</li>
+            <li>Auto-layout</li>
+            <li>Inline message</li>
+            <li>Static indicator</li>
+            <li>Espacement + contraste</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rules -->
+    <section class="section">
+      <h2 class="section-title">🔒 Règles CSS</h2>
+      <div class="rules-card">
+        <h5>Bonne Pratique</h5>
+        <p>✅ <code>theme.css</code> doit être global</p>
+        <p>❌ Aucune couleur inline ailleurs</p>
+        <p>✅ Exception = nouvelle variable (jamais valeur brute)</p>
+        <p style="margin-top: 12px; font-size: 11px; color: var(--text-muted);">
+          👉 Toute l'équipe doit <strong>CONSOMMER</strong> la Library, jamais copier-coller.
+        </p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p><span class="brand">CHE·NU™</span> Design System v4</p>
+      <p style="margin-top: 6px; font-size: 11px;">
+        Stable design system for long-term cognitive work environments.
+      </p>
+    </footer>
+  </div>
+</body>
+</html>

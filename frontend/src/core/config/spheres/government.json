@@ -1,0 +1,97 @@
+{
+  "$schema": "chenu://sphere/v2",
+  "id": "government",
+  "version": "1.0.0",
+  
+  "name": "Gouvernement",
+  "displayName": "Gouvernement",
+  "emoji": "🏛️",
+  "icon": "building-columns",
+  
+  "description": {
+    "fr": "Services administratifs et interactions gouvernementales",
+    "en": "Administrative services and government interactions"
+  },
+  
+  "colors": {
+    "primary": "#8D8371",
+    "secondary": "#7A593A",
+    "accent": "#D8B26A",
+    "background": "#1E1F22",
+    "surface": "#2A2B2F"
+  },
+  
+  "scope": {
+    "included": [
+      "permits",
+      "licenses",
+      "tax-documents",
+      "administrative-forms",
+      "government-communications",
+      "regulatory-compliance",
+      "municipal-services",
+      "provincial-services",
+      "federal-services",
+      "legal-documents"
+    ],
+    "excluded": [
+      "personal-health-records",
+      "private-financial-details",
+      "political-opinions"
+    ]
+  },
+  
+  "features": {
+    "documentStorage": true,
+    "formFilling": true,
+    "deadlineTracking": true,
+    "notifications": true,
+    "complianceChecks": true,
+    "appointmentBooking": true
+  },
+  
+  "agents": {
+    "enabled": true,
+    "types": [
+      "compliance-advisor",
+      "document-organizer",
+      "deadline-reminder",
+      "form-assistant"
+    ],
+    "notes": "Agents help navigate administrative processes without making decisions"
+  },
+  
+  "integrations": [
+    "business",
+    "realestate",
+    "construction"
+  ],
+  
+  "interSphereInteraction": true,
+  
+  "regions": {
+    "quebec": {
+      "enabled": true,
+      "services": ["RBQ", "CCQ", "CNESST", "Revenu Québec", "SAAQ", "RAMQ"]
+    },
+    "canada": {
+      "enabled": true,
+      "services": ["CRA", "Service Canada", "IRCC"]
+    }
+  },
+  
+  "permissions": {
+    "canShareWithBusiness": true,
+    "canShareWithRealEstate": true,
+    "requiresAuth": true,
+    "sensitiveDataHandling": "encrypted"
+  },
+  
+  "metadata": {
+    "safe": true,
+    "nonAutonomous": true,
+    "representational": true,
+    "createdAt": "2025-12-13",
+    "updatedAt": "2025-12-13"
+  }
+}

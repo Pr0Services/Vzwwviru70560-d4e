@@ -1,0 +1,196 @@
+/**
+ * CHE·NU Dashboard Print Styles
+ * Ensures deterministic PDF output
+ */
+
+/* Print-specific styles */
+@media print {
+  /* Reset */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide non-essential elements */
+  .no-print,
+  .print-hidden,
+  nav,
+  button,
+  input,
+  .nav-bar,
+  .global-nav {
+    display: none !important;
+  }
+
+  /* Page setup */
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-size: 10pt !important;
+    line-height: 1.4 !important;
+    color: #000 !important;
+    background: #fff !important;
+  }
+
+  /* Force light mode colors for print */
+  .dark {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* Headers */
+  h1 {
+    font-size: 18pt !important;
+    margin-bottom: 12pt !important;
+  }
+
+  h2 {
+    font-size: 14pt !important;
+    margin-bottom: 8pt !important;
+    page-break-after: avoid;
+  }
+
+  h3 {
+    font-size: 12pt !important;
+    margin-bottom: 6pt !important;
+  }
+
+  /* Tables */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  th, td {
+    border: 0.5pt solid #ccc !important;
+    padding: 4pt 6pt !important;
+    font-size: 9pt !important;
+  }
+
+  th {
+    background: #f0f0f0 !important;
+    font-weight: 600 !important;
+  }
+
+  /* KPI tiles */
+  .kpi-tile,
+  .kpi {
+    border: 1pt solid #ddd !important;
+    padding: 8pt !important;
+    background: #fafafa !important;
+  }
+
+  /* Status indicators */
+  .status-pass,
+  .text-green-600,
+  .text-green-500 {
+    color: #16a34a !important;
+  }
+
+  .status-fail,
+  .text-red-600,
+  .text-red-500 {
+    color: #dc2626 !important;
+  }
+
+  .status-warn,
+  .text-amber-600,
+  .text-amber-500 {
+    color: #d97706 !important;
+  }
+
+  /* Code/mono text */
+  .font-mono,
+  code,
+  pre {
+    font-family: 'SF Mono', Consolas, monospace !important;
+    font-size: 8pt !important;
+  }
+
+  /* Links */
+  a {
+    color: #000 !important;
+    text-decoration: none !important;
+  }
+
+  a[href]::after {
+    content: none !important;
+  }
+
+  /* Avoid page breaks in important sections */
+  .section,
+  .card,
+  .panel {
+    page-break-inside: avoid;
+  }
+
+  /* Footer */
+  .print-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    font-size: 8pt;
+    color: #666;
+    border-top: 0.5pt solid #ddd;
+    padding-top: 4pt;
+  }
+
+  /* Signature block */
+  .sig-block {
+    border: 1pt dashed #999 !important;
+    padding: 8pt !important;
+    margin-top: 16pt !important;
+    background: #f9f9f9 !important;
+  }
+
+  /* Grid layouts - linearize for print */
+  .grid {
+    display: block !important;
+  }
+
+  .grid > * {
+    margin-bottom: 8pt !important;
+  }
+
+  /* Remove shadows and rounded corners */
+  .shadow,
+  .shadow-lg,
+  .shadow-md {
+    box-shadow: none !important;
+  }
+
+  .rounded,
+  .rounded-lg,
+  .rounded-md {
+    border-radius: 0 !important;
+  }
+}
+
+/* Screen-only indicator when preparing to print */
+@media screen {
+  .print-preview-mode {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .print-preview-mode .dark\:bg-gray-800,
+  .print-preview-mode .dark\:bg-gray-900 {
+    background: #fff !important;
+  }
+
+  .print-preview-mode .dark\:text-white,
+  .print-preview-mode .dark\:text-gray-300 {
+    color: #000 !important;
+  }
+}

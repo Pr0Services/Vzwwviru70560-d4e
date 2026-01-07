@@ -1,0 +1,314 @@
+/**
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║                    CHE·NU™ — LANDING PAGE                                    ║
+ * ║                    Page d'accueil publique                                   ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ */
+
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { 
+  Brain, Shield, Users, Zap, Globe, Lock, 
+  ChevronRight, Play, Star, ArrowRight 
+} from 'lucide-react';
+
+// Couleurs CHE·NU
+const colors = {
+  sacredGold: '#D8B26A',
+  ancientStone: '#8D8371',
+  jungleEmerald: '#3F7249',
+  cenoteTurquoise: '#3EB4A2',
+  shadowMoss: '#2F4C39',
+  earthEmber: '#7A593A',
+  uiSlate: '#1E1F22',
+  softSand: '#E9E4D6',
+};
+
+export const LandingPage: React.FC = () => {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#1E1F22] to-[#2F4C39]">
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#1E1F22]/90 backdrop-blur-md border-b border-[#D8B26A]/20">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#D8B26A] to-[#7A593A] flex items-center justify-center">
+              <span className="text-white font-bold text-lg">C</span>
+            </div>
+            <span className="text-2xl font-bold text-white">
+              CHE<span className="text-[#D8B26A]">·</span>NU
+            </span>
+          </Link>
+          
+          <div className="hidden md:flex items-center gap-8">
+            <Link to="/features" className="text-[#E9E4D6] hover:text-[#D8B26A] transition">
+              Fonctionnalités
+            </Link>
+            <Link to="/pricing" className="text-[#E9E4D6] hover:text-[#D8B26A] transition">
+              Tarifs
+            </Link>
+            <Link to="/demo" className="text-[#E9E4D6] hover:text-[#D8B26A] transition">
+              Démo
+            </Link>
+            <Link to="/faq" className="text-[#E9E4D6] hover:text-[#D8B26A] transition">
+              FAQ
+            </Link>
+            <Link to="/investor" className="text-[#E9E4D6] hover:text-[#D8B26A] transition">
+              Investisseurs
+            </Link>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <Link 
+              to="/login" 
+              className="text-[#E9E4D6] hover:text-[#D8B26A] transition"
+            >
+              Connexion
+            </Link>
+            <Link 
+              to="/signup" 
+              className="px-6 py-2 bg-[#D8B26A] text-[#1E1F22] font-semibold rounded-lg hover:bg-[#E9E4D6] transition"
+            >
+              Commencer gratuitement
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="pt-32 pb-20 px-6">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#D8B26A]/20 rounded-full mb-8">
+            <Star className="w-4 h-4 text-[#D8B26A]" />
+            <span className="text-[#D8B26A] text-sm font-medium">
+              Governed Intelligence Operating System
+            </span>
+          </div>
+          
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+            L'intelligence qui<br />
+            <span className="text-[#D8B26A]">vous appartient</span>
+          </h1>
+          
+          <p className="text-xl text-[#E9E4D6]/80 max-w-3xl mx-auto mb-12">
+            CHE·NU est le premier système d'exploitation d'intelligence gouvernée. 
+            Gardez le contrôle total sur vos données, vos agents IA et vos coûts.
+            <strong className="text-[#3EB4A2]"> Gouvernance {'>'} Exécution.</strong>
+          </p>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+            <Link 
+              to="/signup" 
+              className="px-8 py-4 bg-[#D8B26A] text-[#1E1F22] font-bold text-lg rounded-xl hover:bg-[#E9E4D6] transition flex items-center gap-2"
+            >
+              Démarrer gratuitement
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+            <Link 
+              to="/demo" 
+              className="px-8 py-4 border-2 border-[#D8B26A] text-[#D8B26A] font-bold text-lg rounded-xl hover:bg-[#D8B26A]/10 transition flex items-center gap-2"
+            >
+              <Play className="w-5 h-5" />
+              Voir la démo
+            </Link>
+          </div>
+          
+          {/* Hero Image Placeholder */}
+          <div className="relative max-w-5xl mx-auto">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#D8B26A]/20 to-[#3EB4A2]/20 blur-3xl rounded-full"></div>
+            <div className="relative bg-[#1E1F22] border border-[#D8B26A]/30 rounded-2xl p-4 shadow-2xl">
+              <div className="aspect-video bg-gradient-to-br from-[#2F4C39] to-[#1E1F22] rounded-xl flex items-center justify-center">
+                <div className="text-center">
+                  <Brain className="w-24 h-24 text-[#D8B26A] mx-auto mb-4" />
+                  <p className="text-[#E9E4D6]/60">Interface CHE·NU</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section className="py-20 px-6 bg-[#1E1F22]">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4">
+              Pourquoi CHE·NU?
+            </h2>
+            <p className="text-[#E9E4D6]/70 text-lg max-w-2xl mx-auto">
+              Un système conçu pour vous donner le contrôle total sur l'intelligence artificielle
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Feature 1 */}
+            <div className="p-8 bg-gradient-to-br from-[#2F4C39]/50 to-[#1E1F22] rounded-2xl border border-[#3F7249]/30">
+              <div className="w-14 h-14 bg-[#3F7249]/30 rounded-xl flex items-center justify-center mb-6">
+                <Shield className="w-7 h-7 text-[#3EB4A2]" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">Gouvernance Totale</h3>
+              <p className="text-[#E9E4D6]/70">
+                Chaque action IA passe par votre approbation. Vous décidez ce qui s'exécute.
+              </p>
+            </div>
+            
+            {/* Feature 2 */}
+            <div className="p-8 bg-gradient-to-br from-[#2F4C39]/50 to-[#1E1F22] rounded-2xl border border-[#D8B26A]/30">
+              <div className="w-14 h-14 bg-[#D8B26A]/30 rounded-xl flex items-center justify-center mb-6">
+                <Brain className="w-7 h-7 text-[#D8B26A]" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">9 Sphères de Vie</h3>
+              <p className="text-[#E9E4D6]/70">
+                Organisez votre vie en contextes séparés: Personnel, Business, Créatif, et plus.
+              </p>
+            </div>
+            
+            {/* Feature 3 */}
+            <div className="p-8 bg-gradient-to-br from-[#2F4C39]/50 to-[#1E1F22] rounded-2xl border border-[#3EB4A2]/30">
+              <div className="w-14 h-14 bg-[#3EB4A2]/30 rounded-xl flex items-center justify-center mb-6">
+                <Users className="w-7 h-7 text-[#3EB4A2]" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">226 Agents Spécialisés</h3>
+              <p className="text-[#E9E4D6]/70">
+                Des agents IA experts dans chaque domaine, supervisés par Nova.
+              </p>
+            </div>
+            
+            {/* Feature 4 */}
+            <div className="p-8 bg-gradient-to-br from-[#2F4C39]/50 to-[#1E1F22] rounded-2xl border border-[#7A593A]/30">
+              <div className="w-14 h-14 bg-[#7A593A]/30 rounded-xl flex items-center justify-center mb-6">
+                <Lock className="w-7 h-7 text-[#D8B26A]" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">Vos Données, Votre Contrôle</h3>
+              <p className="text-[#E9E4D6]/70">
+                Aucune vente de données. Pas d'optimisation pour l'addiction. Éthique d'abord.
+              </p>
+            </div>
+            
+            {/* Feature 5 */}
+            <div className="p-8 bg-gradient-to-br from-[#2F4C39]/50 to-[#1E1F22] rounded-2xl border border-[#8D8371]/30">
+              <div className="w-14 h-14 bg-[#8D8371]/30 rounded-xl flex items-center justify-center mb-6">
+                <Zap className="w-7 h-7 text-[#E9E4D6]" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">Coûts Transparents</h3>
+              <p className="text-[#E9E4D6]/70">
+                Système de tokens internes. Voyez exactement ce que coûte chaque action.
+              </p>
+            </div>
+            
+            {/* Feature 6 */}
+            <div className="p-8 bg-gradient-to-br from-[#2F4C39]/50 to-[#1E1F22] rounded-2xl border border-[#3F7249]/30">
+              <div className="w-14 h-14 bg-[#3F7249]/30 rounded-xl flex items-center justify-center mb-6">
+                <Globe className="w-7 h-7 text-[#3EB4A2]" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">Threads Persistants</h3>
+              <p className="text-[#E9E4D6]/70">
+                Vos conversations et décisions préservées. Un historique auditable.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof */}
+      <section className="py-20 px-6 bg-gradient-to-b from-[#1E1F22] to-[#2F4C39]">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="flex items-center justify-center gap-1 mb-6">
+            {[1,2,3,4,5].map(i => (
+              <Star key={i} className="w-6 h-6 text-[#D8B26A] fill-[#D8B26A]" />
+            ))}
+          </div>
+          <blockquote className="text-2xl md:text-3xl text-white font-medium mb-8 italic">
+            "CHE·NU a changé ma façon de travailler avec l'IA. Pour la première fois, 
+            je sens que je contrôle vraiment mes données et mes agents."
+          </blockquote>
+          <div className="flex items-center justify-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-[#D8B26A]/30"></div>
+            <div className="text-left">
+              <p className="text-white font-semibold">Marie Dubois</p>
+              <p className="text-[#E9E4D6]/60 text-sm">CEO, TechInnovate</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 px-6 bg-[#1E1F22]">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            Prêt à reprendre le contrôle?
+          </h2>
+          <p className="text-xl text-[#E9E4D6]/70 mb-10">
+            Commencez gratuitement avec 75 requêtes/mois. Aucune carte de crédit requise.
+          </p>
+          <Link 
+            to="/signup" 
+            className="inline-flex items-center gap-2 px-10 py-5 bg-[#D8B26A] text-[#1E1F22] font-bold text-xl rounded-xl hover:bg-[#E9E4D6] transition"
+          >
+            Créer mon compte gratuit
+            <ChevronRight className="w-6 h-6" />
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-16 px-6 bg-[#1E1F22] border-t border-[#D8B26A]/20">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-12 mb-12">
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#D8B26A] to-[#7A593A] flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">C</span>
+                </div>
+                <span className="text-xl font-bold text-white">CHE·NU</span>
+              </div>
+              <p className="text-[#E9E4D6]/60 text-sm">
+                Governed Intelligence Operating System.<br />
+                L'IA qui vous appartient.
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="text-white font-semibold mb-4">Produit</h4>
+              <ul className="space-y-2">
+                <li><Link to="/features" className="text-[#E9E4D6]/60 hover:text-[#D8B26A] text-sm">Fonctionnalités</Link></li>
+                <li><Link to="/pricing" className="text-[#E9E4D6]/60 hover:text-[#D8B26A] text-sm">Tarifs</Link></li>
+                <li><Link to="/demo" className="text-[#E9E4D6]/60 hover:text-[#D8B26A] text-sm">Démo</Link></li>
+                <li><Link to="/faq" className="text-[#E9E4D6]/60 hover:text-[#D8B26A] text-sm">FAQ</Link></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-white font-semibold mb-4">Entreprise</h4>
+              <ul className="space-y-2">
+                <li><Link to="/about" className="text-[#E9E4D6]/60 hover:text-[#D8B26A] text-sm">À propos</Link></li>
+                <li><Link to="/investor" className="text-[#E9E4D6]/60 hover:text-[#D8B26A] text-sm">Investisseurs</Link></li>
+                <li><Link to="/contact" className="text-[#E9E4D6]/60 hover:text-[#D8B26A] text-sm">Contact</Link></li>
+                <li><Link to="/careers" className="text-[#E9E4D6]/60 hover:text-[#D8B26A] text-sm">Carrières</Link></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-white font-semibold mb-4">Légal</h4>
+              <ul className="space-y-2">
+                <li><Link to="/privacy" className="text-[#E9E4D6]/60 hover:text-[#D8B26A] text-sm">Confidentialité</Link></li>
+                <li><Link to="/terms" className="text-[#E9E4D6]/60 hover:text-[#D8B26A] text-sm">Conditions</Link></li>
+                <li><Link to="/security" className="text-[#E9E4D6]/60 hover:text-[#D8B26A] text-sm">Sécurité</Link></li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="pt-8 border-t border-[#D8B26A]/20 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-[#E9E4D6]/40 text-sm">
+              © 2025 CHE·NU™. Tous droits réservés.
+            </p>
+            <p className="text-[#E9E4D6]/40 text-sm">
+              Gouvernance {'>'} Exécution
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default LandingPage;

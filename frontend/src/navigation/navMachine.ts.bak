@@ -1,0 +1,375 @@
+// ═══════════════════════════════════════════════════════════════════════════════
+// CHE·NU™ — NAVIGATION STATE MACHINE (XSTATE)
+// Machine d'état pour la navigation - Context Bureau JAMAIS sauté
+// DELTA APRÈS v38.2
+// ═══════════════════════════════════════════════════════════════════════════════
+
+import { createMachine, assign } from 'xstate';
+
+// ═══════════════════════════════════════════════════════════════
+// TYPES
+// ═══════════════════════════════════════════════════════════════
+
+export type NavigationLocation = 
+  | 'entry'
+  | 'context_bureau'
+  | 'action_bureau'
+  | 'workspace'
+  | 'annexe_archives'
+  | 'annexe_meeting'
+  | 'annexe_backstage'
+  | 'annexe_browser';
+
+export type SphereId = 
+  | 'personal' 
+  | 'business' 
+  | 'government' 
+  | 'studio' 
+  | 'community' 
+  | 'social' 
+  | 'entertainment' 
+  | 'myteam';
+
+export type BureauSectionId = 
+  | 'quick_capture'
+  | 'resume_workspace'
+  | 'threads'
+  | 'data_files'
+  | 'active_agents'
+  | 'meetings';
+
+// ═══════════════════════════════════════════════════════════════
+// CONTEXT
+// ═══════════════════════════════════════════════════════════════
+
+export interface NavigationContext {
+  currentLocation: NavigationLocation;
+  previousLocation: NavigationLocation | null;
+  sphereId: SphereId;
+  sphereCode: string;
+  sectionId: BureauSectionId | null;
+  workspaceId: string | null;
+  documentId: string | null;
+  hasUnsavedWork: boolean;
+  pendingAgentExecutions: string[];
+  searchScope: string | null;
+  annexeStack: NavigationLocation[];
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EVENTS
+// ═══════════════════════════════════════════════════════════════
+
+export type NavigationEvent =
+  | { type: 'ENTER_BUREAU' }
+  | { type: 'SELECT_SECTION'; sectionId: BureauSectionId }
+  | { type: 'OPEN_WORKSPACE'; workspaceId: string; documentId?: string }
+  | { type: 'EXIT_TO_ENTRY' }
+  | { type: 'GO_BACK' }
+  | { type: 'SWITCH_SPHERE'; sphereId: SphereId }
+  | { type: 'OPEN_ANNEXE'; annexe: NavigationLocation }
+  | { type: 'CLOSE_ANNEXE' }
+  | { type: 'SET_UNSAVED_WORK'; hasUnsaved: boolean }
+  | { type: 'ADD_PENDING_EXECUTION'; executionId: string }
+  | { type: 'REMOVE_PENDING_EXECUTION'; executionId: string }
+  | { type: 'CONFIRM_DISCARD' }
+  | { type: 'CANCEL_NAVIGATION' };
+
+// ═══════════════════════════════════════════════════════════════
+// INITIAL CONTEXT
+// ═══════════════════════════════════════════════════════════════
+
+const initialContext: NavigationContext = {
+  currentLocation: 'entry',
+  previousLocation: null,
+  sphereId: 'personal',
+  sphereCode: 'personal',
+  sectionId: null,
+  workspaceId: null,
+  documentId: null,
+  hasUnsavedWork: false,
+  pendingAgentExecutions: [],
+  searchScope: null,
+  annexeStack: [],
+};
+
+// ═══════════════════════════════════════════════════════════════
+// STATE MACHINE
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * CHE·NU Navigation State Machine
+ * 
+ * CRITICAL RULE: Context Bureau is NEVER skipped
+ * Flow: Entry → Context Bureau → Action Bureau → Workspace
+ * 
+ * Intelligence PRE-FILLS the Context Bureau sections
+ * before the user arrives.
+ */
+export const navMachine = createMachine({
+  id: 'navigation',
+  initial: 'entry',
+  context: initialContext,
+  states: {
+    // ─────────────────────────────────────────────────────────────
+    // ENTRY - Sphere selection / overview
+    // ─────────────────────────────────────────────────────────────
+    entry: {
+      entry: assign({
+        currentLocation: 'entry' as NavigationLocation,
+        sectionId: null,
+        workspaceId: null,
+        documentId: null,
+      }),
+      on: {
+        ENTER_BUREAU: {
+          target: 'context_bureau',
+          actions: assign({
+            previousLocation: (ctx) => ctx.currentLocation,
+          }),
+        },
+        SWITCH_SPHERE: {
+          target: 'entry',
+          actions: assign({
+            sphereId: (_, event) => event.sphereId,
+            sphereCode: (_, event) => event.sphereId,
+          }),
+        },
+        OPEN_ANNEXE: {
+          target: 'annexe',
+          actions: assign({
+            previousLocation: (ctx) => ctx.currentLocation,
+            annexeStack: (ctx, event) => [...ctx.annexeStack, event.annexe],
+          }),
+        },
+      },
+    },
+
+    // ─────────────────────────────────────────────────────────────
+    // CONTEXT BUREAU - 6 sections (NEVER SKIPPED)
+    // Intelligence pre-fills this before user arrives
+    // ─────────────────────────────────────────────────────────────
+    context_bureau: {
+      entry: assign({
+        currentLocation: 'context_bureau' as NavigationLocation,
+        sectionId: 'quick_capture' as BureauSectionId, // Default section
+      }),
+      on: {
+        SELECT_SECTION: {
+          actions: assign({
+            sectionId: (_, event) => event.sectionId,
+          }),
+        },
+        OPEN_WORKSPACE: {
+          target: 'action_bureau',
+          actions: assign({
+            previousLocation: (ctx) => ctx.currentLocation,
+            workspaceId: (_, event) => event.workspaceId,
+            documentId: (_, event) => event.documentId || null,
+          }),
+        },
+        EXIT_TO_ENTRY: {
+          target: 'checkUnsaved',
+          cond: (ctx) => !ctx.hasUnsavedWork,
+        },
+        GO_BACK: {
+          target: 'entry',
+        },
+        SWITCH_SPHERE: {
+          target: 'checkUnsaved',
+          actions: assign({
+            sphereId: (_, event) => event.sphereId,
+            sphereCode: (_, event) => event.sphereId,
+          }),
+        },
+        OPEN_ANNEXE: {
+          target: 'annexe',
+          actions: assign({
+            previousLocation: (ctx) => ctx.currentLocation,
+            annexeStack: (ctx, event) => [...ctx.annexeStack, event.annexe],
+          }),
+        },
+      },
+    },
+
+    // ─────────────────────────────────────────────────────────────
+    // ACTION BUREAU - Workspace preparation
+    // ─────────────────────────────────────────────────────────────
+    action_bureau: {
+      entry: assign({
+        currentLocation: 'action_bureau' as NavigationLocation,
+      }),
+      on: {
+        OPEN_WORKSPACE: {
+          target: 'workspace',
+          actions: assign({
+            previousLocation: (ctx) => ctx.currentLocation,
+            workspaceId: (_, event) => event.workspaceId,
+            documentId: (_, event) => event.documentId || null,
+          }),
+        },
+        GO_BACK: {
+          target: 'context_bureau',
+        },
+        EXIT_TO_ENTRY: {
+          target: 'checkUnsaved',
+        },
+      },
+    },
+
+    // ─────────────────────────────────────────────────────────────
+    // WORKSPACE - Document editing / AI execution
+    // ─────────────────────────────────────────────────────────────
+    workspace: {
+      entry: assign({
+        currentLocation: 'workspace' as NavigationLocation,
+      }),
+      on: {
+        SET_UNSAVED_WORK: {
+          actions: assign({
+            hasUnsavedWork: (_, event) => event.hasUnsaved,
+          }),
+        },
+        ADD_PENDING_EXECUTION: {
+          actions: assign({
+            pendingAgentExecutions: (ctx, event) => [
+              ...ctx.pendingAgentExecutions,
+              event.executionId,
+            ],
+          }),
+        },
+        REMOVE_PENDING_EXECUTION: {
+          actions: assign({
+            pendingAgentExecutions: (ctx, event) =>
+              ctx.pendingAgentExecutions.filter((id) => id !== event.executionId),
+          }),
+        },
+        GO_BACK: [
+          {
+            target: 'confirmDiscard',
+            cond: (ctx) => ctx.hasUnsavedWork,
+          },
+          {
+            target: 'action_bureau',
+          },
+        ],
+        EXIT_TO_ENTRY: [
+          {
+            target: 'confirmDiscard',
+            cond: (ctx) => ctx.hasUnsavedWork,
+          },
+          {
+            target: 'entry',
+            actions: assign({
+              workspaceId: null,
+              documentId: null,
+              sectionId: null,
+            }),
+          },
+        ],
+        OPEN_ANNEXE: {
+          target: 'annexe',
+          actions: assign({
+            previousLocation: (ctx) => ctx.currentLocation,
+            annexeStack: (ctx, event) => [...ctx.annexeStack, event.annexe],
+          }),
+        },
+      },
+    },
+
+    // ─────────────────────────────────────────────────────────────
+    // ANNEXE - Side panels (archives, meeting, backstage, browser)
+    // ─────────────────────────────────────────────────────────────
+    annexe: {
+      entry: assign({
+        currentLocation: (ctx) => ctx.annexeStack[ctx.annexeStack.length - 1] || 'entry',
+      }),
+      on: {
+        CLOSE_ANNEXE: [
+          {
+            target: 'annexe',
+            cond: (ctx) => ctx.annexeStack.length > 1,
+            actions: assign({
+              annexeStack: (ctx) => ctx.annexeStack.slice(0, -1),
+              currentLocation: (ctx) => 
+                ctx.annexeStack[ctx.annexeStack.length - 2] || ctx.previousLocation || 'entry',
+            }),
+          },
+          {
+            target: 'entry',
+            cond: (ctx) => ctx.previousLocation === 'entry',
+            actions: assign({
+              annexeStack: [],
+              currentLocation: 'entry' as NavigationLocation,
+            }),
+          },
+          {
+            target: 'context_bureau',
+            cond: (ctx) => ctx.previousLocation === 'context_bureau',
+            actions: assign({
+              annexeStack: [],
+            }),
+          },
+          {
+            target: 'workspace',
+            cond: (ctx) => ctx.previousLocation === 'workspace',
+            actions: assign({
+              annexeStack: [],
+            }),
+          },
+        ],
+        OPEN_ANNEXE: {
+          actions: assign({
+            annexeStack: (ctx, event) => [...ctx.annexeStack, event.annexe],
+            currentLocation: (_, event) => event.annexe,
+          }),
+        },
+      },
+    },
+
+    // ─────────────────────────────────────────────────────────────
+    // CHECK UNSAVED - Guard state
+    // ─────────────────────────────────────────────────────────────
+    checkUnsaved: {
+      always: [
+        {
+          target: 'confirmDiscard',
+          cond: (ctx) => ctx.hasUnsavedWork,
+        },
+        {
+          target: 'entry',
+        },
+      ],
+    },
+
+    // ─────────────────────────────────────────────────────────────
+    // CONFIRM DISCARD - User confirmation
+    // ─────────────────────────────────────────────────────────────
+    confirmDiscard: {
+      on: {
+        CONFIRM_DISCARD: {
+          target: 'entry',
+          actions: assign({
+            hasUnsavedWork: false,
+            workspaceId: null,
+            documentId: null,
+            sectionId: null,
+          }),
+        },
+        CANCEL_NAVIGATION: {
+          target: 'workspace',
+        },
+      },
+    },
+  },
+});
+
+// ═══════════════════════════════════════════════════════════════
+// EXPORTS
+// ═══════════════════════════════════════════════════════════════
+
+export type NavMachineState = typeof navMachine;
+export type NavMachineContext = NavigationContext;
+export type NavMachineEvent = NavigationEvent;
+
+export default navMachine;

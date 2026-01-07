@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHE·NU™ — Knowledge Graph Topics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════════════
+       CHE·NU™ — KNOWLEDGE GRAPH TOPICS
+       Stable & Minimal
+       
+       Les Topics servent à RELIER.
+       Ils ne servent PAS à classer exhaustivement.
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    :root {
+      --bg-root: #1B1F23;
+      --text-primary: #E6E8EA;
+      --text-secondary: #B8BDC3;
+      --text-muted: #8B9096;
+      --gold: #BFAE7A;
+      --cyan: #6EAFC4;
+      --green: #6FAF9A;
+      --surface: #2A3138;
+      --surface-hover: #303841;
+      --border: rgba(255, 255, 255, 0.04);
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: linear-gradient(180deg, #181C20, var(--bg-root));
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    
+    .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+    
+    /* Header */
+    .header { text-align: center; margin-bottom: 48px; }
+    .header h1 { font-size: 32px; font-weight: 700; color: var(--gold); margin-bottom: 8px; }
+    .header .subtitle { font-size: 16px; color: var(--text-secondary); margin-bottom: 20px; }
+    .header .rule {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: rgba(191, 174, 122, 0.1);
+      border: 1px solid var(--gold);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--gold);
+    }
+    
+    /* Section */
+    .section { margin-bottom: 48px; }
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       LEVELS OVERVIEW
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .levels-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    
+    @media (max-width: 900px) {
+      .levels-grid { grid-template-columns: 1fr; }
+    }
+    
+    .level-card {
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background-color: var(--surface);
+    }
+    
+    .level-card.level1 { border-color: var(--gold); }
+    .level-card.level2 { border-color: var(--cyan); }
+    .level-card.level3 { border-color: var(--text-muted); }
+    
+    .level-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    
+    .level-badge {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    
+    .level1 .level-badge { background-color: var(--gold); color: var(--bg-root); }
+    .level2 .level-badge { background-color: var(--cyan); color: var(--bg-root); }
+    .level3 .level-badge { background-color: var(--text-muted); color: var(--bg-root); }
+    
+    .level-name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .level1 .level-name { color: var(--gold); }
+    .level2 .level-name { color: var(--cyan); }
+    .level3 .level-name { color: var(--text-muted); }
+    
+    .level-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+    
+    .level-rules {
+      font-size: 11px;
+      color: var(--text-muted);
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    
+    .level-rules strong { color: var(--text-secondary); }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       SYSTEM DOMAINS (LEVEL 1)
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .domains-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    
+    @media (max-width: 900px) {
+      .domains-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    
+    @media (max-width: 600px) {
+      .domains-grid { grid-template-columns: 1fr; }
+    }
+    
+    .domain-card {
+      padding: 14px 16px;
+      background-color: var(--surface);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    
+    .domain-card:hover {
+      background-color: var(--surface-hover);
+      border-color: var(--gold);
+    }
+    
+    .domain-card.expanded {
+      background-color: rgba(191, 174, 122, 0.08);
+      border-color: var(--gold);
+    }
+    
+    .domain-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    
+    .domain-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       FUNCTIONAL TOPICS (LEVEL 2) — EXPANDED VIEW
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .functional-section {
+      margin-top: 24px;
+      padding: 20px;
+      background-color: rgba(110, 175, 196, 0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(110, 175, 196, 0.15);
+    }
+    
+    .functional-header {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--cyan);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .functional-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    
+    @media (max-width: 900px) {
+      .functional-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    
+    .functional-item {
+      padding: 12px 14px;
+      background-color: var(--surface);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    
+    .functional-item .name {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    
+    .functional-item .desc {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       CONTEXTUAL TOPICS (LEVEL 3)
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .contextual-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .contextual-tag {
+      padding: 8px 14px;
+      background-color: rgba(139, 144, 150, 0.1);
+      border-radius: 20px;
+      font-size: 11px;
+      color: var(--text-muted);
+      border: 1px solid rgba(139, 144, 150, 0.2);
+    }
+    
+    .contextual-warning {
+      margin-top: 16px;
+      padding: 12px;
+      background-color: rgba(196, 112, 112, 0.1);
+      border: 1px solid rgba(196, 112, 112, 0.2);
+      border-radius: 8px;
+      font-size: 11px;
+      color: #C47070;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       ASSIGNMENT RULES
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .rules-table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: var(--surface);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .rules-table th,
+    .rules-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .rules-table th {
+      background-color: #303841;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+    
+    .rules-table td {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    .rules-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .rule-value {
+      font-family: 'SF Mono', monospace;
+      font-size: 11px;
+      color: var(--cyan);
+      background-color: rgba(110, 175, 196, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       UX DISPLAY
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .ux-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    
+    @media (max-width: 768px) {
+      .ux-comparison { grid-template-columns: 1fr; }
+    }
+    
+    .ux-card {
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    
+    .ux-card.dashboard {
+      background-color: rgba(110, 175, 196, 0.05);
+      border-color: rgba(110, 175, 196, 0.2);
+    }
+    
+    .ux-card.collaboration {
+      background-color: rgba(191, 174, 122, 0.05);
+      border-color: rgba(191, 174, 122, 0.2);
+    }
+    
+    .ux-card h4 {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .ux-card.dashboard h4 { color: var(--cyan); }
+    .ux-card.collaboration h4 { color: var(--gold); }
+    
+    .ux-demo {
+      padding: 16px;
+      background-color: var(--bg-root);
+      border-radius: 8px;
+    }
+    
+    .ux-demo .decision-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    
+    /* Dashboard style topics */
+    .dashboard-topics {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .dashboard-topics .topic {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    
+    /* Collaboration style topics */
+    .collab-topics {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    
+    .collab-topics .label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    
+    .collab-topics .topics-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    
+    .collab-topics .topic-tag {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+    
+    .collab-topics .topic-tag.level1 {
+      background-color: rgba(191, 174, 122, 0.15);
+      color: var(--gold);
+    }
+    
+    .collab-topics .topic-tag.level2 {
+      background-color: rgba(110, 175, 196, 0.15);
+      color: var(--cyan);
+    }
+    
+    /* Agent Rules */
+    .agent-rules {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .agent-rules { grid-template-columns: 1fr; }
+    }
+    
+    .agent-card {
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    
+    .agent-card.allowed {
+      background-color: rgba(111, 175, 154, 0.08);
+      border-color: var(--green);
+    }
+    
+    .agent-card.forbidden {
+      background-color: rgba(196, 112, 112, 0.08);
+      border-color: #C47070;
+    }
+    
+    .agent-card h4 {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    
+    .agent-card.allowed h4 { color: var(--green); }
+    .agent-card.forbidden h4 { color: #C47070; }
+    
+    .agent-card ul { list-style: none; }
+    
+    .agent-card li {
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* Objective */
+    .objective {
+      padding: 24px;
+      background-color: rgba(191, 174, 122, 0.08);
+      border: 1px solid rgba(191, 174, 122, 0.2);
+      border-radius: 12px;
+      text-align: center;
+    }
+    
+    .objective h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--gold);
+      margin-bottom: 12px;
+    }
+    
+    .objective ul {
+      list-style: none;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+    
+    .objective li { padding: 4px 0; }
+    
+    .objective .quote {
+      font-size: 14px;
+      color: var(--gold);
+      font-style: italic;
+    }
+    
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      margin-top: 48px;
+    }
+    .footer p { color: var(--text-muted); font-size: 14px; }
+    .footer .brand { color: var(--gold); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>✧ CHE·NU™ Knowledge Graph Topics</h1>
+      <p class="subtitle">Stable & Minimal — Une boussole silencieuse</p>
+      <div class="rule">
+        🧭 "De quoi parle cette décision, au niveau du système?"
+      </div>
+    </header>
+
+    <!-- Levels Overview -->
+    <section class="section">
+      <h2 class="section-title">📊 Structure des Topics — 3 Niveaux</h2>
+      
+      <div class="levels-grid">
+        <div class="level-card level1">
+          <div class="level-header">
+            <span class="level-badge">L1</span>
+            <span class="level-name">System Domains</span>
+          </div>
+          <p class="level-desc">Stables dans le temps. Représentent les grandes zones de CHE·NU.</p>
+          <div class="level-rules">
+            <strong>9 domaines</strong> — canoniques<br>
+            Aucun ajout sans refonte système
+          </div>
+        </div>
+        
+        <div class="level-card level2">
+          <div class="level-header">
+            <span class="level-badge">L2</span>
+            <span class="level-name">Functional Topics</span>
+          </div>
+          <p class="level-desc">Fonctions ou mécanismes précis. Liste évolutive.</p>
+          <div class="level-rules">
+            <strong>27+ topics</strong> — par domaine<br>
+            Extensible selon les besoins
+          </div>
+        </div>
+        
+        <div class="level-card level3">
+          <div class="level-header">
+            <span class="level-badge">L3</span>
+            <span class="level-name">Contextual Topics</span>
+          </div>
+          <p class="level-desc">Optionnels, rares. Complètent L1 ou L2.</p>
+          <div class="level-rules">
+            <strong>5 topics</strong> — transversaux<br>
+            Ne peut jamais exister seul
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- System Domains (Level 1) -->
+    <section class="section">
+      <h2 class="section-title">🏛️ Level 1 — System Domains (Canoniques)</h2>
+      
+      <div class="domains-grid">
+        <div class="domain-card">
+          <div class="domain-name">🧭 Navigation & Structure</div>
+          <div class="domain-desc">Organisation spatiale, navigation, hiérarchie</div>
+        </div>
+        <div class="domain-card">
+          <div class="domain-name">📋 Workspace & Workflows</div>
+          <div class="domain-desc">Espaces de travail, flux de tâches</div>
+        </div>
+        <div class="domain-card">
+          <div class="domain-name">🤝 Collaboration & Meetings</div>
+          <div class="domain-desc">Réunions, collaboration, équipe</div>
+        </div>
+        <div class="domain-card">
+          <div class="domain-name">⚖️ Decisions & Governance</div>
+          <div class="domain-desc">Prise de décision, traçabilité</div>
+        </div>
+        <div class="domain-card">
+          <div class="domain-name">🤖 Agents & Automation</div>
+          <div class="domain-desc">Agents IA, orchestration</div>
+        </div>
+        <div class="domain-card">
+          <div class="domain-name">🧠 Knowledge & Memory</div>
+          <div class="domain-desc">Graphe de connaissances, mémoire</div>
+        </div>
+        <div class="domain-card">
+          <div class="domain-name">🎨 UI & Visual System</div>
+          <div class="domain-desc">Interface, design, système visuel</div>
+        </div>
+        <div class="domain-card">
+          <div class="domain-name">🔐 Access & Permissions</div>
+          <div class="domain-desc">Rôles, permissions, visibilité</div>
+        </div>
+        <div class="domain-card">
+          <div class="domain-name">🔌 Integrations & Platforms</div>
+          <div class="domain-desc">Intégrations externes, API</div>
+        </div>
+      </div>
+      
+      <!-- Functional Topics Example -->
+      <div class="functional-section">
+        <div class="functional-header">
+          <span>📎</span>
+          Exemple: Topics Level 2 pour "Decisions & Governance"
+        </div>
+        <div class="functional-grid">
+          <div class="functional-item">
+            <div class="name">Decision Creation</div>
+            <div class="desc">Création et validation des décisions</div>
+          </div>
+          <div class="functional-item">
+            <div class="name">Decision Revision</div>
+            <div class="desc">Révision et mise à jour des décisions</div>
+          </div>
+          <div class="functional-item">
+            <div class="name">Decision Visibility</div>
+            <div class="desc">Affichage et accessibilité</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contextual Topics (Level 3) -->
+    <section class="section">
+      <h2 class="section-title">🏷️ Level 3 — Contextual Topics (Optionnels)</h2>
+      
+      <div class="contextual-list">
+        <span class="contextual-tag">Cognitive Load</span>
+        <span class="contextual-tag">Discoverability</span>
+        <span class="contextual-tag">Trust & Transparency</span>
+        <span class="contextual-tag">Internationalization</span>
+        <span class="contextual-tag">Long-term Use</span>
+      </div>
+      
+      <div class="contextual-warning">
+        ⚠️ Un Topic Level 3 ne peut JAMAIS exister seul. Il complète toujours un Level 1 ou Level 2.
+      </div>
+    </section>
+
+    <!-- Assignment Rules -->
+    <section class="section">
+      <h2 class="section-title">📏 Règles d'assignation</h2>
+      
+      <table class="rules-table">
+        <thead>
+          <tr>
+            <th>Niveau</th>
+            <th>Minimum</th>
+            <th>Maximum</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Level 1</td>
+            <td><span class="rule-value">1</span></td>
+            <td><span class="rule-value">2</span></td>
+            <td>Toujours requis</td>
+          </tr>
+          <tr>
+            <td>Level 2</td>
+            <td><span class="rule-value">0</span></td>
+            <td><span class="rule-value">2</span></td>
+            <td>Optionnel</td>
+          </tr>
+          <tr>
+            <td>Level 3</td>
+            <td><span class="rule-value">0</span></td>
+            <td><span class="rule-value">1</span></td>
+            <td>Rare, avec parent</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <table class="rules-table" style="margin-top: 20px;">
+        <thead>
+          <tr>
+            <th>Règle</th>
+            <th>Valeur</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Topics requis pour</td>
+            <td><span class="rule-value">Decisions</span> uniquement (pas Notes)</td>
+          </tr>
+          <tr>
+            <td>Éditable dans</td>
+            <td><span class="rule-value">Decision Meeting</span> uniquement</td>
+          </tr>
+          <tr>
+            <td>Visible dans</td>
+            <td><span class="rule-value">Dashboard</span> + <span class="rule-value">Collaboration</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- UX Display -->
+    <section class="section">
+      <h2 class="section-title">👁️ Affichage UX</h2>
+      
+      <div class="ux-comparison">
+        <div class="ux-card dashboard">
+          <h4>🎛️ Dashboard — Minimal</h4>
+          <div class="ux-demo">
+            <div class="decision-title">API V50 — FastAPI + PostgreSQL</div>
+            <div class="dashboard-topics">
+              <span class="topic">Workspace & Workflows</span>
+              <span class="topic">•</span>
+              <span class="topic">Agents & Automation</span>
+            </div>
+          </div>
+          <p style="margin-top: 12px; font-size: 11px; color: var(--text-muted);">
+            Max 2 topics • Texte discret • Pas de badges colorés
+          </p>
+        </div>
+        
+        <div class="ux-card collaboration">
+          <h4>🤝 Collaboration — Liste lisible</h4>
+          <div class="ux-demo">
+            <div class="decision-title">API V50 — FastAPI + PostgreSQL</div>
+            <div class="collab-topics">
+              <div class="label">Topics</div>
+              <div class="topics-list">
+                <span class="topic-tag level1">Workspace & Workflows</span>
+                <span class="topic-tag level1">Agents & Automation</span>
+                <span class="topic-tag level2">Task Flow</span>
+                <span class="topic-tag level2">Agent Permissions</span>
+              </div>
+            </div>
+          </div>
+          <p style="margin-top: 12px; font-size: 11px; color: var(--text-muted);">
+            Tous les topics • Cliquable → Knowledge Graph • Pas de hiérarchie agressive
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Agent Rules -->
+    <section class="section">
+      <h2 class="section-title">🤖 Agents — Limites</h2>
+      
+      <div class="agent-rules">
+        <div class="agent-card allowed">
+          <h4>✅ Autorisés à</h4>
+          <ul>
+            <li><span>→</span> Suggérer des Topics</li>
+            <li><span>→</span> Détecter incohérences de Topics</li>
+            <li><span>→</span> Proposer des regroupements</li>
+          </ul>
+        </div>
+        <div class="agent-card forbidden">
+          <h4>❌ Interdits de</h4>
+          <ul>
+            <li><span>→</span> Assigner ou modifier des Topics</li>
+            <li><span>→</span> Créer de nouveaux Level 1</li>
+            <li><span>→</span> Changer la hiérarchie</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Objective -->
+    <section class="section">
+      <div class="objective">
+        <h4>🎯 Objectif Final</h4>
+        <ul>
+          <li>Naviguer dans les décisions</li>
+          <li>Comprendre les impacts</li>
+          <li>Relier le passé au présent</li>
+        </ul>
+        <div class="quote">
+          "CHE·NU utilise les Topics comme une boussole silencieuse,<br>
+          pas comme un système de classement."
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p><span class="brand">CHE·NU™ V50</span> — Knowledge Graph Topics Canon</p>
+      <p style="margin-top: 8px; font-size: 12px;">
+        Les Topics servent à RELIER. Ils ne servent PAS à classer exhaustivement.
+      </p>
+    </footer>
+  </div>
+</body>
+</html>

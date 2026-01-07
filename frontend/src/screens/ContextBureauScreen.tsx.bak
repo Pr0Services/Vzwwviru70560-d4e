@@ -1,0 +1,230 @@
+/**
+ * CHE·NU™ — Context Bureau Screen
+ * "Sur quoi je travaille?"
+ * Never skipped. Intelligence pre-fills, never bypasses.
+ */
+
+import React from "react";
+import { motion } from "framer-motion";
+import type { NavContext, ID } from "@shared/types";
+import { SPHERE_CONFIG } from "@shared/constants";
+
+interface ContextBureauScreenProps {
+  ctx: NavContext;
+  onSelectIdentity: (id: ID) => void;
+  onSelectSphere: (id: ID) => void;
+  onSelectProject: (id: ID) => void;
+  onClearProject: () => void;
+  onConfirm: () => void;
+}
+
+export function ContextBureauScreen({
+  ctx,
+  onSelectIdentity,
+  onSelectSphere,
+  onSelectProject,
+  onClearProject,
+  onConfirm,
+}: ContextBureauScreenProps) {
+  const { selection, prefilled, data, contextSummary } = ctx;
+
+  // Get current selections
+  const currentIdentity = selection.identityId
+    ? data.identities.find((i) => i.id === selection.identityId)
+    : null;
+
+  const availableSpheres = selection.identityId
+    ? data.spheresByIdentity[selection.identityId] ?? []
+    : [];
+
+  const currentSphere = selection.sphereId
+    ? availableSpheres.find((s) => s.id === selection.sphereId)
+    : null;
+
+  const keyIS =
+    selection.identityId && selection.sphereId
+      ? `${selection.identityId}:${selection.sphereId}`
+      : null;
+
+  const availableProjects = keyIS
+    ? data.projectsByIdentitySphere[keyIS] ?? []
+    : [];
+
+  const currentProject = selection.projectId
+    ? availableProjects.find((p) => p.id === selection.projectId)
+    : null;
+
+  const isContextValid = !!selection.identityId && !!selection.sphereId;
+
+  return (
+    <motion.div
+      className="context-bureau-screen"
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+    >
+      <header className="screen-header">
+        <h2>📍 Context Bureau</h2>
+        <p className="screen-subtitle">Sur quoi je travaille?</p>
+      </header>
+
+      <div className="context-form">
+        {/* IDENTITY SELECTION */}
+        <div className="context-row">
+          <label className="context-label">Identité</label>
+          {currentIdentity ? (
+            <div className="context-value">
+              <span className="context-icon">
+                {currentIdentity.type === "personal"
+                  ? "🏠"
+                  : currentIdentity.type === "business"
+                  ? "💼"
+                  : "🏛️"}
+              </span>
+              <span className="context-text">{currentIdentity.name}</span>
+              {prefilled.identity && <span className="auto-badge">Auto</span>}
+              <button
+                className="change-btn"
+                onClick={() => onSelectIdentity("")}
+              >
+                Changer
+              </button>
+            </div>
+          ) : (
+            <div className="context-options">
+              {data.identities.map((identity) => (
+                <button
+                  key={identity.id}
+                  className="option-btn"
+                  onClick={() => onSelectIdentity(identity.id)}
+                >
+                  <span>
+                    {identity.type === "personal"
+                      ? "🏠"
+                      : identity.type === "business"
+                      ? "💼"
+                      : "🏛️"}
+                  </span>
+                  <span>{identity.name}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* SPHERE SELECTION */}
+        {selection.identityId && (
+          <div className="context-row">
+            <label className="context-label">Sphère</label>
+            {currentSphere ? (
+              <div className="context-value">
+                <span className="context-icon">
+                  {SPHERE_CONFIG[currentSphere.key]?.emoji ?? "◯"}
+                </span>
+                <span className="context-text">{currentSphere.label}</span>
+                {prefilled.sphere && <span className="auto-badge">Auto</span>}
+                <button className="change-btn" onClick={() => onSelectSphere("")}>
+                  Changer
+                </button>
+              </div>
+            ) : (
+              <div className="context-options spheres-grid">
+                {availableSpheres.map((sphere) => {
+                  const config = SPHERE_CONFIG[sphere.key];
+                  return (
+                    <button
+                      key={sphere.id}
+                      className="option-btn sphere-option"
+                      onClick={() => onSelectSphere(sphere.id)}
+                      style={{ borderColor: config?.color }}
+                    >
+                      <span className="sphere-emoji">{config?.emoji}</span>
+                      <span className="sphere-label">{sphere.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* PROJECT SELECTION (Optional) */}
+        {selection.sphereId && availableProjects.length > 0 && (
+          <div className="context-row">
+            <label className="context-label">Projet (optionnel)</label>
+            {currentProject ? (
+              <div className="context-value">
+                <span className="context-icon">📁</span>
+                <span className="context-text">{currentProject.name}</span>
+                {prefilled.project && <span className="auto-badge">Auto</span>}
+                <button className="change-btn" onClick={onClearProject}>
+                  Effacer
+                </button>
+              </div>
+            ) : (
+              <div className="context-options">
+                <button className="option-btn option-all" onClick={onClearProject}>
+                  <span>📂</span>
+                  <span>Tous les projets</span>
+                </button>
+                {availableProjects.slice(0, 5).map((project) => (
+                  <button
+                    key={project.id}
+                    className="option-btn"
+                    onClick={() => onSelectProject(project.id)}
+                  >
+                    <span>📁</span>
+                    <span>{project.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* CONTEXT SUMMARY */}
+      {isContextValid && (
+        <motion.div
+          className="context-summary"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <h3>Résumé</h3>
+          <div className="summary-grid">
+            <div className="summary-item">
+              <span className="summary-value">{contextSummary.urgentTasks}</span>
+              <span className="summary-label">Tâches urgentes</span>
+            </div>
+            <div className="summary-item">
+              <span className="summary-value">{contextSummary.upcomingMeetings}</span>
+              <span className="summary-label">Réunions proches</span>
+            </div>
+            <div className="summary-item">
+              <span className="summary-value">{contextSummary.alerts}</span>
+              <span className="summary-label">Alertes</span>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* CONFIRM BUTTON */}
+      <div className="context-actions">
+        {isContextValid ? (
+          <motion.button
+            className="confirm-btn"
+            onClick={onConfirm}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            Aller travailler →
+          </motion.button>
+        ) : (
+          <div className="context-hint">
+            Sélectionnez une identité et une sphère pour continuer
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+}

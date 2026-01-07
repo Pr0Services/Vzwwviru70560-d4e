@@ -1,0 +1,395 @@
+/**
+ * CHE·NU — Meeting Workspace Styles
+ * 3-surface layout, calm professional aesthetic
+ */
+
+.container {
+  display: grid;
+  grid-template-columns: 280px 280px 1fr;
+  min-height: 100vh;
+  background: #fafbfc;
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  color: #718096;
+}
+
+/* Surface A - Nova */
+.surfaceA {
+  background: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  overflow-y: auto;
+}
+
+/* Surface B - Context */
+.surfaceB {
+  background: #f7fafc;
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Surface C - Workspace */
+.surfaceC {
+  background: #ffffff;
+  overflow-y: auto;
+}
+
+/* Nova Panel */
+.novaPanel {
+  padding: 1.5rem;
+}
+
+.novaHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.novaIndicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #48bb78;
+}
+
+.novaLabel {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #4a5568;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.novaMessage {
+  font-size: 0.9rem;
+  color: #2d3748;
+  line-height: 1.7;
+  margin: 0 0 1rem 0;
+  white-space: pre-line;
+}
+
+.enableButton {
+  width: 100%;
+  padding: 0.75rem;
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  color: #4a5568;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.enableButton:hover {
+  background: #edf2f7;
+  border-color: #cbd5e0;
+}
+
+.enablePrompt {
+  padding: 1rem;
+  background: #f7fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.promptText {
+  font-size: 0.875rem;
+  color: #4a5568;
+  margin: 0 0 1rem 0;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.promptButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.primaryButton, .secondaryButton {
+  flex: 1;
+  padding: 0.625rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.primaryButton {
+  background: #0a1628;
+  color: #ffffff;
+  border: 1px solid #0a1628;
+}
+
+.secondaryButton {
+  background: #ffffff;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
+}
+
+/* Budget Meter */
+.budgetMeter {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f7fafc;
+  border-radius: 8px;
+}
+
+.budgetHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.budgetLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: #718096;
+  letter-spacing: 0.05em;
+}
+
+.budgetValue {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #2d3748;
+}
+
+.budgetBar {
+  height: 4px;
+  background: #e2e8f0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.budgetFill {
+  height: 100%;
+  background: #48bb78;
+  transition: width 0.3s ease;
+}
+
+.budgetFill.approaching {
+  background: #ecc94b;
+}
+
+.budgetFill.critical {
+  background: #f56565;
+}
+
+.budgetWarning {
+  font-size: 0.75rem;
+  margin: 0.5rem 0 0 0;
+}
+
+.budgetWarning.approaching {
+  color: #b7791f;
+}
+
+.budgetWarning.critical {
+  color: #c53030;
+}
+
+/* Context Panel */
+.contextPanel {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.contextHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.meetingName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0;
+}
+
+.statusBadge {
+  font-size: 0.65rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.statusBadge.draft { background: #e2e8f0; color: #4a5568; }
+.statusBadge.live { background: #c6f6d5; color: #22543d; }
+.statusBadge.paused { background: #fefcbf; color: #744210; }
+.statusBadge.ended { background: #fed7d7; color: #742a2a; }
+
+.contextDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.contextItem {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+}
+
+.contextLabel { color: #718096; }
+.contextValue { color: #2d3748; font-weight: 500; }
+
+/* Meeting Controls */
+.meetingControls {
+  padding: 1rem 1.5rem;
+  margin-top: auto;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.controlButton, .controlButtonDanger {
+  flex: 1;
+  padding: 0.625rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.controlButton {
+  background: #0a1628;
+  color: #ffffff;
+  border: none;
+}
+
+.controlButtonDanger {
+  background: #ffffff;
+  color: #c53030;
+  border: 1px solid #fed7d7;
+}
+
+/* Workspace Panel */
+.workspacePanel {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.workspaceSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sectionTitle {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.75rem 0;
+}
+
+.sectionCount {
+  font-size: 0.7rem;
+  background: #e2e8f0;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  color: #4a5568;
+}
+
+.notesArea {
+  min-height: 150px;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.notesArea:focus {
+  outline: none;
+  border-color: #3182ce;
+}
+
+.emptyState {
+  font-size: 0.8rem;
+  color: #a0aec0;
+  font-style: italic;
+  margin: 0;
+}
+
+.itemList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.item, .actionItem {
+  padding: 0.75rem;
+  background: #f7fafc;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: #2d3748;
+}
+
+.actionItem {
+  display: flex;
+  justify-content: space-between;
+}
+
+.actionStatus {
+  font-size: 0.7rem;
+  color: #718096;
+  text-transform: uppercase;
+}
+
+/* AI Actions */
+.aiActions {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.aiButton {
+  flex: 1;
+  padding: 0.625rem;
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #4a5568;
+  cursor: pointer;
+}
+
+.aiButton:hover {
+  background: #edf2f7;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+  
+  .surfaceA, .surfaceB {
+    border-right: none;
+    border-bottom: 1px solid #e2e8f0;
+  }
+}

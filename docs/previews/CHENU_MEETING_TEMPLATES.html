@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHE·NU™ — Meeting Templates Canon</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════════════
+       CHE·NU™ — COLLABORATION SPACE
+       MEETING TEMPLATES CANON — 4 TYPES EXACTEMENT
+       
+       RÈGLE: Le type détermine la structure, la densité, le rythme, les outputs
+       Un meeting ne peut PAS changer de type après création.
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    :root {
+      /* === GLOBAL === */
+      --bg-root: #1B1F23;
+      --text-primary: #E6E8EA;
+      --text-secondary: #B8BDC3;
+      --text-muted: #8B9096;
+      --gold: #BFAE7A;
+      --cyan: #6EAFC4;
+      --green: #6FAF9A;
+      --error: #C47070;
+      
+      /* === ALIGNMENT === */
+      --alignment-bg: #2A3036;
+      --alignment-surface: #2F363D;
+      --alignment-surface-focus: #353D46;
+      --alignment-radius: 10px;
+      --alignment-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+      --alignment-border: rgba(255, 255, 255, 0.035);
+      --alignment-gap: 12px;
+      --alignment-padding: 16px;
+      
+      /* === DECISION === */
+      --decision-bg: #282E34;
+      --decision-surface: #2D343B;
+      --decision-surface-focus: #333A42;
+      --decision-radius: 8px;
+      --decision-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+      --decision-border: rgba(255, 255, 255, 0.04);
+      --decision-gap: 10px;
+      --decision-padding: 14px;
+      --decision-accent: #6EAFC4;
+      
+      /* === WORKING === */
+      --working-bg: #2E353D;
+      --working-surface: #353D46;
+      --working-surface-focus: #3C4650;
+      --working-radius: 14px;
+      --working-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+      --working-border: rgba(255, 255, 255, 0.05);
+      --working-gap: 20px;
+      --working-padding: 24px;
+      
+      /* === REVIEW === */
+      --review-bg: #2C3238;
+      --review-surface: #31383F;
+      --review-surface-focus: #373E46;
+      --review-radius: 12px;
+      --review-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+      --review-border: rgba(255, 255, 255, 0.03);
+      --review-gap: 16px;
+      --review-padding: 20px;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: linear-gradient(180deg, #181C20, var(--bg-root));
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    
+    .container { max-width: 1400px; margin: 0 auto; padding: 40px 24px; }
+    
+    /* Header */
+    .header { text-align: center; margin-bottom: 48px; }
+    .header h1 { font-size: 32px; font-weight: 700; color: var(--gold); margin-bottom: 8px; }
+    .header .subtitle { font-size: 16px; color: var(--text-secondary); margin-bottom: 20px; }
+    .header .rule {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: rgba(196, 112, 112, 0.1);
+      border: 1px solid var(--error);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--error);
+    }
+    
+    /* Grid */
+    .meetings-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+    
+    @media (max-width: 1000px) {
+      .meetings-grid { grid-template-columns: 1fr; }
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       MEETING CARDS
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .meeting-card {
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    
+    .meeting-header {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    
+    .meeting-header .icon { font-size: 28px; }
+    .meeting-header .info { flex: 1; }
+    .meeting-header .name { font-size: 16px; font-weight: 600; }
+    .meeting-header .intention { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    
+    .meeting-header .badge {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .meeting-content {
+      padding: 20px;
+    }
+    
+    .meeting-section {
+      margin-bottom: 8px;
+    }
+    
+    .meeting-section:last-child {
+      margin-bottom: 0;
+    }
+    
+    .section-surface {
+      padding: 12px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.035);
+      transition: background-color 0.15s ease;
+    }
+    
+    .section-surface:hover {
+      background-color: var(--alignment-surface-focus);
+    }
+    
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    
+    .section-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    .section-required {
+      font-size: 9px;
+      color: var(--gold);
+      margin-left: 6px;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       1. ALIGNMENT MEETING
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .meeting-card.alignment {
+      background-color: var(--alignment-bg);
+    }
+    
+    .meeting-card.alignment .meeting-header .name { color: var(--text-primary); }
+    .meeting-card.alignment .meeting-header .badge {
+      background-color: rgba(255, 255, 255, 0.08);
+      color: var(--text-secondary);
+    }
+    
+    .meeting-card.alignment .section-surface {
+      background-color: var(--alignment-surface);
+      border-radius: var(--alignment-radius);
+      box-shadow: var(--alignment-shadow);
+    }
+    
+    .meeting-card.alignment .section-surface:hover {
+      background-color: var(--alignment-surface-focus);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       2. DECISION MEETING
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .meeting-card.decision {
+      background-color: var(--decision-bg);
+    }
+    
+    .meeting-card.decision .meeting-header .name { color: var(--cyan); }
+    .meeting-card.decision .meeting-header .badge {
+      background-color: var(--cyan);
+      color: var(--bg-root);
+    }
+    
+    .meeting-card.decision .section-surface {
+      background-color: var(--decision-surface);
+      border-radius: var(--decision-radius);
+      box-shadow: var(--decision-shadow);
+      padding: 10px 12px;
+    }
+    
+    .meeting-card.decision .section-surface:hover {
+      background-color: var(--decision-surface-focus);
+    }
+    
+    .meeting-card.decision .section-surface.decision-taken {
+      background-color: rgba(110, 175, 196, 0.08);
+      border-left: 3px solid var(--cyan);
+      border-radius: 0 var(--decision-radius) var(--decision-radius) 0;
+    }
+    
+    .meeting-card.decision .section-surface.decision-taken .section-title {
+      color: var(--cyan);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       3. WORKING MEETING
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .meeting-card.working {
+      background-color: var(--working-bg);
+    }
+    
+    .meeting-card.working .meeting-header .name { color: var(--gold); }
+    .meeting-card.working .meeting-header .badge {
+      background-color: var(--gold);
+      color: var(--bg-root);
+    }
+    
+    .meeting-card.working .section-surface {
+      background-color: var(--working-surface);
+      border-radius: var(--working-radius);
+      box-shadow: var(--working-shadow);
+      padding: 16px 18px;
+      margin-bottom: 16px;
+    }
+    
+    .meeting-card.working .section-surface:hover {
+      background-color: var(--working-surface-focus);
+      transform: translateY(-2px);
+    }
+    
+    .meeting-card.working .section-surface:last-child {
+      margin-bottom: 0;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       4. REVIEW MEETING
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .meeting-card.review {
+      background-color: var(--review-bg);
+    }
+    
+    .meeting-card.review .meeting-header .name { color: var(--green); }
+    .meeting-card.review .meeting-header .badge {
+      background-color: rgba(111, 175, 154, 0.2);
+      color: var(--green);
+    }
+    
+    .meeting-card.review .section-surface {
+      background-color: var(--review-surface);
+      border-radius: var(--review-radius);
+      box-shadow: var(--review-shadow);
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+    
+    .meeting-card.review .section-surface:hover {
+      background-color: var(--review-surface-focus);
+    }
+    
+    .meeting-card.review .section-surface:last-child {
+      margin-bottom: 0;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       INFO SECTIONS
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .info-section {
+      margin-bottom: 48px;
+    }
+    
+    .info-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .info-title .number {
+      width: 32px;
+      height: 32px;
+      background-color: var(--gold);
+      color: var(--bg-root);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    
+    /* Tokens Table */
+    .tokens-table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #2A3138;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .tokens-table th,
+    .tokens-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    
+    .tokens-table th {
+      background-color: #303841;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .tokens-table td {
+      font-size: 12px;
+    }
+    
+    .tokens-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .code {
+      font-family: 'SF Mono', monospace;
+      font-size: 11px;
+      color: var(--cyan);
+      background-color: var(--bg-root);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    
+    .color-swatch {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      vertical-align: middle;
+      margin-right: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    
+    /* Outputs Grid */
+    .outputs-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    
+    @media (max-width: 900px) {
+      .outputs-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    
+    .output-card {
+      background-color: #2A3138;
+      border-radius: 10px;
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    
+    .output-card .type-icon { font-size: 24px; margin-bottom: 10px; }
+    .output-card .type-name { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+    .output-card .outputs-list { font-size: 11px; color: var(--text-muted); }
+    .output-card .outputs-list li { margin-bottom: 4px; }
+    .output-card .outputs-list .required { color: var(--gold); }
+    
+    /* Agent Rules */
+    .agent-rules {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    
+    @media (max-width: 768px) {
+      .agent-rules { grid-template-columns: 1fr; }
+    }
+    
+    .agent-card {
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    
+    .agent-card.allowed {
+      background-color: rgba(111, 175, 154, 0.08);
+      border-color: var(--green);
+    }
+    
+    .agent-card.forbidden {
+      background-color: rgba(196, 112, 112, 0.08);
+      border-color: var(--error);
+    }
+    
+    .agent-card h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    
+    .agent-card.allowed h3 { color: var(--green); }
+    .agent-card.forbidden h3 { color: var(--error); }
+    
+    .agent-card ul {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .agent-card li {
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding: 6px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 40px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      margin-top: 48px;
+    }
+    .footer p { color: var(--text-muted); font-size: 14px; }
+    .footer .brand { color: var(--gold); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>✧ CHE·NU™ Meeting Templates</h1>
+      <p class="subtitle">Collaboration Space — 4 Types Canoniques</p>
+      <div class="rule">
+        ⚠️ Un meeting ne peut PAS changer de type après création
+      </div>
+    </header>
+
+    <!-- 4 Meeting Types -->
+    <div class="meetings-grid">
+      
+      <!-- 1. ALIGNMENT -->
+      <div class="meeting-card alignment">
+        <div class="meeting-header">
+          <span class="icon">🎯</span>
+          <div class="info">
+            <div class="name">Alignment Meeting</div>
+            <div class="intention">Aligner les compréhensions, réduire l'ambiguïté</div>
+          </div>
+          <span class="badge">Notes</span>
+        </div>
+        <div class="meeting-content">
+          <div class="meeting-section">
+            <div class="section-surface">
+              <div class="section-title">Context <span class="section-required">Required</span></div>
+              <div class="section-desc">Pourquoi ce meeting existe</div>
+            </div>
+          </div>
+          <div class="meeting-section">
+            <div class="section-surface">
+              <div class="section-title">Current Understanding <span class="section-required">Required</span></div>
+              <div class="section-desc">État partagé du système</div>
+            </div>
+          </div>
+          <div class="meeting-section">
+            <div class="section-surface">
+              <div class="section-title">Points of Divergence</div>
+              <div class="section-desc">Où les compréhensions diffèrent</div>
+            </div>
+          </div>
+          <div class="meeting-section">
+            <div class="section-surface">
+              <div class="section-title">Open Questions <span class="section-required">Required</span></div>
+              <div class="section-desc">Questions non résolues</div>
+            </div>
+          </div>
+          <div class="meeting-section">
+            <div class="section-surface">
+              <div class="section-title">Next Alignment Needs</div>
+              <div class="section-desc">Ce qui doit être clarifié plus tard</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 2. DECISION -->
+      <div class="meeting-card decision">
+        <div class="meeting-header">
+          <span class="icon">⚖️</span>
+          <div class="info">
+            <div class="name">Decision Meeting</div>
+            <div class="intention">Trancher, valider, choisir une direction</div>
+          </div>
+          <span class="badge">Décisions</span>
+        </div>
+        <div class="meeting-content">
+          <div class="meeting-section">
+            <div class="section-surface">
+              <div class="section-title">Context <span class="section-required">Required</span></div>
+              <div class="section-desc">Situation à résoudre</div>
+            </div>
+          </div>
+          <div class="meeting-section">
+            <div class="section-surface">
+              <div class="section-title">Options Considered <span class="section-required">Required</span></div>
+              <div class="section-desc">Liste courte des options</div>
+            </div>
+          </div>
+          <div class="meeting-section">
+            <div class="section-surface decision-taken">
+              <div class="section-title">Decision Taken <span class="section-required">OBLIGATOIRE</span></div>
+              <div class="section-desc">Choix final validé</div>
+            </div>
+          </div>
+          <div class="meeting-section">
+            <div class="section-surface">
+              <div class="section-title">Rationale <span class="section-required">Required</span></div>
+              <div class="section-desc">Pourquoi ce choix</div>
+            </div>
+          </div>
+          <div class="meeting-section">
+            <div class="section-surface">
+              <div class="section-title">Impact <span class="section-required">Required</span></div>
+              <div class="section-desc">Conséquences attendues</div>
+            </div>
+          </div>
+          <div class="meeting-section">
+            <div class="section-surface">
+              <div class="section-title">Follow-up</div>
+              <div class="section-desc">Actions ou vérifications</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 3. WORKING -->
+      <div class="meeting-card working">
+        <div class="meeting-header">
+          <span class="icon">🔧</span>
+          <div class="info">
+            <div class="name">Working Meeting</div>
+            <div class="intention">Travailler ensemble en temps réel</div>
+          </div>
+          <span class="badge">Outputs</span>
+        </div>
+        <div class="meeting-content">
+          <div class="section-surface">
+            <div class="section-title">Goal <span class="section-required">Required</span></div>
+            <div class="section-desc">Objectif clair de la session</div>
+          </div>
+          <div class="section-surface">
+            <div class="section-title">Scope <span class="section-required">Required</span></div>
+            <div class="section-desc">Ce qui est inclus / exclu</div>
+          </div>
+          <div class="section-surface">
+            <div class="section-title">Live Notes</div>
+            <div class="section-desc">Notes collaboratives</div>
+          </div>
+          <div class="section-surface">
+            <div class="section-title">Intermediate Outputs</div>
+            <div class="section-desc">Résultats partiels</div>
+          </div>
+          <div class="section-surface">
+            <div class="section-title">Outputs <span class="section-required">Required</span></div>
+            <div class="section-desc">Résultats produits</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 4. REVIEW -->
+      <div class="meeting-card review">
+        <div class="meeting-header">
+          <span class="icon">🔄</span>
+          <div class="info">
+            <div class="name">Review / Retrospective</div>
+            <div class="intention">Analyser, apprendre, améliorer</div>
+          </div>
+          <span class="badge">Learnings</span>
+        </div>
+        <div class="meeting-content">
+          <div class="section-surface">
+            <div class="section-title">What Worked <span class="section-required">Required</span></div>
+            <div class="section-desc">Points positifs</div>
+          </div>
+          <div class="section-surface">
+            <div class="section-title">What Didn't <span class="section-required">Required</span></div>
+            <div class="section-desc">Frictions / limites</div>
+          </div>
+          <div class="section-surface">
+            <div class="section-title">Learnings <span class="section-required">Required</span></div>
+            <div class="section-desc">Enseignements</div>
+          </div>
+          <div class="section-surface">
+            <div class="section-title">Improvements</div>
+            <div class="section-desc">Propositions d'amélioration</div>
+          </div>
+          <div class="section-surface">
+            <div class="section-title">Actions</div>
+            <div class="section-desc">Ajustements concrets (optionnel)</div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- UI Tokens -->
+    <section class="info-section">
+      <h2 class="info-title">
+        <span class="number">1</span>
+        Tokens UI par type
+      </h2>
+      
+      <table class="tokens-table">
+        <thead>
+          <tr>
+            <th>Token</th>
+            <th>🎯 Alignment</th>
+            <th>⚖️ Decision</th>
+            <th>🔧 Working</th>
+            <th>🔄 Review</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Border Radius</td>
+            <td><span class="code">10px</span></td>
+            <td><span class="code">8px</span></td>
+            <td><span class="code">14px</span></td>
+            <td><span class="code">12px</span></td>
+          </tr>
+          <tr>
+            <td>Background</td>
+            <td><span class="color-swatch" style="background: #2A3036;"></span><span class="code">#2A3036</span></td>
+            <td><span class="color-swatch" style="background: #282E34;"></span><span class="code">#282E34</span></td>
+            <td><span class="color-swatch" style="background: #2E353D;"></span><span class="code">#2E353D</span></td>
+            <td><span class="color-swatch" style="background: #2C3238;"></span><span class="code">#2C3238</span></td>
+          </tr>
+          <tr>
+            <td>Surface</td>
+            <td><span class="color-swatch" style="background: #2F363D;"></span><span class="code">#2F363D</span></td>
+            <td><span class="color-swatch" style="background: #2D343B;"></span><span class="code">#2D343B</span></td>
+            <td><span class="color-swatch" style="background: #353D46;"></span><span class="code">#353D46</span></td>
+            <td><span class="color-swatch" style="background: #31383F;"></span><span class="code">#31383F</span></td>
+          </tr>
+          <tr>
+            <td>Gap</td>
+            <td><span class="code">12px</span></td>
+            <td><span class="code">10px</span></td>
+            <td><span class="code">20px</span></td>
+            <td><span class="code">16px</span></td>
+          </tr>
+          <tr>
+            <td>Scroll</td>
+            <td>Court</td>
+            <td>Très court</td>
+            <td>Long</td>
+            <td>Medium</td>
+          </tr>
+          <tr>
+            <td>Animation</td>
+            <td>❌ Non</td>
+            <td>❌ Non</td>
+            <td>✅ Transitions lentes</td>
+            <td>❌ Non</td>
+          </tr>
+          <tr>
+            <td>Accent</td>
+            <td>Aucun</td>
+            <td><span style="color: var(--cyan);">Cyan sur Decision</span></td>
+            <td>Aucun</td>
+            <td>Aucun</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Outputs -->
+    <section class="info-section">
+      <h2 class="info-title">
+        <span class="number">2</span>
+        Outputs attendus
+      </h2>
+      
+      <div class="outputs-grid">
+        <div class="output-card">
+          <div class="type-icon">🎯</div>
+          <div class="type-name">Alignment</div>
+          <ul class="outputs-list">
+            <li class="required">✓ Notes</li>
+            <li class="required">✓ Questions ouvertes</li>
+            <li>✗ Aucune décision</li>
+          </ul>
+        </div>
+        <div class="output-card">
+          <div class="type-icon">⚖️</div>
+          <div class="type-name">Decision</div>
+          <ul class="outputs-list">
+            <li class="required">✓ Décisions (OBLIGATOIRE)</li>
+            <li>✓ Raisons</li>
+            <li>✓ Alternatives rejetées</li>
+          </ul>
+        </div>
+        <div class="output-card">
+          <div class="type-icon">🔧</div>
+          <div class="type-name">Working</div>
+          <ul class="outputs-list">
+            <li class="required">✓ Notes</li>
+            <li>✓ Drafts</li>
+            <li class="required">✓ Outputs</li>
+          </ul>
+        </div>
+        <div class="output-card">
+          <div class="type-icon">🔄</div>
+          <div class="type-name">Review</div>
+          <ul class="outputs-list">
+            <li class="required">✓ Notes</li>
+            <li class="required">✓ Learnings</li>
+            <li>✓ Actions (optionnel)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Agent Rules -->
+    <section class="info-section">
+      <h2 class="info-title">
+        <span class="number">3</span>
+        Agents — Limites strictes
+      </h2>
+      
+      <div class="agent-rules">
+        <div class="agent-card allowed">
+          <h3>✅ Agents autorisés à</h3>
+          <ul>
+            <li><span>→</span> Structurer les notes</li>
+            <li><span>→</span> Résumer les meetings</li>
+            <li><span>→</span> Rappeler les décisions</li>
+            <li><span>→</span> Alerter sur incohérences</li>
+          </ul>
+        </div>
+        <div class="agent-card forbidden">
+          <h3>❌ Agents interdits de</h3>
+          <ul>
+            <li><span>→</span> Décider</li>
+            <li><span>→</span> Reformuler une décision</li>
+            <li><span>→</span> Créer un meeting</li>
+            <li><span>→</span> Changer le type de meeting</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p><span class="brand">CHE·NU™ V50</span> — Meeting Templates Canon</p>
+      <p style="margin-top: 8px; font-size: 12px;">
+        Avant de lire le contenu, l'utilisateur sait: quel type • pourquoi • quel résultat
+      </p>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,338 @@
+/**
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║                    CHE·NU™ — FAQ PAGE                                        ║
+ * ║                    Foire aux questions                                       ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ */
+
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { 
+  ChevronDown, ChevronUp, HelpCircle, Search,
+  Shield, Brain, Wallet, Users, Lock, Zap
+} from 'lucide-react';
+
+// Types
+interface FAQItem {
+  question: string;
+  answer: string;
+  category: string;
+}
+
+// FAQ Data
+const faqData: FAQItem[] = [
+  // Général
+  {
+    category: 'Général',
+    question: "Qu'est-ce que CHE·NU exactement?",
+    answer: "CHE·NU est un Governed Intelligence Operating System - le premier système d'exploitation qui vous donne le contrôle total sur vos agents IA, vos données et vos coûts. Contrairement aux chatbots traditionnels, CHE·NU organise votre vie en 9 sphères distinctes (Personnel, Business, Créatif, etc.) et applique le principe 'Gouvernance > Exécution' où chaque action IA requiert votre approbation."
+  },
+  {
+    category: 'Général',
+    question: "Qu'est-ce que 'Gouvernance > Exécution' signifie?",
+    answer: "C'est notre philosophie fondamentale. Avant qu'une IA exécute une action importante, elle passe par un checkpoint qui requiert votre validation. Vous gardez le contrôle à tout moment. L'IA propose, vous disposez. Cela garantit que l'IA reste un outil à votre service, jamais l'inverse."
+  },
+  {
+    category: 'Général',
+    question: "Qui est Nova?",
+    answer: "Nova est l'intelligence système de CHE·NU. Elle supervise tous vos agents IA, gère vos threads, et assure la cohérence de votre espace de travail. Nova n'est pas un agent 'engagé' - elle est toujours présente et fait partie intégrante du système. Elle orchestre les 226 agents spécialisés disponibles."
+  },
+  
+  // Sphères
+  {
+    category: 'Sphères',
+    question: "Que sont les 9 Sphères?",
+    answer: "Les Sphères sont des contextes de vie complètement séparés: 1) Personal 🏠, 2) Business 💼, 3) Government & Institutions 🏛️, 4) Studio de création 🎨, 5) Community 👥, 6) Social & Media 📱, 7) Entertainment 🎬, 8) My Team 🤝, 9) Scholar 📚. Chaque sphère ouvre un Bureau avec la même structure, mais des données et agents différents."
+  },
+  {
+    category: 'Sphères',
+    question: "Puis-je ajouter plus de sphères?",
+    answer: "Non, le nombre de sphères est fixé à 9. C'est une décision architecturale délibérée. 9 sphères couvrent tous les aspects de la vie sans créer de surcharge cognitive. Au lieu d'ajouter des sphères, vous pouvez personnaliser les sections et agents au sein de chaque sphère."
+  },
+  {
+    category: 'Sphères',
+    question: "Mes données sont-elles séparées entre les sphères?",
+    answer: "Oui, absolument. Chaque sphère est un environnement isolé. Vos données Business ne sont jamais mélangées avec vos données Personal. Cette séparation est fondamentale pour la clarté et la sécurité. Les agents d'une sphère n'ont pas accès aux données des autres sphères sauf autorisation explicite."
+  },
+  
+  // Agents
+  {
+    category: 'Agents',
+    question: "Que sont les agents dans CHE·NU?",
+    answer: "Les agents sont des IA spécialisées dans des domaines précis. Il y a 226 agents couvrant des domaines comme le juridique, la comptabilité, la création de contenu, l'immobilier, etc. Chaque agent a un coût en tokens, un périmètre défini, et agit uniquement quand vous l'autorisez."
+  },
+  {
+    category: 'Agents',
+    question: "Quelle est la différence entre Nova et un agent?",
+    answer: "Nova est l'intelligence système - elle est toujours présente, gratuite, et supervise tout. Les agents sont des spécialistes 'engagés' pour des tâches spécifiques. Vous payez pour leur utilisation. Nova peut vous recommander quel agent utiliser, mais c'est vous qui décidez."
+  },
+  {
+    category: 'Agents',
+    question: "Puis-je créer mes propres agents?",
+    answer: "Oui! Selon votre plan, vous pouvez créer des agents personnalisés avec des instructions spécifiques, un périmètre défini, et des règles de gouvernance. Le plan Base permet 3 agents custom, Pro en permet 10, et les plans Enterprise offrent plus de flexibilité."
+  },
+  
+  // Tokens & Coûts
+  {
+    category: 'Tokens & Coûts',
+    question: "Que sont les tokens CHE·NU?",
+    answer: "Les tokens CHE·NU sont des crédits internes qui représentent l'énergie d'intelligence utilisée. Ce ne sont PAS des cryptomonnaies - ils n'ont aucune valeur spéculative. Ils servent uniquement à rendre les coûts transparents et contrôlables. Chaque action IA coûte un certain nombre de tokens."
+  },
+  {
+    category: 'Tokens & Coûts',
+    question: "Comment fonctionne la facturation?",
+    answer: "Chaque plan inclut un nombre de requêtes mensuelles. Une 'requête' correspond à une interaction avec l'IA (question/réponse). Si vous dépassez votre quota, vous pouvez acheter des packs additionnels ou upgrader votre plan. Vos requêtes non utilisées ne se cumulent pas au mois suivant."
+  },
+  {
+    category: 'Tokens & Coûts',
+    question: "Pourquoi vos prix sont-ils plus bas que ChatGPT?",
+    answer: "Nous avons développé 4 modules d'optimisation des coûts (Semantic Cache, Prompt Compressor, Local Model Router, Backlog Learner) qui réduisent nos coûts d'infrastructure de 50-80%. Ces économies sont répercutées sur nos prix. Notre prix par requête est 60-95% moins cher que la concurrence."
+  },
+  
+  // Sécurité & Vie Privée
+  {
+    category: 'Sécurité',
+    question: "Mes données sont-elles en sécurité?",
+    answer: "Absolument. Nous utilisons un chiffrement de bout en bout, vos données sont stockées dans des centres de données certifiés (SOC2, ISO27001), et nous ne vendons JAMAIS vos données. Contrairement à d'autres services IA, vos conversations ne sont pas utilisées pour entraîner nos modèles sans votre consentement explicite."
+  },
+  {
+    category: 'Sécurité',
+    question: "CHE·NU est-il conforme au RGPD?",
+    answer: "Oui. Nous sommes pleinement conformes au RGPD européen et au EU AI Act. Vous avez le droit d'accès, de rectification, de suppression et de portabilité de vos données. Notre modèle 'Gouvernance > Exécution' est aligné avec les principes d'IA responsable exigés par les régulations européennes."
+  },
+  {
+    category: 'Sécurité',
+    question: "Où sont hébergées mes données?",
+    answer: "Par défaut, vos données sont hébergées dans l'UE (France/Allemagne). Les clients Enterprise peuvent choisir leur région d'hébergement ou opter pour une installation on-premise. Nous offrons également une option de chiffrement avec clés client pour les données sensibles."
+  },
+  
+  // Technique
+  {
+    category: 'Technique',
+    question: "Quels modèles d'IA utilisez-vous?",
+    answer: "Nous utilisons un mix intelligent de modèles: Claude (Anthropic), GPT-4 (OpenAI), et des modèles locaux open-source (Llama, Mistral) pour les tâches simples. Notre routeur intelligent choisit automatiquement le meilleur modèle selon la complexité de votre requête et votre budget."
+  },
+  {
+    category: 'Technique',
+    question: "Puis-je intégrer CHE·NU avec d'autres outils?",
+    answer: "Oui! Le plan Pro inclut des intégrations avec Google Calendar, Google Drive, et d'autres services populaires. Le plan Business et supérieur permet des intégrations custom via notre API. Nous supportons les webhooks, Zapier, et des connecteurs natifs pour Slack, Notion, etc."
+  },
+  {
+    category: 'Technique',
+    question: "Y a-t-il une API disponible?",
+    answer: "Oui, à partir du plan Pro. L'API permet d'intégrer CHE·NU dans vos propres applications, d'automatiser des workflows, et d'accéder à vos agents programmatiquement. Documentation complète disponible sur docs.chenu.ai."
+  },
+  
+  // Plans & Abonnements
+  {
+    category: 'Abonnements',
+    question: "Puis-je essayer gratuitement?",
+    answer: "Oui! Le plan Découverte est gratuit pour toujours avec 75 requêtes/mois, 3 sphères, et 1 agent. C'est suffisant pour découvrir CHE·NU et comprendre sa valeur. Aucune carte de crédit n'est requise pour commencer."
+  },
+  {
+    category: 'Abonnements',
+    question: "Puis-je changer de plan à tout moment?",
+    answer: "Oui. Vous pouvez upgrader à tout moment (effet immédiat, au prorata). Pour downgrader, le changement prend effet au prochain cycle de facturation. Si vous downgrader, assurez-vous de ne pas dépasser les limites du nouveau plan (agents, stockage, etc.)."
+  },
+  {
+    category: 'Abonnements',
+    question: "Offrez-vous une réduction annuelle?",
+    answer: "Oui! Tous les plans payants bénéficient de 20% de réduction en choisissant la facturation annuelle. Par exemple, le plan Pro passe de $39.99/mois à $31.99/mois facturé annuellement."
+  },
+];
+
+// FAQ Accordion Component
+const FAQAccordion: React.FC<{ item: FAQItem; isOpen: boolean; toggle: () => void }> = ({ 
+  item, isOpen, toggle 
+}) => {
+  return (
+    <div className="border-b border-[#8D8371]/20">
+      <button
+        onClick={toggle}
+        className="w-full py-6 flex items-center justify-between text-left hover:text-[#D8B26A] transition"
+      >
+        <span className="text-lg font-medium text-white pr-8">{item.question}</span>
+        {isOpen ? (
+          <ChevronUp className="w-5 h-5 text-[#D8B26A] shrink-0" />
+        ) : (
+          <ChevronDown className="w-5 h-5 text-[#8D8371] shrink-0" />
+        )}
+      </button>
+      {isOpen && (
+        <div className="pb-6 text-[#E9E4D6]/70 leading-relaxed">
+          {item.answer}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Main Component
+export const FAQPage: React.FC = () => {
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  
+  const categories = [...new Set(faqData.map(item => item.category))];
+  
+  const filteredFAQ = faqData.filter(item => {
+    const matchesSearch = searchTerm === '' || 
+      item.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.answer.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = activeCategory === null || item.category === activeCategory;
+    return matchesSearch && matchesCategory;
+  });
+  
+  const categoryIcons: Record<string, React.ReactNode> = {
+    'Général': <HelpCircle className="w-4 h-4" />,
+    'Sphères': <Brain className="w-4 h-4" />,
+    'Agents': <Users className="w-4 h-4" />,
+    'Tokens & Coûts': <Wallet className="w-4 h-4" />,
+    'Sécurité': <Shield className="w-4 h-4" />,
+    'Technique': <Zap className="w-4 h-4" />,
+    'Abonnements': <Lock className="w-4 h-4" />,
+  };
+  
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#1E1F22] to-[#2F4C39]">
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#1E1F22]/90 backdrop-blur-md border-b border-[#D8B26A]/20">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#D8B26A] to-[#7A593A] flex items-center justify-center">
+              <span className="text-white font-bold text-lg">C</span>
+            </div>
+            <span className="text-2xl font-bold text-white">
+              CHE<span className="text-[#D8B26A]">·</span>NU
+            </span>
+          </Link>
+          
+          <div className="flex items-center gap-4">
+            <Link to="/login" className="text-[#E9E4D6] hover:text-[#D8B26A] transition">
+              Connexion
+            </Link>
+            <Link to="/signup" className="px-6 py-2 bg-[#D8B26A] text-[#1E1F22] font-semibold rounded-lg hover:bg-[#E9E4D6] transition">
+              Commencer
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* Header */}
+      <section className="pt-32 pb-12 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <HelpCircle className="w-16 h-16 text-[#D8B26A] mx-auto mb-6" />
+          <h1 className="text-5xl font-bold text-white mb-6">
+            Foire aux questions
+          </h1>
+          <p className="text-xl text-[#E9E4D6]/70 mb-8">
+            Trouvez rapidement les réponses à vos questions sur CHE·NU
+          </p>
+          
+          {/* Search */}
+          <div className="relative max-w-xl mx-auto">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8D8371]" />
+            <input
+              type="text"
+              placeholder="Rechercher une question..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-4 bg-[#1E1F22] border border-[#8D8371]/30 rounded-xl text-white placeholder-[#8D8371] focus:border-[#D8B26A] focus:outline-none transition"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Category Filters */}
+      <section className="px-6 pb-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex flex-wrap justify-center gap-3">
+            <button
+              onClick={() => setActiveCategory(null)}
+              className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${
+                activeCategory === null 
+                  ? 'bg-[#D8B26A] text-[#1E1F22]' 
+                  : 'bg-[#1E1F22] text-[#E9E4D6]/70 hover:text-white border border-[#8D8371]/30'
+              }`}
+            >
+              Tous
+            </button>
+            {categories.map(category => (
+              <button
+                key={category}
+                onClick={() => setActiveCategory(category)}
+                className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${
+                  activeCategory === category 
+                    ? 'bg-[#D8B26A] text-[#1E1F22]' 
+                    : 'bg-[#1E1F22] text-[#E9E4D6]/70 hover:text-white border border-[#8D8371]/30'
+                }`}
+              >
+                {categoryIcons[category]}
+                {category}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ List */}
+      <section className="px-6 pb-20">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-[#1E1F22] rounded-2xl border border-[#8D8371]/20 p-8">
+            {filteredFAQ.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-[#E9E4D6]/60">Aucune question ne correspond à votre recherche.</p>
+              </div>
+            ) : (
+              filteredFAQ.map((item, idx) => (
+                <FAQAccordion
+                  key={idx}
+                  item={item}
+                  isOpen={openIndex === idx}
+                  toggle={() => setOpenIndex(openIndex === idx ? null : idx)}
+                />
+              ))
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Still Have Questions */}
+      <section className="py-16 px-6 bg-[#1E1F22]">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Vous avez encore des questions?
+          </h2>
+          <p className="text-[#E9E4D6]/70 mb-8">
+            Notre équipe est là pour vous aider.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              to="/contact"
+              className="px-8 py-3 bg-[#D8B26A] text-[#1E1F22] font-semibold rounded-xl hover:bg-[#E9E4D6] transition"
+            >
+              Nous contacter
+            </Link>
+            <a
+              href="mailto:support@chenu.ai"
+              className="px-8 py-3 border border-[#D8B26A] text-[#D8B26A] font-semibold rounded-xl hover:bg-[#D8B26A]/10 transition"
+            >
+              support@chenu.ai
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 px-6 bg-[#1E1F22] border-t border-[#D8B26A]/20">
+        <div className="max-w-7xl mx-auto text-center">
+          <p className="text-[#E9E4D6]/40 text-sm">
+            © 2025 CHE·NU™. Tous droits réservés. | Gouvernance {'>'} Exécution
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default FAQPage;

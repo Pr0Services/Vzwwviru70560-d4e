@@ -1,0 +1,487 @@
+/**
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║                    CHE·NU™ — FEATURES PAGE                                   ║
+ * ║                    Toutes les fonctionnalités en détail                      ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ */
+
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { 
+  Shield, Brain, Zap, Lock, Eye, Users, 
+  ArrowRight, Check, ChevronRight,
+  Home, Briefcase, Building2, Palette, 
+  Users2, Smartphone, Gamepad2, GraduationCap, UserCircle2,
+  MessageSquare, FileText, Calendar, Database,
+  Bot, BarChart3, Layers, Globe, Sparkles,
+  CheckCircle2, Clock, Coins, Target, Workflow,
+  FolderKanban, Video, PieChart, Settings,
+  Cpu, Network, Fingerprint, Bell
+} from 'lucide-react';
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const spheres = [
+  { id: 'personal', name: 'Personnel', emoji: '🏠', icon: Home, color: '#3EB4A2', 
+    description: 'Gérez votre vie personnelle, finances, santé, et projets privés.' },
+  { id: 'business', name: 'Business', emoji: '💼', icon: Briefcase, color: '#D8B26A',
+    description: 'Pilotez votre entreprise, clients, projets, et opérations.' },
+  { id: 'government', name: 'Gouvernement', emoji: '🏛️', icon: Building2, color: '#8D8371',
+    description: 'Gérez les relations institutionnelles et administratives.' },
+  { id: 'studio', name: 'Studio Créatif', emoji: '🎨', icon: Palette, color: '#7A593A',
+    description: 'Créez du contenu, designs, et productions artistiques.' },
+  { id: 'community', name: 'Communauté', emoji: '👥', icon: Users2, color: '#3F7249',
+    description: 'Animez vos communautés et associations.' },
+  { id: 'social', name: 'Social & Media', emoji: '📱', icon: Smartphone, color: '#2F4C39',
+    description: 'Gérez votre présence sur les réseaux sociaux.' },
+  { id: 'entertainment', name: 'Entertainment', emoji: '🎬', icon: Gamepad2, color: '#E9E4D6',
+    description: 'Organisez vos loisirs, jeux, et divertissements.' },
+  { id: 'team', name: 'Mon Équipe', emoji: '🤝', icon: UserCircle2, color: '#5ED8FF',
+    description: 'Collaborez avec votre équipe et gérez les agents.' },
+  { id: 'scholars', name: 'Scholars', emoji: '🎓', icon: GraduationCap, color: '#9B59B6',
+    description: 'Apprenez, formez-vous, et développez vos compétences.' },
+];
+
+const bureauSections = [
+  { icon: BarChart3, name: 'Dashboard', desc: 'Vue d\'ensemble et KPIs' },
+  { icon: FileText, name: 'Notes', desc: 'Capture et organisation' },
+  { icon: CheckCircle2, name: 'Tasks', desc: 'Gestion des tâches' },
+  { icon: FolderKanban, name: 'Projects', desc: 'Projets et milestones' },
+  { icon: MessageSquare, name: 'Threads', desc: 'Conversations persistantes' },
+  { icon: Video, name: 'Meetings', desc: 'Réunions et comptes-rendus' },
+  { icon: Database, name: 'Data', desc: 'Base de données' },
+  { icon: Bot, name: 'Agents', desc: 'Agents IA spécialisés' },
+  { icon: PieChart, name: 'Reports', desc: 'Rapports et historique' },
+  { icon: Coins, name: 'Budget', desc: 'Gouvernance tokens' },
+];
+
+const coreFeatures = [
+  {
+    id: 'governance',
+    icon: Shield,
+    title: 'Système de Gouvernance',
+    subtitle: 'Governance > Execution',
+    description: 'Chaque action IA passe par un checkpoint. Vous voyez ce qui sera fait, le coût, et vous décidez.',
+    benefits: [
+      'Approbation humaine obligatoire',
+      'Visualisation avant exécution',
+      'Coût tokens visible',
+      'Audit trail complet',
+    ],
+    color: '#D8B26A',
+  },
+  {
+    id: 'spheres',
+    icon: Layers,
+    title: '9 Sphères Contextuelles',
+    subtitle: 'Séparation = Intelligence',
+    description: 'Vos données sont compartimentées par contexte. Aucune fuite entre vie pro et perso.',
+    benefits: [
+      'Isolation des données',
+      'Réduction cognitive',
+      'Navigation intuitive',
+      'Permissions granulaires',
+    ],
+    color: '#3EB4A2',
+  },
+  {
+    id: 'agents',
+    icon: Brain,
+    title: '226+ Agents Spécialisés',
+    subtitle: 'Experts dans chaque domaine',
+    description: 'Des agents formés pour la construction, finance, juridique, création, marketing, et plus.',
+    benefits: [
+      'Expertise domaine',
+      'Supervision Nova',
+      'Personnalisables',
+      'Coût maîtrisé',
+    ],
+    color: '#3F7249',
+  },
+  {
+    id: 'tokens',
+    icon: Coins,
+    title: 'Économie de Tokens',
+    subtitle: 'Contrôle total des coûts',
+    description: 'Visualisez et contrôlez chaque token dépensé. Budgets par sphère, agent, ou projet.',
+    benefits: [
+      'Transparence totale',
+      'Budgets personnalisés',
+      'Alertes de dépassement',
+      'Rapports détaillés',
+    ],
+    color: '#7A593A',
+  },
+  {
+    id: 'threads',
+    icon: MessageSquare,
+    title: 'Threads Persistants',
+    subtitle: 'Mémoire de travail',
+    description: 'Contrairement aux chats éphémères, les Threads conservent contexte et décisions.',
+    benefits: [
+      'Contexte persistant',
+      'Historique auditable',
+      'Export .chenu',
+      'Partage contrôlé',
+    ],
+    color: '#8D8371',
+  },
+  {
+    id: 'nova',
+    icon: Sparkles,
+    title: 'Nova - Intelligence Système',
+    subtitle: 'Toujours présente',
+    description: 'Nova supervise, guide, et assure la cohérence globale. Elle n\'est pas un agent, elle EST le système.',
+    benefits: [
+      'Mémoire globale',
+      'Supervision agents',
+      'Gouvernance',
+      'Guidance contextuelle',
+    ],
+    color: '#3EB4A2',
+  },
+];
+
+const advancedFeatures = [
+  { icon: Lock, title: 'Chiffrement E2E', desc: 'AES-256 au repos, TLS 1.3 en transit' },
+  { icon: Fingerprint, title: 'Audit Immutable', desc: 'Hash chain pour traçabilité' },
+  { icon: Globe, title: 'Multi-langue', desc: 'Interface FR/EN/ES' },
+  { icon: Cpu, title: 'On-premise', desc: 'Déploiement privé disponible' },
+  { icon: Network, title: 'API REST', desc: 'Intégration complète' },
+  { icon: Bell, title: 'Notifications', desc: 'Alertes temps réel' },
+  { icon: Calendar, title: 'Meetings AI', desc: 'Comptes-rendus automatiques' },
+  { icon: Workflow, title: 'Automations', desc: 'Workflows personnalisés' },
+];
+
+const integrations = [
+  { name: 'Google Workspace', logo: '📧' },
+  { name: 'Microsoft 365', logo: '📊' },
+  { name: 'Slack', logo: '💬' },
+  { name: 'Notion', logo: '📝' },
+  { name: 'Calendly', logo: '📅' },
+  { name: 'Stripe', logo: '💳' },
+  { name: 'GitHub', logo: '🐙' },
+  { name: 'Zapier', logo: '⚡' },
+];
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// COMPONENTS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const FeatureCard: React.FC<{ feature: typeof coreFeatures[0] }> = ({ feature }) => (
+  <div className="bg-[#1E1F22] rounded-2xl border border-[#D8B26A]/20 p-8 hover:border-[#D8B26A]/50 transition-all group">
+    <div 
+      className="w-14 h-14 rounded-xl flex items-center justify-center mb-6"
+      style={{ background: `linear-gradient(135deg, ${feature.color}40, ${feature.color}20)` }}
+    >
+      <feature.icon className="w-7 h-7" style={{ color: feature.color }} />
+    </div>
+    
+    <h3 className="text-xl font-bold text-white mb-2">{feature.title}</h3>
+    <p className="text-[#D8B26A] text-sm font-medium mb-4">{feature.subtitle}</p>
+    <p className="text-[#E9E4D6]/70 mb-6">{feature.description}</p>
+    
+    <ul className="space-y-2">
+      {feature.benefits.map((benefit, i) => (
+        <li key={i} className="flex items-center gap-2 text-[#E9E4D6]/80 text-sm">
+          <Check className="w-4 h-4 text-[#3EB4A2]" />
+          {benefit}
+        </li>
+      ))}
+    </ul>
+  </div>
+);
+
+const SphereCard: React.FC<{ sphere: typeof spheres[0] }> = ({ sphere }) => (
+  <div className="flex items-start gap-4 p-4 rounded-xl bg-[#1E1F22]/50 border border-white/5 hover:border-[#D8B26A]/30 transition-all">
+    <div 
+      className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
+      style={{ background: `linear-gradient(135deg, ${sphere.color}40, ${sphere.color}20)` }}
+    >
+      <span className="text-2xl">{sphere.emoji}</span>
+    </div>
+    <div>
+      <h4 className="text-white font-semibold mb-1">{sphere.name}</h4>
+      <p className="text-[#E9E4D6]/60 text-sm">{sphere.description}</p>
+    </div>
+  </div>
+);
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MAIN COMPONENT
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export const FeaturesPage: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<'core' | 'spheres' | 'bureau'>('core');
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#1E1F22] to-[#2F4C39]">
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#1E1F22]/90 backdrop-blur-md border-b border-[#D8B26A]/20">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#D8B26A] to-[#7A593A] flex items-center justify-center">
+              <span className="text-white font-bold text-lg">C</span>
+            </div>
+            <span className="text-2xl font-bold text-white">
+              CHE<span className="text-[#D8B26A]">·</span>NU
+            </span>
+          </Link>
+          
+          <div className="hidden md:flex items-center gap-8">
+            <Link to="/" className="text-[#E9E4D6] hover:text-[#D8B26A] transition">Accueil</Link>
+            <Link to="/pricing" className="text-[#E9E4D6] hover:text-[#D8B26A] transition">Tarifs</Link>
+            <Link to="/demo" className="text-[#E9E4D6] hover:text-[#D8B26A] transition">Démo</Link>
+            <Link 
+              to="/signup"
+              className="px-5 py-2 bg-gradient-to-r from-[#D8B26A] to-[#7A593A] text-white rounded-lg font-medium hover:shadow-lg transition"
+            >
+              Commencer
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero */}
+      <section className="pt-32 pb-16 px-6">
+        <div className="max-w-6xl mx-auto text-center">
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+            Fonctionnalités
+          </h1>
+          <p className="text-xl text-[#E9E4D6]/80 max-w-3xl mx-auto">
+            Découvrez tout ce qui fait de CHE·NU le premier 
+            <span className="text-[#D8B26A]"> Système d'Exploitation à Intelligence Gouvernée</span>
+          </p>
+        </div>
+      </section>
+
+      {/* Tab Navigation */}
+      <section className="px-6 pb-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex justify-center gap-2 p-2 bg-[#1E1F22]/50 rounded-xl">
+            {[
+              { id: 'core', label: 'Fonctionnalités Core' },
+              { id: 'spheres', label: 'Les 9 Sphères' },
+              { id: 'bureau', label: 'Structure Bureau' },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`px-6 py-3 rounded-lg font-medium transition-all ${
+                  activeTab === tab.id
+                    ? 'bg-[#D8B26A] text-[#1E1F22]'
+                    : 'text-[#E9E4D6] hover:bg-white/10'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Core Features */}
+      {activeTab === 'core' && (
+        <section className="px-6 pb-20">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {coreFeatures.map((feature) => (
+                <FeatureCard key={feature.id} feature={feature} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Spheres */}
+      {activeTab === 'spheres' && (
+        <section className="px-6 pb-20">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-white mb-4">
+                9 Sphères, 9 Contextes
+              </h2>
+              <p className="text-[#E9E4D6]/70 max-w-2xl mx-auto">
+                Chaque sphère est un espace isolé avec ses propres données, agents, et paramètres.
+                Cette séparation protège vos informations et réduit la surcharge cognitive.
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {spheres.map((sphere) => (
+                <SphereCard key={sphere.id} sphere={sphere} />
+              ))}
+            </div>
+            
+            <div className="mt-12 p-6 bg-[#D8B26A]/10 rounded-2xl border border-[#D8B26A]/30">
+              <div className="flex items-start gap-4">
+                <Lock className="w-8 h-8 text-[#D8B26A] flex-shrink-0" />
+                <div>
+                  <h4 className="text-white font-semibold mb-2">Isolation Garantie</h4>
+                  <p className="text-[#E9E4D6]/70 text-sm">
+                    Les données de chaque sphère sont strictement isolées. Un agent de la sphère Business 
+                    ne peut jamais accéder aux données de la sphère Personnel, sauf autorisation explicite.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Bureau Structure */}
+      {activeTab === 'bureau' && (
+        <section className="px-6 pb-20">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-white mb-4">
+                Structure Bureau Universelle
+              </h2>
+              <p className="text-[#E9E4D6]/70 max-w-2xl mx-auto">
+                Chaque sphère ouvre un Bureau avec la même structure. 
+                Une fois appris, vous naviguez partout intuitivement.
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
+              {bureauSections.map((section, i) => (
+                <div 
+                  key={i}
+                  className="p-4 bg-[#1E1F22] rounded-xl border border-white/10 text-center hover:border-[#D8B26A]/30 transition-all"
+                >
+                  <section.icon className="w-8 h-8 text-[#D8B26A] mx-auto mb-3" />
+                  <h4 className="text-white font-medium mb-1">{section.name}</h4>
+                  <p className="text-[#E9E4D6]/50 text-xs">{section.desc}</p>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-12 p-8 bg-[#1E1F22] rounded-2xl border border-[#3EB4A2]/30">
+              <h4 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                <Sparkles className="w-6 h-6 text-[#3EB4A2]" />
+                Pourquoi cette uniformité?
+              </h4>
+              <div className="grid md:grid-cols-3 gap-6">
+                <div>
+                  <h5 className="text-[#3EB4A2] font-medium mb-2">Apprentissage Rapide</h5>
+                  <p className="text-[#E9E4D6]/60 text-sm">
+                    Apprenez une fois, utilisez partout. Pas de nouvelle interface à chaque sphère.
+                  </p>
+                </div>
+                <div>
+                  <h5 className="text-[#3EB4A2] font-medium mb-2">Cohérence</h5>
+                  <p className="text-[#E9E4D6]/60 text-sm">
+                    Les mêmes outils, la même logique. Seul le contenu et les agents changent.
+                  </p>
+                </div>
+                <div>
+                  <h5 className="text-[#3EB4A2] font-medium mb-2">Efficacité</h5>
+                  <p className="text-[#E9E4D6]/60 text-sm">
+                    Réduction de 40% du temps de navigation par rapport aux apps traditionnelles.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Advanced Features */}
+      <section className="px-6 py-20 bg-[#1E1F22]/50">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-bold text-white text-center mb-12">
+            Fonctionnalités Avancées
+          </h2>
+          
+          <div className="grid md:grid-cols-4 gap-6">
+            {advancedFeatures.map((feature, i) => (
+              <div key={i} className="p-5 bg-[#2F4C39]/20 rounded-xl border border-[#3F7249]/20">
+                <feature.icon className="w-8 h-8 text-[#D8B26A] mb-3" />
+                <h4 className="text-white font-medium mb-1">{feature.title}</h4>
+                <p className="text-[#E9E4D6]/50 text-sm">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Integrations */}
+      <section className="px-6 py-20">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Intégrations
+          </h2>
+          <p className="text-[#E9E4D6]/70 mb-12">
+            CHE·NU se connecte à vos outils favoris
+          </p>
+          
+          <div className="flex flex-wrap justify-center gap-4">
+            {integrations.map((integration, i) => (
+              <div 
+                key={i}
+                className="flex items-center gap-2 px-4 py-3 bg-[#1E1F22] rounded-xl border border-white/10"
+              >
+                <span className="text-xl">{integration.logo}</span>
+                <span className="text-white">{integration.name}</span>
+              </div>
+            ))}
+          </div>
+          
+          <p className="text-[#E9E4D6]/50 text-sm mt-8">
+            + API REST complète pour intégrations personnalisées
+          </p>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="px-6 py-20 bg-gradient-to-r from-[#D8B26A]/10 to-[#3EB4A2]/10">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-white mb-6">
+            Prêt à gouverner votre intelligence?
+          </h2>
+          <p className="text-xl text-[#E9E4D6]/80 mb-8">
+            Commencez gratuitement et découvrez la puissance de CHE·NU
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link 
+              to="/signup"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-[#D8B26A] to-[#7A593A] text-white rounded-xl font-semibold text-lg hover:shadow-xl transition"
+            >
+              Commencer gratuitement
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+            <Link 
+              to="/demo"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 text-white rounded-xl font-semibold text-lg hover:bg-white/20 transition border border-white/20"
+            >
+              Voir la démo
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 px-6 border-t border-white/10">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#D8B26A] to-[#7A593A] flex items-center justify-center">
+              <span className="text-white font-bold">C</span>
+            </div>
+            <span className="text-white font-semibold">CHE·NU™</span>
+          </div>
+          <div className="text-[#E9E4D6]/50 text-sm">
+            © 2025 CHE·NU Inc. Tous droits réservés.
+          </div>
+          <div className="flex gap-6">
+            <Link to="/faq" className="text-[#E9E4D6]/50 hover:text-[#D8B26A] text-sm">FAQ</Link>
+            <Link to="/privacy" className="text-[#E9E4D6]/50 hover:text-[#D8B26A] text-sm">Confidentialité</Link>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default FeaturesPage;

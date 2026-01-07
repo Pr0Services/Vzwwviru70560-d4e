@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHE·NU™ — Decision Timeline: Dashboard vs Collaboration</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════════════
+       CHE·NU™ — DECISION TIMELINE
+       Dashboard vs Collaboration + Knowledge Graph
+       
+       RÈGLE: Le contexte détermine le NIVEAU DE DÉTAIL
+       La Timeline est READ-ONLY partout
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    :root {
+      /* === GLOBAL === */
+      --bg-root: #1B1F23;
+      --text-primary: #E6E8EA;
+      --text-secondary: #B8BDC3;
+      --text-muted: #8B9096;
+      --gold: #BFAE7A;
+      --cyan: #6EAFC4;
+      --green: #6FAF9A;
+      
+      /* === DASHBOARD MODE === */
+      --dashboard-bg: #242A30;
+      --dashboard-surface: #2A3138;
+      
+      /* === COLLABORATION MODE === */
+      --collab-bg: #1F2429;
+      --collab-surface: #2A3138;
+      
+      /* === ITEMS === */
+      --item-bg: #2A3138;
+      --item-bg-hover: #303841;
+      --item-bg-active: #2D3540;
+      --item-border: rgba(255, 255, 255, 0.04);
+      --item-border-active: rgba(110, 175, 196, 0.2);
+      
+      /* === DOTS === */
+      --dot-active: #6EAFC4;
+      --dot-superseded: #8B9096;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: linear-gradient(180deg, #181C20, var(--bg-root));
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    
+    .container { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+    
+    /* Header */
+    .header { text-align: center; margin-bottom: 48px; }
+    .header h1 { font-size: 32px; font-weight: 700; color: var(--gold); margin-bottom: 8px; }
+    .header .subtitle { font-size: 16px; color: var(--text-secondary); margin-bottom: 20px; }
+    
+    /* Section */
+    .section { margin-bottom: 48px; }
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-title .emoji { font-size: 24px; }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       COMPARISON GRID
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+    
+    @media (max-width: 900px) {
+      .comparison-grid { grid-template-columns: 1fr; }
+    }
+    
+    /* Mode Headers */
+    .mode-container {
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    
+    .mode-header {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    
+    .mode-header .icon { font-size: 20px; }
+    .mode-header .name { font-size: 14px; font-weight: 600; flex: 1; }
+    .mode-header .badge {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .mode-content {
+      padding: 20px;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       DASHBOARD MODE
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .mode-container.dashboard {
+      background-color: var(--dashboard-bg);
+    }
+    
+    .mode-container.dashboard .mode-header .name { color: var(--cyan); }
+    .mode-container.dashboard .mode-header .badge {
+      background-color: rgba(110, 175, 196, 0.15);
+      color: var(--cyan);
+    }
+    
+    .dashboard-timeline {
+      max-height: 280px;
+      overflow: hidden;
+    }
+    
+    .dashboard-timeline .timeline-item {
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      background-color: var(--item-bg);
+      border: 1px solid var(--item-border);
+    }
+    
+    .dashboard-timeline .timeline-item.active {
+      background-color: var(--item-bg-active);
+      border-color: var(--item-border-active);
+    }
+    
+    .dashboard-timeline .item-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .dashboard-timeline .item-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    
+    .dashboard-timeline .item-dot.active {
+      background-color: var(--dot-active);
+    }
+    
+    .dashboard-timeline .item-dot.superseded {
+      background-color: transparent;
+      border: 2px solid var(--dot-superseded);
+    }
+    
+    .dashboard-timeline .item-title {
+      font-size: 12px;
+      font-weight: 500;
+      flex: 1;
+    }
+    
+    .dashboard-timeline .active .item-title { color: var(--text-primary); }
+    .dashboard-timeline .superseded .item-title { color: var(--text-muted); }
+    
+    .dashboard-timeline .item-badge {
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    
+    .dashboard-timeline .active .item-badge {
+      background-color: rgba(110, 175, 196, 0.15);
+      color: var(--cyan);
+    }
+    
+    .dashboard-timeline .superseded .item-badge {
+      background-color: rgba(139, 144, 150, 0.1);
+      color: var(--text-muted);
+    }
+    
+    .dashboard-timeline .superseded {
+      opacity: 0.6;
+    }
+    
+    .dashboard-timeline .item-meta {
+      display: flex;
+      gap: 8px;
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      margin-left: 16px;
+    }
+    
+    .dashboard-timeline .item-impact {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      margin-left: 16px;
+    }
+    
+    .view-full-history {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    
+    .view-full-history:hover {
+      color: var(--cyan);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       COLLABORATION MODE
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .mode-container.collaboration {
+      background-color: var(--collab-bg);
+    }
+    
+    .mode-container.collaboration .mode-header .name { color: var(--gold); }
+    .mode-container.collaboration .mode-header .badge {
+      background-color: rgba(191, 174, 122, 0.15);
+      color: var(--gold);
+    }
+    
+    .collab-timeline {
+      position: relative;
+      padding-left: 24px;
+    }
+    
+    .collab-timeline::before {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background-color: rgba(255, 255, 255, 0.06);
+    }
+    
+    .collab-timeline .timeline-item {
+      position: relative;
+      padding: 14px 16px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+      background-color: var(--item-bg);
+      border: 1px solid var(--item-border);
+    }
+    
+    .collab-timeline .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -24px;
+      top: 18px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      z-index: 1;
+    }
+    
+    .collab-timeline .timeline-item.active::before {
+      background-color: var(--dot-active);
+      width: 12px;
+      height: 12px;
+      left: -25px;
+      top: 17px;
+    }
+    
+    .collab-timeline .timeline-item.superseded::before {
+      background-color: transparent;
+      border: 2px solid var(--dot-superseded);
+    }
+    
+    .collab-timeline .timeline-item.active {
+      background-color: var(--item-bg-active);
+      border-color: var(--item-border-active);
+    }
+    
+    .collab-timeline .timeline-item.superseded {
+      opacity: 0.6;
+    }
+    
+    .collab-timeline .item-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    
+    .collab-timeline .item-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    
+    .collab-timeline .superseded .item-title {
+      color: var(--text-secondary);
+    }
+    
+    .collab-timeline .item-badge {
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    
+    .collab-timeline .active .item-badge {
+      background-color: rgba(110, 175, 196, 0.15);
+      color: var(--cyan);
+    }
+    
+    .collab-timeline .superseded .item-badge {
+      background-color: rgba(139, 144, 150, 0.15);
+      color: var(--text-muted);
+    }
+    
+    .collab-timeline .item-meta {
+      display: flex;
+      gap: 12px;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    
+    .collab-timeline .item-meeting {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--cyan);
+    }
+    
+    .collab-timeline .item-impact {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--item-border);
+    }
+    
+    .collab-timeline .item-relation {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-top: 6px;
+    }
+    
+    /* Related Knowledge (Collaboration only) */
+    .related-knowledge {
+      margin-top: 12px;
+      padding: 10px 12px;
+      background-color: rgba(255, 255, 255, 0.02);
+      border-radius: 8px;
+    }
+    
+    .related-knowledge .label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    
+    .related-knowledge .items {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    
+    .related-knowledge .items div {
+      margin-bottom: 3px;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       KNOWLEDGE GRAPH SECTION
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .knowledge-section {
+      background-color: var(--dashboard-surface);
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    
+    .knowledge-section h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .knowledge-structure {
+      font-family: 'SF Mono', monospace;
+      font-size: 12px;
+      color: var(--text-secondary);
+      background-color: var(--bg-root);
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+    
+    .knowledge-structure .node { color: var(--cyan); }
+    .knowledge-structure .relation { color: var(--gold); }
+    .knowledge-structure .arrow { color: var(--text-muted); }
+    
+    .exposure-rules {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    
+    @media (max-width: 768px) {
+      .exposure-rules { grid-template-columns: 1fr; }
+    }
+    
+    .exposure-card {
+      padding: 16px;
+      border-radius: 10px;
+      background-color: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    
+    .exposure-card h4 {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .exposure-card.dashboard h4 { color: var(--cyan); }
+    .exposure-card.collaboration h4 { color: var(--gold); }
+    .exposure-card.advanced h4 { color: var(--green); }
+    
+    .exposure-card p {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    
+    /* Objectives */
+    .objectives-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+    }
+    
+    @media (max-width: 768px) {
+      .objectives-grid { grid-template-columns: 1fr; }
+    }
+    
+    .objective-card {
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    
+    .objective-card.dashboard {
+      background-color: rgba(110, 175, 196, 0.08);
+      border-color: rgba(110, 175, 196, 0.2);
+    }
+    
+    .objective-card.collaboration {
+      background-color: rgba(191, 174, 122, 0.08);
+      border-color: rgba(191, 174, 122, 0.2);
+    }
+    
+    .objective-card.knowledge {
+      background-color: rgba(111, 175, 154, 0.08);
+      border-color: rgba(111, 175, 154, 0.2);
+    }
+    
+    .objective-card .icon { font-size: 28px; margin-bottom: 12px; }
+    .objective-card .label { font-size: 12px; font-weight: 600; margin-bottom: 8px; }
+    .objective-card.dashboard .label { color: var(--cyan); }
+    .objective-card.collaboration .label { color: var(--gold); }
+    .objective-card.knowledge .label { color: var(--green); }
+    .objective-card .quote {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+    
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 40px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      margin-top: 48px;
+    }
+    .footer p { color: var(--text-muted); font-size: 14px; }
+    .footer .brand { color: var(--gold); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>✧ CHE·NU™ Decision Timeline</h1>
+      <p class="subtitle">Dashboard vs Collaboration + Knowledge Graph</p>
+    </header>
+
+    <!-- Comparison -->
+    <section class="section">
+      <h2 class="section-title">
+        <span class="emoji">⚖️</span>
+        Timeline selon le contexte
+      </h2>
+      
+      <div class="comparison-grid">
+        <!-- DASHBOARD -->
+        <div class="mode-container dashboard">
+          <div class="mode-header">
+            <span class="icon">🎛️</span>
+            <span class="name">Dashboard — Pilotage</span>
+            <span class="badge">Compact</span>
+          </div>
+          <div class="mode-content">
+            <div class="dashboard-timeline">
+              <div class="timeline-item superseded">
+                <div class="item-header">
+                  <span class="item-dot superseded"></span>
+                  <span class="item-title">API V49 — Express.js</span>
+                  <span class="item-badge">Superseded</span>
+                </div>
+                <div class="item-meta">
+                  <span>📅 1 Nov 2024</span>
+                </div>
+              </div>
+              
+              <div class="timeline-item active">
+                <div class="item-header">
+                  <span class="item-dot active"></span>
+                  <span class="item-title">API V50 — FastAPI + PostgreSQL</span>
+                  <span class="item-badge">Active</span>
+                </div>
+                <div class="item-meta">
+                  <span>📅 15 Dec 2024</span>
+                </div>
+                <div class="item-impact">High — Scalabilité améliorée</div>
+              </div>
+            </div>
+            <div class="view-full-history">View full history →</div>
+          </div>
+        </div>
+        
+        <!-- COLLABORATION -->
+        <div class="mode-container collaboration">
+          <div class="mode-header">
+            <span class="icon">🤝</span>
+            <span class="name">Collaboration — Compréhension</span>
+            <span class="badge">Complet</span>
+          </div>
+          <div class="mode-content">
+            <div class="collab-timeline">
+              <div class="timeline-item superseded">
+                <div class="item-header">
+                  <span class="item-title">API V49 — Express.js + MongoDB</span>
+                  <span class="item-badge">Superseded</span>
+                </div>
+                <div class="item-meta">
+                  <span>📅 1 Nov 2024</span>
+                </div>
+                <span class="item-meeting">Decision Meeting #38</span>
+                <div class="item-impact">Migration vers stack JavaScript</div>
+                <div class="item-relation">Revisited by decision from 15 Dec 2024</div>
+              </div>
+              
+              <div class="timeline-item active">
+                <div class="item-header">
+                  <span class="item-title">API V50 — FastAPI + PostgreSQL</span>
+                  <span class="item-badge">Active</span>
+                </div>
+                <div class="item-meta">
+                  <span>📅 15 Dec 2024</span>
+                </div>
+                <span class="item-meeting">Decision Meeting #42</span>
+                <div class="item-impact">High — Scalabilité et performance améliorées</div>
+                <div class="item-relation">Supersedes decision from 1 Nov 2024</div>
+                
+                <div class="related-knowledge">
+                  <div class="label">Related Knowledge</div>
+                  <div class="items">
+                    <div>Related to: Backend Architecture, API Design</div>
+                    <div>Affects: Workspace Engine, Agent System</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Knowledge Graph -->
+    <section class="section">
+      <h2 class="section-title">
+        <span class="emoji">🧠</span>
+        Knowledge Graph Connection
+      </h2>
+      
+      <div class="knowledge-section">
+        <h3>📊 Structure des nœuds</h3>
+        
+        <div class="knowledge-structure">
+          <div><span class="node">Decision Node</span></div>
+          <div style="padding-left: 20px;">├── id</div>
+          <div style="padding-left: 20px;">├── title</div>
+          <div style="padding-left: 20px;">├── status</div>
+          <div style="padding-left: 20px;">├── date</div>
+          <div style="padding-left: 20px;">├── impact</div>
+          <div style="padding-left: 20px;">├── meeting_id</div>
+          <div style="padding-left: 20px;">└── workspace_id</div>
+          <br>
+          <div><span class="relation">Relations:</span></div>
+          <div style="padding-left: 20px;"><span class="node">DECISION</span> <span class="arrow">→</span> <span class="relation">SUPERSEDES</span> <span class="arrow">→</span> <span class="node">DECISION</span></div>
+          <div style="padding-left: 20px;"><span class="node">DECISION</span> <span class="arrow">→</span> <span class="relation">RELATES_TO</span> <span class="arrow">→</span> <span class="node">TOPIC</span></div>
+          <div style="padding-left: 20px;"><span class="node">DECISION</span> <span class="arrow">→</span> <span class="relation">AFFECTS</span> <span class="arrow">→</span> <span class="node">WORKSPACE</span></div>
+          <div style="padding-left: 20px;"><span class="node">DECISION</span> <span class="arrow">→</span> <span class="relation">PRODUCED_IN</span> <span class="arrow">→</span> <span class="node">MEETING</span></div>
+        </div>
+        
+        <h3>👁️ Exposition UX</h3>
+        
+        <div class="exposure-rules">
+          <div class="exposure-card dashboard">
+            <h4>🎛️ Dashboard</h4>
+            <p>AUCUNE visualisation du graphe.<br>Utilisation indirecte uniquement (résumés, regroupements).</p>
+          </div>
+          <div class="exposure-card collaboration">
+            <h4>🤝 Collaboration</h4>
+            <p>Section "Related Knowledge" optionnelle.<br>Liste textuelle des relations (pas de graphe visuel).</p>
+          </div>
+          <div class="exposure-card advanced">
+            <h4>🔬 Advanced</h4>
+            <p>Via "Explore knowledge graph" uniquement.<br>Mode lecture seule, non activé par défaut.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Objectives -->
+    <section class="section">
+      <h2 class="section-title">
+        <span class="emoji">🎯</span>
+        Objectif Final
+      </h2>
+      
+      <div class="objectives-grid">
+        <div class="objective-card dashboard">
+          <div class="icon">🎛️</div>
+          <div class="label">Dashboard</div>
+          <div class="quote">"Je sais ce qui est en vigueur."</div>
+        </div>
+        <div class="objective-card collaboration">
+          <div class="icon">🤝</div>
+          <div class="label">Collaboration</div>
+          <div class="quote">"Je comprends pourquoi et comment on en est arrivé là."</div>
+        </div>
+        <div class="objective-card knowledge">
+          <div class="icon">🧠</div>
+          <div class="label">Knowledge Graph</div>
+          <div class="quote">"Le système se souvient sans m'encombrer."</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p><span class="brand">CHE·NU™ V50</span> — Decision Timeline Canon</p>
+      <p style="margin-top: 8px; font-size: 12px;">
+        CHE·NU transforme les décisions en mémoire vivante, sans perdre la clarté humaine.
+      </p>
+    </footer>
+  </div>
+</body>
+</html>

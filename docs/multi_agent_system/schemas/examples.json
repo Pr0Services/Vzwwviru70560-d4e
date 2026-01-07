@@ -1,0 +1,46 @@
+{
+  "Spec": {
+    "id": "CANON_GUARD",
+    "name": "Canonical Thread Guard",
+    "category": "safety",
+    "cost_level": 1,
+    "latency_level": 1,
+    "risk_coverage": [
+      "duplicate_memory",
+      "append_only_violation",
+      "permission_bypass"
+    ],
+    "triggers": {
+      "always_on": true
+    },
+    "cooldown": 0,
+    "output": "block",
+    "owner_agent": "CanonGuardCEA"
+  },
+  "GovernanceSignal": {
+    "level": "CORRECT",
+    "criterion": "coherence",
+    "message": "Detected contradiction with founding intent",
+    "scope": {
+      "segment_id": "seg_12",
+      "region": "paragraph_3"
+    },
+    "confidence": 0.82
+  },
+  "BacklogItem": {
+    "backlog_type": "error",
+    "severity": "S3",
+    "description": "Schema mismatch in XR blueprint item",
+    "references": {
+      "thread_id": "...",
+      "event_ids": [
+        "..."
+      ]
+    },
+    "detected_at": "2026-01-06T00:00:00Z",
+    "metrics": {
+      "fix_tokens": 1200,
+      "escape_depth": "late"
+    }
+  }
+}

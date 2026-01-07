@@ -1,0 +1,64 @@
+{
+  "$schema": "chenu://permissions/v1",
+  "version": "1.0.0",
+  
+  "roles": {
+    "owner": {
+      "inherits": ["admin"],
+      "abilities": ["transfer", "delete-sphere", "configure"]
+    },
+    "admin": {
+      "inherits": ["write"],
+      "abilities": ["manage-agents", "manage-permissions", "audit"]
+    },
+    "write": {
+      "inherits": ["read"],
+      "abilities": ["create", "update", "delete", "execute"]
+    },
+    "read": {
+      "inherits": ["view"],
+      "abilities": ["search", "filter", "export-read"]
+    },
+    "view": {
+      "inherits": [],
+      "abilities": ["see-content", "see-agents", "see-metrics"]
+    },
+    "glimpse": {
+      "inherits": [],
+      "abilities": ["see-title", "see-icon", "see-status"]
+    },
+    "none": {
+      "inherits": [],
+      "abilities": []
+    }
+  },
+
+  "sphereOverrides": {
+    "personal": {
+      "default": "none",
+      "self": "owner"
+    },
+    "business": {
+      "default": "view",
+      "member": "read",
+      "contributor": "write",
+      "leader": "admin"
+    },
+    "creative": {
+      "default": "view",
+      "collaborator": "write"
+    }
+  },
+
+  "contextRules": {
+    "publicSphere": {
+      "anonymous": "glimpse",
+      "authenticated": "view"
+    },
+    "privateSphere": {
+      "anonymous": "none",
+      "authenticated": "none",
+      "member": "read"
+    }
+  }
+}

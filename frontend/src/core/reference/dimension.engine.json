@@ -1,0 +1,81 @@
+{
+  "$schema": "chenu://dimension-engine/v1",
+  "version": "1.0.0",
+  
+  "resolution": {
+    "order": ["content", "activity", "complexity", "permission"],
+    "mode": "multiplicative"
+  },
+
+  "content": {
+    "thresholds": {
+      "minimal": { "max": 3, "scale": 0.6, "density": "minimal" },
+      "low": { "min": 3, "max": 10, "scale": 0.8, "density": "compact" },
+      "medium": { "min": 10, "max": 30, "scale": 1.0, "density": "standard" },
+      "high": { "min": 30, "max": 100, "scale": 1.3, "density": "expanded" },
+      "extreme": { "min": 100, "scale": 1.6, "density": "full" }
+    },
+    "metrics": ["items", "agents", "processes", "decisions"]
+  },
+
+  "activity": {
+    "states": {
+      "dormant": { "motion": "none", "visibility": 0.4, "updateMs": 60000 },
+      "idle": { "motion": "none", "visibility": 0.7, "updateMs": 30000 },
+      "active": { "motion": "subtle", "visibility": 1.0, "updateMs": 5000 },
+      "busy": { "motion": "moderate", "visibility": 1.0, "updateMs": 1000 },
+      "critical": { "motion": "urgent", "visibility": 1.0, "updateMs": 500 }
+    },
+    "transitions": {
+      "toIdle": 30000,
+      "toDormant": 300000,
+      "busyThreshold": 5,
+      "criticalTriggers": ["pendingApproval", "error", "deadline", "alert"]
+    }
+  },
+
+  "complexity": {
+    "levels": {
+      "simple": { "depthAllowed": 1, "density": "minimal" },
+      "standard": { "depthAllowed": 2, "density": "standard" },
+      "advanced": { "depthAllowed": 3, "density": "expanded" },
+      "expert": { "depthAllowed": 4, "density": "full" }
+    }
+  },
+
+  "permission": {
+    "levels": {
+      "none": { "visible": false, "interactable": false, "visibility": 0 },
+      "glimpse": { "visible": true, "interactable": false, "visibility": 0.3 },
+      "view": { "visible": true, "interactable": false, "visibility": 0.7 },
+      "read": { "visible": true, "interactable": true, "visibility": 1.0 },
+      "write": { "visible": true, "interactable": true, "visibility": 1.0 },
+      "admin": { "visible": true, "interactable": true, "visibility": 1.0 }
+    }
+  },
+
+  "depth": {
+    "maxLevels": 4,
+    "scaleFactor": 0.85,
+    "visibilityFactor": 0.9
+  },
+
+  "motion": {
+    "types": {
+      "none": { "animation": null, "intensity": 0 },
+      "subtle": { "animation": "breathe", "intensity": 0.3 },
+      "moderate": { "animation": "pulse", "intensity": 0.6 },
+      "urgent": { "animation": "alert", "intensity": 1.0 }
+    }
+  },
+
+  "density": {
+    "types": {
+      "minimal": { "spacing": 0.5, "details": 1 },
+      "compact": { "spacing": 0.75, "details": 2 },
+      "standard": { "spacing": 1.0, "details": 3 },
+      "expanded": { "spacing": 1.25, "details": 4 },
+      "full": { "spacing": 1.5, "details": 5 }
+    }
+  }
+}

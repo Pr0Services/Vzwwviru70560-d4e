@@ -1,0 +1,48 @@
+{
+  "name": "Futuristic",
+  "id": "futuristic",
+  "default": false,
+  "description": "Clean, crisp, technological, calm. Glass and ceramic materials with cool lighting.",
+  "character": {
+    "materials": ["glass", "ceramic", "soft metal", "acrylic"],
+    "lighting": "Crisp but not harsh, cool white",
+    "geometry": "Rounded corners (8-12px), smooth curves"
+  },
+  "tokens": {
+    "color": {
+      "background": {
+        "primary": "#FAFBFC",
+        "secondary": "#F2F4F7",
+        "surface": "#FFFFFF"
+      },
+      "border": {
+        "default": "#E8ECEF",
+        "subtle": "#D1D7DD"
+      }
+    },
+    "radius": {
+      "base": "10px"
+    },
+    "shadow": {
+      "sm": "0 1px 2px rgba(0, 50, 100, 0.04)",
+      "md": "0 4px 12px rgba(0, 50, 100, 0.06)",
+      "lg": "0 12px 24px rgba(0, 50, 100, 0.08)"
+    }
+  },
+  "textures": {
+    "surface": "subtle noise/grain (very light)",
+    "overlay": "optional frosted glass effect"
+  },
+  "illustrations": {
+    "style": "geometric, vector, low-poly"
+  },
+  "sphereColorAdjustments": {
+    "temperature": "+5% blue (cooler)",
+    "saturation": "unchanged"
+  },
+  "restrictions": [
+    "No neon",
+    "No harsh contrast",
+    "No dark backgrounds"
+  ]
+}

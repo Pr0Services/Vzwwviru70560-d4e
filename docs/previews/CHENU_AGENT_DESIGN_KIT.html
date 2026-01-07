@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHE·NU™ — Agent Voice & Design Kit</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════════════
+       CHE·NU™ — AGENT VOICE & DESIGN KIT
+       Un agent est un outil silencieux, pas un interlocuteur social.
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    :root {
+      --bg-root: #1F2429;
+      --bg-dashboard: #242A30;
+      --surface-dashboard: #2A3138;
+      --surface-collaboration: #2D343C;
+      --surface-focus: #39424A;
+      
+      --text-primary: #E2E5E8;
+      --text-secondary: #B5BBC2;
+      --text-muted: #8E949B;
+      
+      --accent-soft: rgba(191, 174, 122, 0.35);
+      --border-subtle: rgba(255, 255, 255, 0.04);
+      
+      --gold: #BFAE7A;
+      --cyan: #6EAFC4;
+      --green: #6FAF9A;
+      
+      --font-primary: 'Inter', system-ui, sans-serif;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: var(--font-primary);
+      font-size: 14px;
+      line-height: 1.6;
+      background: linear-gradient(180deg, #181C20, var(--bg-root));
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+    
+    .container { max-width: 1000px; margin: 0 auto; padding: 40px 24px; }
+    
+    /* Header */
+    .header { text-align: center; margin-bottom: 48px; }
+    .header h1 { font-size: 21px; font-weight: 500; color: var(--gold); margin-bottom: 8px; }
+    .header .subtitle { font-size: 15px; color: var(--text-secondary); margin-bottom: 20px; }
+    .header .rule {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: rgba(191, 174, 122, 0.1);
+      border: 1px solid var(--gold);
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--gold);
+    }
+    
+    /* Section */
+    .section { margin-bottom: 48px; }
+    .section-title {
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       AGENT VOICE
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .voice-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    
+    @media (max-width: 768px) {
+      .voice-grid { grid-template-columns: 1fr; }
+    }
+    
+    .voice-card {
+      padding: 16px;
+      background-color: var(--surface-dashboard);
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+    }
+    
+    .voice-card h4 {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--cyan);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+    
+    .voice-card ul { list-style: none; }
+    .voice-card li {
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding: 3px 0;
+    }
+    
+    .voice-card.forbidden {
+      background-color: rgba(196, 112, 112, 0.08);
+      border-color: rgba(196, 112, 112, 0.2);
+    }
+    
+    .voice-card.forbidden h4 { color: #C47070; }
+    .voice-card.forbidden li { color: #C47070; }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       MESSAGE STRUCTURE
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .message-demo {
+      background-color: var(--surface-dashboard);
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid var(--border-subtle);
+      max-width: 500px;
+    }
+    
+    .message-section {
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+    }
+    
+    .message-section:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    
+    .message-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    
+    .message-text {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    
+    .message-optional {
+      opacity: 0.6;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       AGENT PERMISSIONS BY SPACE
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .space-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .space-tab {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: 1px solid transparent;
+    }
+    
+    .space-tab:hover { color: var(--text-secondary); }
+    .space-tab.active {
+      background-color: rgba(110, 175, 196, 0.1);
+      color: var(--cyan);
+      border-color: rgba(110, 175, 196, 0.2);
+    }
+    
+    .space-content {
+      display: none;
+      background-color: var(--surface-dashboard);
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid var(--border-subtle);
+    }
+    
+    .space-content.active { display: block; }
+    
+    .space-header {
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    
+    .space-header h3 {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    
+    .space-header .intention {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    
+    .permissions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    
+    @media (max-width: 600px) {
+      .permissions-grid { grid-template-columns: 1fr; }
+    }
+    
+    .permissions-card {
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+    }
+    
+    .permissions-card.allowed {
+      background-color: rgba(111, 175, 154, 0.08);
+      border-color: rgba(111, 175, 154, 0.2);
+    }
+    
+    .permissions-card.forbidden {
+      background-color: rgba(196, 112, 112, 0.08);
+      border-color: rgba(196, 112, 112, 0.2);
+    }
+    
+    .permissions-card h5 {
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+    
+    .permissions-card.allowed h5 { color: var(--green); }
+    .permissions-card.forbidden h5 { color: #C47070; }
+    
+    .permissions-card ul { list-style: none; }
+    .permissions-card li {
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding: 3px 0;
+    }
+    
+    .message-format {
+      margin-top: 16px;
+      padding: 12px;
+      background-color: rgba(110, 175, 196, 0.08);
+      border-radius: 8px;
+    }
+    
+    .message-format .label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    
+    .message-format .value {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       AGENT UI ELEMENTS
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .ui-elements-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .ui-elements-grid { grid-template-columns: 1fr; }
+    }
+    
+    .ui-element {
+      background-color: var(--surface-dashboard);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid var(--border-subtle);
+    }
+    
+    .ui-element h4 {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+    
+    .ui-element-demo {
+      margin-bottom: 16px;
+    }
+    
+    /* Agent Message Block Demo */
+    .agent-message-demo {
+      background-color: var(--surface-collaboration);
+      border: 1px solid var(--border-subtle);
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    /* Agent Suggestion Demo */
+    .agent-suggestion-demo {
+      background-color: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-subtle);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      opacity: 0.9;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .agent-suggestion-demo .dismiss {
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    /* Agent Indicator Demo */
+    .agent-indicator-demo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    
+    .agent-indicator-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--text-muted);
+      opacity: 0.5;
+    }
+    
+    .ui-element-rules {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    
+    .ui-element-rules .rule {
+      padding: 2px 0;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       DESIGN KIT STRUCTURE
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .kit-structure {
+      background-color: var(--surface-dashboard);
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid var(--border-subtle);
+      font-family: var(--font-primary);
+    }
+    
+    .kit-tree {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    .kit-tree-item {
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+    }
+    
+    .kit-tree-folder {
+      color: var(--gold);
+      font-weight: 500;
+      margin: 8px 0 4px 0;
+    }
+    
+    .kit-tree-indent { margin-left: 16px; }
+    .kit-tree-icon { margin-right: 8px; color: var(--text-muted); }
+    
+    /* Goal */
+    .goal-card {
+      padding: 24px;
+      background-color: rgba(191, 174, 122, 0.08);
+      border: 1px solid rgba(191, 174, 122, 0.2);
+      border-radius: 12px;
+      text-align: center;
+    }
+    
+    .goal-card .quote {
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    
+    .goal-card .values {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    
+    .goal-card .tagline {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 40px 0;
+      border-top: 1px solid var(--border-subtle);
+      margin-top: 48px;
+    }
+    
+    .footer p { font-size: 14px; color: var(--text-muted); }
+    .footer .brand { color: var(--gold); font-weight: 500; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>✧ CHE·NU™ Agent Voice & Design Kit</h1>
+      <p class="subtitle">Agent Permissions by Space — FINAL</p>
+      <div class="rule">
+        🤖 Un agent est un outil silencieux, pas un interlocuteur social.
+      </div>
+    </header>
+
+    <!-- Agent Voice -->
+    <section class="section">
+      <h2 class="section-title">🗣️ Agent Voice — Principes</h2>
+      
+      <div class="voice-grid">
+        <div class="voice-card">
+          <h4>✅ Ton</h4>
+          <ul>
+            <li>Neutre</li>
+            <li>Factuel</li>
+            <li>Calme</li>
+            <li>Non émotionnel</li>
+            <li>Jamais enthousiaste</li>
+          </ul>
+        </div>
+        <div class="voice-card">
+          <h4>✅ Style</h4>
+          <ul>
+            <li>Phrases courtes</li>
+            <li>Vocabulaire simple</li>
+            <li>Aucune exclamation</li>
+            <li>Aucune métaphore</li>
+            <li>Aucune familiarité</li>
+          </ul>
+        </div>
+        <div class="voice-card forbidden">
+          <h4>❌ Interdit</h4>
+          <ul>
+            <li>Emojis</li>
+            <li>Humour</li>
+            <li>Flatterie</li>
+            <li>"Great idea!"</li>
+            <li>"I'm excited to help!"</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Message Structure -->
+    <section class="section">
+      <h2 class="section-title">📝 Structure des Messages</h2>
+      
+      <div class="message-demo">
+        <div class="message-section">
+          <div class="message-label">Context (optionnel)</div>
+          <div class="message-text">This decision affects the Navigation system.</div>
+        </div>
+        <div class="message-section">
+          <div class="message-label">Observation (requis)</div>
+          <div class="message-text">Two active decisions impact the same topic.</div>
+        </div>
+        <div class="message-section message-optional">
+          <div class="message-label">Suggestion (optionnel)</div>
+          <div class="message-text">You may want to review their consistency.</div>
+        </div>
+        <div class="message-section message-optional">
+          <div class="message-label">Next Step (optionnel)</div>
+          <div class="message-text">Open the related Decision Timeline.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Agent Permissions by Space -->
+    <section class="section">
+      <h2 class="section-title">🏠 Agent Permissions by Space</h2>
+      
+      <div class="space-tabs">
+        <span class="space-tab active" onclick="showSpace('dashboard')">🎛️ Dashboard</span>
+        <span class="space-tab" onclick="showSpace('collaboration')">🤝 Collaboration</span>
+        <span class="space-tab" onclick="showSpace('workspace')">📋 Workspace</span>
+        <span class="space-tab" onclick="showSpace('knowledge')">🧠 Knowledge</span>
+      </div>
+      
+      <!-- Dashboard -->
+      <div id="space-dashboard" class="space-content active">
+        <div class="space-header">
+          <h3>Dashboard</h3>
+          <div class="intention">Vue de pilotage, lecture rapide</div>
+        </div>
+        <div class="permissions-grid">
+          <div class="permissions-card allowed">
+            <h5>✅ Autorisé</h5>
+            <ul>
+              <li>Résumer l'état</li>
+              <li>Afficher décisions actives</li>
+              <li>Signaler changements récents</li>
+            </ul>
+          </div>
+          <div class="permissions-card forbidden">
+            <h5>❌ Interdit</h5>
+            <ul>
+              <li>Créer ou modifier</li>
+              <li>Initier un meeting</li>
+              <li>Suggérer une décision</li>
+            </ul>
+          </div>
+        </div>
+        <div class="message-format">
+          <div class="label">Format</div>
+          <div class="value">1–2 lignes max • État uniquement</div>
+        </div>
+      </div>
+      
+      <!-- Collaboration -->
+      <div id="space-collaboration" class="space-content">
+        <div class="space-header">
+          <h3>Collaboration Space</h3>
+          <div class="intention">Réflexion collective, structuration</div>
+        </div>
+        <div class="permissions-grid">
+          <div class="permissions-card allowed">
+            <h5>✅ Autorisé</h5>
+            <ul>
+              <li>Structurer notes</li>
+              <li>Résumer meetings</li>
+              <li>Signaler incohérences</li>
+              <li>Suggérer Topics</li>
+              <li>Rappeler décisions existantes</li>
+            </ul>
+          </div>
+          <div class="permissions-card forbidden">
+            <h5>❌ Interdit</h5>
+            <ul>
+              <li>Décider</li>
+              <li>Valider une décision</li>
+              <li>Modifier une décision existante</li>
+            </ul>
+          </div>
+        </div>
+        <div class="message-format">
+          <div class="label">Format</div>
+          <div class="value">Contextuel • Structuré • Jamais interruptif</div>
+        </div>
+      </div>
+      
+      <!-- Workspace -->
+      <div id="space-workspace" class="space-content">
+        <div class="space-header">
+          <h3>Workspace</h3>
+          <div class="intention">Production, concentration</div>
+        </div>
+        <div class="permissions-grid">
+          <div class="permissions-card allowed">
+            <h5>✅ Autorisé</h5>
+            <ul>
+              <li>Assister sur une tâche précise</li>
+              <li>Rappeler contexte</li>
+              <li>Proposer organisation</li>
+            </ul>
+          </div>
+          <div class="permissions-card forbidden">
+            <h5>❌ Interdit</h5>
+            <ul>
+              <li>Afficher décisions globales</li>
+              <li>Initier des réunions</li>
+              <li>Suggestions non sollicitées</li>
+            </ul>
+          </div>
+        </div>
+        <div class="message-format">
+          <div class="label">Format</div>
+          <div class="value">Rare • Court • Orienté action locale</div>
+        </div>
+      </div>
+      
+      <!-- Knowledge -->
+      <div id="space-knowledge" class="space-content">
+        <div class="space-header">
+          <h3>Knowledge Views</h3>
+          <div class="intention">Compréhension, exploration</div>
+        </div>
+        <div class="permissions-grid">
+          <div class="permissions-card allowed">
+            <h5>✅ Autorisé</h5>
+            <ul>
+              <li>Générer résumés</li>
+              <li>Expliquer relations</li>
+              <li>Proposer navigation</li>
+            </ul>
+          </div>
+          <div class="permissions-card forbidden">
+            <h5>❌ Interdit</h5>
+            <ul>
+              <li>Modifier le graphe</li>
+              <li>Prioriser visuellement</li>
+              <li>Déclencher une révision</li>
+            </ul>
+          </div>
+        </div>
+        <div class="message-format">
+          <div class="label">Format</div>
+          <div class="value">Explicatif • Neutre • Lecture seule</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Agent UI Elements -->
+    <section class="section">
+      <h2 class="section-title">🎨 Agent UI Elements</h2>
+      
+      <div class="ui-elements-grid">
+        <div class="ui-element">
+          <h4>Message Block</h4>
+          <div class="ui-element-demo">
+            <div class="agent-message-demo">
+              Two active decisions impact the same topic. You may want to review their consistency.
+            </div>
+          </div>
+          <div class="ui-element-rules">
+            <div class="rule">• Surface neutre</div>
+            <div class="rule">• Texte plus petit</div>
+            <div class="rule">• Jamais modal</div>
+            <div class="rule">• Dismissible</div>
+          </div>
+        </div>
+        
+        <div class="ui-element">
+          <h4>Suggestion</h4>
+          <div class="ui-element-demo">
+            <div class="agent-suggestion-demo">
+              <span>Review related decisions?</span>
+              <span class="dismiss">×</span>
+            </div>
+          </div>
+          <div class="ui-element-rules">
+            <div class="rule">• Visuellement optionnelle</div>
+            <div class="rule">• Pas d'auto-accept</div>
+            <div class="rule">• Toujours dismissible</div>
+          </div>
+        </div>
+        
+        <div class="ui-element">
+          <h4>Indicator</h4>
+          <div class="ui-element-demo">
+            <div class="agent-indicator-demo">
+              <span class="agent-indicator-dot"></span>
+              <span>Agent processing</span>
+            </div>
+          </div>
+          <div class="ui-element-rules">
+            <div class="rule">• Discret</div>
+            <div class="rule">• Jamais animé</div>
+            <div class="rule">• Jamais pulsant</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Design Kit Structure -->
+    <section class="section">
+      <h2 class="section-title">📦 Design Kit Structure</h2>
+      
+      <div class="kit-structure">
+        <div class="kit-tree">
+          <div class="kit-tree-item kit-tree-folder">CHE·NU Design Kit</div>
+          
+          <div class="kit-tree-item kit-tree-folder kit-tree-indent">├─ Foundations</div>
+          <div class="kit-tree-item kit-tree-indent kit-tree-indent"><span class="kit-tree-icon">├─</span>Color Tokens</div>
+          <div class="kit-tree-item kit-tree-indent kit-tree-indent"><span class="kit-tree-icon">├─</span>Typography Tokens</div>
+          <div class="kit-tree-item kit-tree-indent kit-tree-indent"><span class="kit-tree-icon">├─</span>Spacing & Rhythm</div>
+          <div class="kit-tree-item kit-tree-indent kit-tree-indent"><span class="kit-tree-icon">└─</span>Elevation & Shadows</div>
+          
+          <div class="kit-tree-item kit-tree-folder kit-tree-indent">├─ Core Components</div>
+          <div class="kit-tree-item kit-tree-indent kit-tree-indent"><span class="kit-tree-icon">├─</span>Buttons</div>
+          <div class="kit-tree-item kit-tree-indent kit-tree-indent"><span class="kit-tree-icon">├─</span>Inputs</div>
+          <div class="kit-tree-item kit-tree-indent kit-tree-indent"><span class="kit-tree-icon">├─</span>Cards / Surfaces</div>
+          <div class="kit-tree-item kit-tree-indent kit-tree-indent"><span class="kit-tree-icon">└─</span>Lists</div>
+          
+          <div class="kit-tree-item kit-tree-folder kit-tree-indent">├─ Specialized Components</div>
+          <div class="kit-tree-item kit-tree-indent kit-tree-indent"><span class="kit-tree-icon">├─</span>Meeting Template</div>
+          <div class="kit-tree-item kit-tree-indent kit-tree-indent"><span class="kit-tree-icon">├─</span>Decision Block</div>
+          <div class="kit-tree-item kit-tree-indent kit-tree-indent"><span class="kit-tree-icon">├─</span>Decision Timeline</div>
+          <div class="kit-tree-item kit-tree-indent kit-tree-indent"><span class="kit-tree-icon">└─</span>Topic List</div>
+          
+          <div class="kit-tree-item kit-tree-folder kit-tree-indent">└─ Agent UI Elements</div>
+          <div class="kit-tree-item kit-tree-indent kit-tree-indent"><span class="kit-tree-icon">├─</span>Agent Message Block</div>
+          <div class="kit-tree-item kit-tree-indent kit-tree-indent"><span class="kit-tree-icon">├─</span>Agent Suggestion</div>
+          <div class="kit-tree-item kit-tree-indent kit-tree-indent"><span class="kit-tree-icon">└─</span>Agent Indicator</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Goal -->
+    <section class="section">
+      <div class="goal-card">
+        <div class="quote">"Le système veille, sans m'interrompre."</div>
+        <div class="values">Cohérence • Sérénité • Évolutivité</div>
+        <div class="tagline">
+          CHE·NU reste un environnement de travail, pas une expérience conversationnelle.
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p><span class="brand">CHE·NU™ V50</span> — Agent Voice & Design Kit</p>
+      <p style="margin-top: 8px; font-size: 12px;">
+        Les agents sont CONTEXTUELS. Aucun agent n'a de pouvoir global.
+      </p>
+    </footer>
+  </div>
+  
+  <script>
+    function showSpace(space) {
+      // Hide all spaces
+      document.querySelectorAll('.space-content').forEach(el => el.classList.remove('active'));
+      // Show selected space
+      document.getElementById('space-' + space).classList.add('active');
+      // Update tabs
+      document.querySelectorAll('.space-tab').forEach(el => el.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+  </script>
+</body>
+</html>

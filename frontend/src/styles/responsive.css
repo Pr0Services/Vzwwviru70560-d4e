@@ -1,0 +1,152 @@
+/**
+ * CHE·NU™ - Responsive Design System
+ */
+
+/* Base Variables */
+:root {
+  --mobile-breakpoint: 768px;
+  --tablet-breakpoint: 1024px;
+  --desktop-breakpoint: 1440px;
+}
+
+/* Mobile First (< 768px) */
+@media (max-width: 767px) {
+  .hub-layout {
+    flex-direction: column;
+    height: calc(100vh - 60px); /* Account for bottom nav */
+  }
+  
+  .hub {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+  }
+  
+  .hub.workspace {
+    flex: 1;
+    min-height: 300px;
+  }
+  
+  /* Hide desktop elements */
+  .desktop-only {
+    display: none !important;
+  }
+  
+  /* Show mobile elements */
+  .mobile-only {
+    display: block;
+  }
+  
+  /* Stack navigation */
+  .sphere-selector {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+  }
+  
+  /* Compact bureau */
+  .bureau-sections {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Full width dialogs */
+  .modal, .dialog {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    border-radius: 0;
+  }
+}
+
+/* Tablet (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .hub-layout {
+    grid-template-columns: 300px 1fr;
+  }
+  
+  /* 2 columns max */
+  .visible-hubs-count {
+    max-width: 2;
+  }
+  
+  /* Show some desktop elements */
+  .tablet-show {
+    display: block;
+  }
+  
+  /* Bureau grid */
+  .bureau-sections {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Desktop (> 1024px) */
+@media (min-width: 1024px) {
+  .hub-layout {
+    grid-template-columns: 250px 1fr 400px;
+  }
+  
+  /* Hide mobile elements */
+  .mobile-only, .mobile-bottom-nav {
+    display: none !important;
+  }
+  
+  /* 3 hub layout */
+  .hub.communication {
+    width: 250px;
+  }
+  
+  .hub.navigation {
+    width: auto;
+    flex: 1;
+  }
+  
+  .hub.workspace {
+    width: 400px;
+  }
+  
+  /* Full bureau grid */
+  .bureau-sections {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Large Desktop (> 1440px) */
+@media (min-width: 1440px) {
+  .hub-layout {
+    grid-template-columns: 300px 1fr 500px;
+    max-width: 1920px;
+    margin: 0 auto;
+  }
+  
+  .hub.communication {
+    width: 300px;
+  }
+  
+  .hub.workspace {
+    width: 500px;
+  }
+}
+
+/* High DPI Displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* Optimize for retina */
+  img, svg {
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .mobile-bottom-nav,
+  .mobile-nav,
+  .hub.communication {
+    display: none !important;
+  }
+  
+  .hub.workspace {
+    width: 100%;
+    box-shadow: none;
+  }
+}

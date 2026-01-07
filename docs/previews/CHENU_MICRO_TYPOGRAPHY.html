@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHE·NU™ — Micro-Typography Canon</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════════════
+       CHE·NU™ — MICRO-TYPOGRAPHY CANON
+       Readability, Rhythm & Cognitive Comfort
+       
+       RÈGLE: Si on remarque la typo, c'est qu'elle est trop présente.
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    :root {
+      /* Font Families */
+      --font-primary: 'Inter', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      
+      /* Type Scale (échelle douce ≈1.2) */
+      --font-size-title-xl: 21px;
+      --font-size-title: 17px;
+      --font-size-section: 15px;
+      --font-size-body: 14px;
+      --font-size-meta: 12px;
+      
+      /* Line Heights */
+      --line-height-tight: 1.3;
+      --line-height-title: 1.35;
+      --line-height-section: 1.4;
+      --line-height-body: 1.6;
+      --line-height-list: 1.55;
+      --line-height-meta: 1.45;
+      
+      /* Letter Spacing */
+      --letter-spacing-title: -0.01em;
+      --letter-spacing-body: 0;
+      --letter-spacing-meta: 0.02em;
+      
+      /* Font Weights */
+      --font-weight-light: 300;
+      --font-weight-regular: 400;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 600;
+      
+      /* Colors */
+      --bg-root: #1B1F23;
+      --text-primary: #E6E8EA;
+      --text-secondary: #B8BDC3;
+      --text-muted: #8B9096;
+      --gold: #BFAE7A;
+      --cyan: #6EAFC4;
+      --green: #6FAF9A;
+      --surface: #2A3138;
+      --border: rgba(255, 255, 255, 0.04);
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: var(--font-primary);
+      font-size: var(--font-size-body);
+      line-height: var(--line-height-body);
+      font-weight: var(--font-weight-regular);
+      background: linear-gradient(180deg, #181C20, var(--bg-root));
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+    
+    .container { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+    
+    /* Header */
+    .header { text-align: center; margin-bottom: 48px; }
+    
+    .header h1 {
+      font-size: var(--font-size-title-xl);
+      line-height: var(--line-height-tight);
+      font-weight: var(--font-weight-medium);
+      letter-spacing: var(--letter-spacing-title);
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+    
+    .header .subtitle {
+      font-size: var(--font-size-section);
+      line-height: var(--line-height-section);
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+    
+    .header .rule {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: rgba(191, 174, 122, 0.1);
+      border: 1px solid var(--gold);
+      border-radius: 8px;
+      font-size: var(--font-size-body);
+      color: var(--gold);
+    }
+    
+    /* Section */
+    .section { margin-bottom: 48px; }
+    
+    .section-title {
+      font-size: var(--font-size-title);
+      line-height: var(--line-height-title);
+      font-weight: var(--font-weight-medium);
+      letter-spacing: var(--letter-spacing-title);
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       TYPE SCALE DEMO
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .scale-demo {
+      background-color: var(--surface);
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid var(--border);
+    }
+    
+    .scale-item {
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .scale-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    
+    .scale-label {
+      font-size: var(--font-size-meta);
+      color: var(--text-muted);
+      letter-spacing: var(--letter-spacing-meta);
+      margin-bottom: 8px;
+    }
+    
+    .scale-title-xl {
+      font-size: var(--font-size-title-xl);
+      line-height: var(--line-height-tight);
+      font-weight: var(--font-weight-medium);
+      letter-spacing: var(--letter-spacing-title);
+    }
+    
+    .scale-title {
+      font-size: var(--font-size-title);
+      line-height: var(--line-height-title);
+      font-weight: var(--font-weight-medium);
+      letter-spacing: var(--letter-spacing-title);
+    }
+    
+    .scale-section {
+      font-size: var(--font-size-section);
+      line-height: var(--line-height-section);
+      font-weight: var(--font-weight-medium);
+    }
+    
+    .scale-body {
+      font-size: var(--font-size-body);
+      line-height: var(--line-height-body);
+      font-weight: var(--font-weight-regular);
+    }
+    
+    .scale-meta {
+      font-size: var(--font-size-meta);
+      line-height: var(--line-height-meta);
+      font-weight: var(--font-weight-regular);
+      color: var(--text-muted);
+      letter-spacing: var(--letter-spacing-meta);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       NOTES vs DECISIONS DEMO
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    
+    @media (max-width: 768px) {
+      .comparison-grid { grid-template-columns: 1fr; }
+    }
+    
+    .note-demo,
+    .decision-demo {
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    
+    .note-demo {
+      background-color: var(--surface);
+    }
+    
+    .note-demo h4 {
+      font-size: var(--font-size-section);
+      font-weight: var(--font-weight-medium);
+      color: var(--cyan);
+      margin-bottom: 16px;
+    }
+    
+    .note-demo .content {
+      font-size: var(--font-size-body);
+      font-weight: var(--font-weight-regular);
+      color: var(--text-secondary); /* Légèrement atténuée */
+      line-height: var(--line-height-body);
+    }
+    
+    .decision-demo {
+      background-color: #2D3540; /* Contraste +10% */
+      border-color: rgba(110, 175, 196, 0.2);
+    }
+    
+    .decision-demo h4 {
+      font-size: var(--font-size-section);
+      font-weight: var(--font-weight-medium);
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    
+    .decision-demo .content {
+      font-size: var(--font-size-body);
+      font-weight: var(--font-weight-medium); /* Medium */
+      color: var(--text-primary); /* Contraste +8-10% */
+      line-height: var(--line-height-body);
+      margin-bottom: 12px; /* Espacement légèrement supérieur */
+    }
+    
+    .decision-demo .active {
+      font-weight: var(--font-weight-semibold); /* Semibold pour active */
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       PARAGRAPH DEMO
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .paragraph-demo {
+      background-color: var(--surface);
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid var(--border);
+    }
+    
+    .paragraph-demo p {
+      font-size: var(--font-size-body);
+      line-height: var(--line-height-body);
+      color: var(--text-secondary);
+      max-width: 65ch; /* 60-70 caractères */
+      margin-bottom: 16px;
+    }
+    
+    .paragraph-demo p:last-child {
+      margin-bottom: 0;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       LIST DEMO
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .list-demo {
+      background-color: var(--surface);
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid var(--border);
+    }
+    
+    .list-demo ul {
+      list-style: none;
+    }
+    
+    .list-demo li {
+      font-size: var(--font-size-body);
+      line-height: var(--line-height-list);
+      color: var(--text-secondary);
+      margin-bottom: 12px; /* Espace vertical généreux */
+      padding-left: 1em;
+      position: relative;
+    }
+    
+    .list-demo li::before {
+      content: '–'; /* Tiret simple */
+      position: absolute;
+      left: 0;
+      color: var(--text-muted);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       META INFO DEMO
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .meta-demo {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    
+    .meta-item {
+      padding: 12px 16px;
+      background-color: var(--surface);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    
+    .meta-item .label {
+      font-size: var(--font-size-meta);
+      color: var(--text-muted);
+      letter-spacing: var(--letter-spacing-meta);
+      margin-bottom: 4px;
+    }
+    
+    .meta-item .value {
+      font-size: var(--font-size-meta);
+      color: var(--text-muted);
+      /* JAMAIS en capitales */
+      text-transform: none;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       TOKENS TABLE
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .tokens-table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: var(--surface);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .tokens-table th,
+    .tokens-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .tokens-table th {
+      background-color: #303841;
+      font-size: var(--font-size-meta);
+      font-weight: var(--font-weight-medium);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: var(--letter-spacing-meta);
+    }
+    
+    .tokens-table td {
+      font-size: var(--font-size-body);
+      color: var(--text-secondary);
+    }
+    
+    .tokens-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .token-value {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--cyan);
+      background-color: rgba(110, 175, 196, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       VALIDATION TESTS
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .tests-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    
+    @media (max-width: 768px) {
+      .tests-grid { grid-template-columns: 1fr; }
+    }
+    
+    .test-card {
+      padding: 16px;
+      background-color: var(--surface);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    
+    .test-card .question {
+      font-size: var(--font-size-body);
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    
+    .test-card .criteria {
+      font-size: var(--font-size-meta);
+      color: var(--text-muted);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       FORBIDDEN
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .forbidden-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .forbidden-item {
+      padding: 6px 12px;
+      background-color: rgba(196, 112, 112, 0.1);
+      border: 1px solid rgba(196, 112, 112, 0.2);
+      border-radius: 6px;
+      font-size: var(--font-size-meta);
+      color: #C47070;
+    }
+    
+    /* Goal */
+    .goal-card {
+      padding: 24px;
+      background-color: rgba(191, 174, 122, 0.08);
+      border: 1px solid rgba(191, 174, 122, 0.2);
+      border-radius: 12px;
+      text-align: center;
+    }
+    
+    .goal-card .good {
+      font-size: var(--font-size-title);
+      font-weight: var(--font-weight-medium);
+      color: var(--green);
+      margin-bottom: 8px;
+    }
+    
+    .goal-card .bad {
+      font-size: var(--font-size-body);
+      color: #C47070;
+      margin-bottom: 16px;
+    }
+    
+    .goal-card .quote {
+      font-size: var(--font-size-body);
+      color: var(--gold);
+      font-style: italic;
+    }
+    
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      margin-top: 48px;
+    }
+    
+    .footer p {
+      font-size: var(--font-size-body);
+      color: var(--text-muted);
+    }
+    
+    .footer .brand {
+      color: var(--gold);
+      font-weight: var(--font-weight-medium);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>✧ CHE·NU™ Micro-Typography</h1>
+      <p class="subtitle">Readability, Rhythm & Cognitive Comfort</p>
+      <div class="rule">
+        📖 Si on remarque la typo, c'est qu'elle est trop présente.
+      </div>
+    </header>
+
+    <!-- Type Scale -->
+    <section class="section">
+      <h2 class="section-title">📏 Échelle Typographique (≈1.2)</h2>
+      
+      <div class="scale-demo">
+        <div class="scale-item">
+          <div class="scale-label">Title XL — 21px / 1.3 / Medium</div>
+          <div class="scale-title-xl">Architecture API V50 — FastAPI</div>
+        </div>
+        <div class="scale-item">
+          <div class="scale-label">Title — 17px / 1.35 / Medium</div>
+          <div class="scale-title">Decision Timeline Implementation</div>
+        </div>
+        <div class="scale-item">
+          <div class="scale-label">Section — 15px / 1.4 / Medium</div>
+          <div class="scale-section">Knowledge Graph Topics</div>
+        </div>
+        <div class="scale-item">
+          <div class="scale-label">Body — 14px / 1.6 / Regular ← BASE</div>
+          <div class="scale-body">La typographie CHE·NU doit disparaître quand on lit, guider sans attirer l'attention, et respirer verticalement.</div>
+        </div>
+        <div class="scale-item">
+          <div class="scale-label">Meta — 12px / 1.45 / Regular</div>
+          <div class="scale-meta">15 Dec 2024 • Active • Decision Meeting #42</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Notes vs Decisions -->
+    <section class="section">
+      <h2 class="section-title">📝 Notes vs Decisions — Micro-Différence</h2>
+      
+      <div class="comparison-grid">
+        <div class="note-demo">
+          <h4>📋 Note</h4>
+          <div class="content">
+            La discussion a porté sur l'architecture backend. Plusieurs options ont été considérées. Le consensus n'est pas encore atteint.
+          </div>
+        </div>
+        
+        <div class="decision-demo">
+          <h4>⚖️ Decision</h4>
+          <div class="content active">
+            Adopter FastAPI + PostgreSQL comme stack backend principal pour CHE·NU V50.
+          </div>
+          <div class="scale-meta">Impact: High — Scalabilité améliorée</div>
+        </div>
+      </div>
+      
+      <p style="font-size: var(--font-size-meta); color: var(--text-muted); margin-top: 16px; text-align: center;">
+        La différence doit être RESSENTIE, pas explicitement vue.
+      </p>
+    </section>
+
+    <!-- Paragraph -->
+    <section class="section">
+      <h2 class="section-title">📄 Paragraphes — Max 65 caractères</h2>
+      
+      <div class="paragraph-demo">
+        <p>
+          La typographie sert la pensée, pas le style. Elle doit permettre une lecture soutenue sans fatigue visuelle, avec un rythme lent et une hiérarchie claire.
+        </p>
+        <p>
+          Les marges généreuses et l'espacement vertical créent une respiration naturelle. Le texte ne doit jamais toucher les bords.
+        </p>
+      </div>
+    </section>
+
+    <!-- List -->
+    <section class="section">
+      <h2 class="section-title">📋 Listes — Espacement généreux</h2>
+      
+      <div class="list-demo">
+        <ul>
+          <li>Espace vertical entre items supérieur à l'espace horizontal</li>
+          <li>Puces simples ou tirets, jamais d'icônes décoratives</li>
+          <li>Largeur maximale de 60-70 caractères</li>
+          <li>Marges généreuses, jamais de texte bord à bord</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Meta Info -->
+    <section class="section">
+      <h2 class="section-title">🏷️ Méta-Info — Informer sans voler l'attention</h2>
+      
+      <div class="meta-demo">
+        <div class="meta-item">
+          <div class="label">Date</div>
+          <div class="value">15 dec 2024</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">Status</div>
+          <div class="value">active</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">Source</div>
+          <div class="value">decision meeting #42</div>
+        </div>
+      </div>
+      
+      <p style="font-size: var(--font-size-meta); color: var(--text-muted); margin-top: 16px;">
+        ⚠️ Jamais en capitales. Jamais plus d'une ligne.
+      </p>
+    </section>
+
+    <!-- Tokens -->
+    <section class="section">
+      <h2 class="section-title">🎨 CSS Tokens</h2>
+      
+      <table class="tokens-table">
+        <thead>
+          <tr>
+            <th>Token</th>
+            <th>Valeur</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>--font-size-body</td>
+            <td><span class="token-value">14px</span></td>
+          </tr>
+          <tr>
+            <td>--line-height-body</td>
+            <td><span class="token-value">1.6</span></td>
+          </tr>
+          <tr>
+            <td>--font-weight-regular</td>
+            <td><span class="token-value">400</span></td>
+          </tr>
+          <tr>
+            <td>--font-weight-medium</td>
+            <td><span class="token-value">500</span></td>
+          </tr>
+          <tr>
+            <td>--font-weight-semibold</td>
+            <td><span class="token-value">600</span> (décisions actives uniquement)</td>
+          </tr>
+          <tr>
+            <td>--text-max-width</td>
+            <td><span class="token-value">65ch</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Validation Tests -->
+    <section class="section">
+      <h2 class="section-title">✅ Tests de Validation</h2>
+      
+      <div class="tests-grid">
+        <div class="test-card">
+          <div class="question">1) Lire un texte 5 minutes sans scroller → OK ?</div>
+          <div class="criteria">Pas de fatigue visuelle</div>
+        </div>
+        <div class="test-card">
+          <div class="question">2) Repérer une décision en 2 secondes → OK ?</div>
+          <div class="criteria">Hiérarchie visuelle claire</div>
+        </div>
+        <div class="test-card">
+          <div class="question">3) Fermer les yeux, rouvrir → hiérarchie claire ?</div>
+          <div class="criteria">Structure immédiatement perceptible</div>
+        </div>
+        <div class="test-card">
+          <div class="question">4) Aucun mot ne "crie" visuellement ?</div>
+          <div class="criteria">Typographie équilibrée</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Forbidden -->
+    <section class="section">
+      <h2 class="section-title">❌ Patterns Interdits</h2>
+      
+      <div class="forbidden-list">
+        <span class="forbidden-item">Polices fantaisie</span>
+        <span class="forbidden-item">Tailles < 12px</span>
+        <span class="forbidden-item">Line-height < 1.4</span>
+        <span class="forbidden-item">Bold généralisé</span>
+        <span class="forbidden-item">Tracking excessif</span>
+        <span class="forbidden-item">UPPERCASE + tracking</span>
+        <span class="forbidden-item">Animations de texte</span>
+        <span class="forbidden-item">Underline permanent</span>
+        <span class="forbidden-item">Italique décoratif</span>
+      </div>
+    </section>
+
+    <!-- Goal -->
+    <section class="section">
+      <div class="goal-card">
+        <div class="good">"Je peux lire, réfléchir et décider ici sans effort."</div>
+        <div class="bad">Pas: "C'est beau, mais fatigant."</div>
+        <div class="quote">
+          CHE·NU utilise la typographie comme un rythme, pas comme un style.
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p><span class="brand">CHE·NU™ V50</span> — Micro-Typography Canon</p>
+      <p style="margin-top: 8px; font-size: 12px;">
+        La typographie sert la pensée, pas le style.
+      </p>
+    </footer>
+  </div>
+</body>
+</html>

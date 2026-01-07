@@ -1,0 +1,1057 @@
+/**
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║              CHE·NU™ — WEB APPLICATION                                       ║
+ * ║              Governed Intelligence Operating System                          ║
+ * ║              GOUVERNANCE > EXÉCUTION                                         ║
+ * ╠══════════════════════════════════════════════════════════════════════════════╣
+ * ║  FLOW:                                                                       ║
+ * ║  1. Check if setup complete → if NO → SetupScreen                           ║
+ * ║  2. If setup complete → Normal app flow                                     ║
+ * ║                                                                              ║
+ * ║  LAYOUT STRUCTURE:                                                          ║
+ * ║  ┌──────────────────────────────────────────────────────────────────────┐    ║
+ * ║  │ [Services CHE·NU]                                      [TOP RIGHT]  │    ║
+ * ║  ├────────────┬─────────────────────────────────────────────────────────┤    ║
+ * ║  │            │                                                         │    ║
+ * ║  │  MINIMAP   │                MAIN CONTENT                            │    ║
+ * ║  │  (LEFT)    │                                                         │    ║
+ * ║  │  9 Spheres │                                                         │    ║
+ * ║  │            │                                                         │    ║
+ * ║  ├────────────┴─────────────────────────────────────────────────────────┤    ║
+ * ║  │ [Communication Links]                           [NOVA BTN]  BOTTOM  │    ║
+ * ║  └──────────────────────────────────────────────────────────────────────┘    ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ */
+
+import React, { useMemo, useState, useEffect } from "react";
+import { useMachine } from "@xstate/react";
+import { navMachine } from "@/navigation/navMachine";
+import { MOCK_DATA } from "./utils/mockData";
+
+// Screens
+import { SetupScreen } from "./screens/SetupScreen";
+import { EntryScreen } from "./screens/EntryScreen";
+import { ContextBureauScreen } from "./screens/ContextBureauScreen";
+import { ActionBureauScreen } from "./screens/ActionBureauScreen";
+import { WorkspaceScreen } from "./screens/WorkspaceScreen";
+import { AdminDashboard } from "./screens/AdminDashboard";
+
+// Components
+import { OrbitalMinimap } from "@/components/minimap/OrbitalMinimap";
+import { NovaWidget } from "./NovaWidget";
+
+// Types
+import type { NavContext, DiamondState } from "@shared/types";
+
+// Styles
+import "./styles/global.css";
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SERVICES BAR COMPONENT (Top Right)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+interface ServiceItem {
+  id: string;
+  icon: string;
+  label: string;
+  description: string;
+  action?: () => void;
+}
+
+interface ServicesBarProps {
+  userName: string;
+  tokenBalance: number;
+  onAdminClick?: () => void;
+}
+
+const CHENU_SERVICES: ServiceItem[] = [
+  { id: 'search', icon: '🔍', label: 'Recherche', description: 'Recherche intelligente' },
+  { id: 'notifications', icon: '🔔', label: 'Notifications', description: 'Alertes et messages' },
+  { id: 'calendar', icon: '📅', label: 'Calendrier', description: 'Événements et réunions' },
+  { id: 'tokens', icon: '⬡', label: 'Tokens', description: 'Budget intelligence' },
+  { id: 'settings', icon: '⚙️', label: 'Paramètres', description: 'Configuration' },
+];
+
+const ServicesBar: React.FC<ServicesBarProps> = ({ 
+  userName, 
+  tokenBalance,
+  onAdminClick 
+}) => {
+  return (
+    <div className="services-bar">
+      <div className="services-left">
+        <div className="logo-mark">
+          <span className="logo-symbol">◇</span>
+          <span className="logo-text">CHE·NU</span>
+        </div>
+        {/* Admin Button */}
+        <button 
+          onClick={onAdminClick}
+          className="admin-button"
+          style={{
+            marginLeft: 16,
+            padding: '6px 12px',
+            backgroundColor: 'rgba(216, 178, 106, 0.1)',
+            border: '1px solid rgba(216, 178, 106, 0.3)',
+            borderRadius: 6,
+            color: '#D8B26A',
+            fontSize: 12,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+          }}
+        >
+          <span>⚙️</span>
+          <span>Admin</span>
+        </button>
+      </div>
+
+      <div className="services-center">
+        <div className="quick-search">
+          <span className="search-icon">🔍</span>
+          <input 
+            type="text" 
+            placeholder="Rechercher dans CHE·NU..." 
+            className="search-input"
+          />
+          <kbd className="shortcut">⌘K</kbd>
+        </div>
+      </div>
+
+      <div className="services-right">
+        {/* Token Balance */}
+        <div className="token-display" title="Solde de tokens d'intelligence">
+          <span className="token-icon">⬡</span>
+          <span className="token-balance">{tokenBalance.toLocaleString()}</span>
+        </div>
+
+        {/* Notifications */}
+        <button className="service-btn" title="Notifications">
+          <span className="btn-icon">🔔</span>
+          <span className="notification-badge">3</span>
+        </button>
+
+        {/* Calendar */}
+        <button className="service-btn" title="Calendrier">
+          <span className="btn-icon">📅</span>
+        </button>
+
+        {/* Settings */}
+        <button className="service-btn" title="Paramètres">
+          <span className="btn-icon">⚙️</span>
+        </button>
+
+        {/* User Profile */}
+        <div className="user-profile">
+          <div className="user-avatar">
+            {userName.charAt(0).toUpperCase()}
+          </div>
+          <span className="user-name">{userName}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// COMMUNICATION BAR COMPONENT (Bottom)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+interface CommLink {
+  id: string;
+  icon: string;
+  label: string;
+  count?: number;
+  status?: 'online' | 'offline' | 'busy';
+}
+
+const COMM_LINKS: CommLink[] = [
+  { id: 'messages', icon: '💬', label: 'Messages', count: 5 },
+  { id: 'threads', icon: '🧵', label: 'Threads actifs', count: 3 },
+  { id: 'meetings', icon: '📹', label: 'Réunions', count: 1, status: 'online' },
+  { id: 'calls', icon: '📞', label: 'Appels' },
+  { id: 'voice', icon: '🎤', label: 'Voice' },
+];
+
+const CommunicationBar: React.FC<{ onNovaClick: () => void }> = ({ onNovaClick }) => {
+  const [hoveredLink, setHoveredLink] = useState<string | null>(null);
+
+  return (
+    <div className="communication-bar">
+      {/* Left: Communication Links */}
+      <div className="comm-links">
+        {COMM_LINKS.map(link => (
+          <button
+            key={link.id}
+            className={`comm-link ${hoveredLink === link.id ? 'hovered' : ''}`}
+            onMouseEnter={() => setHoveredLink(link.id)}
+            onMouseLeave={() => setHoveredLink(null)}
+            title={link.label}
+          >
+            <span className="link-icon">{link.icon}</span>
+            <span className="link-label">{link.label}</span>
+            {link.count && link.count > 0 && (
+              <span className="link-badge">{link.count}</span>
+            )}
+            {link.status === 'online' && (
+              <span className="status-dot online" />
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* Center: Quick Actions */}
+      <div className="comm-quick-actions">
+        <button className="quick-action" title="Nouveau thread">
+          <span>+ Thread</span>
+        </button>
+        <button className="quick-action" title="Nouvelle réunion">
+          <span>+ Réunion</span>
+        </button>
+      </div>
+
+      {/* Right: Nova Button (Mobile Always Accessible) */}
+      <div className="comm-nova">
+        <button 
+          className="nova-comm-btn"
+          onClick={onNovaClick}
+          title="Nova - Intelligence système"
+        >
+          <span className="nova-symbol">✧</span>
+          <span className="nova-label">Nova</span>
+          <span className="nova-status">En ligne</span>
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONTEXT ADAPTER
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function buildNavContext(machineContext: any, data: typeof MOCK_DATA): NavContext {
+  const { sphereId, workspaceId } = machineContext;
+  
+  const identity = data.identities[0];
+  const spheres = identity ? data.spheresByIdentity[identity.id] : [];
+  const sphere = spheres.find(s => s.key === sphereId) || spheres[0];
+  
+  const keyIS = identity && sphere ? `${identity.id}:${sphere.id}` : null;
+
+  const diamond: DiamondState = {
+    identity: identity || null,
+    sphere: sphere || null,
+    project: null,
+    contextLabel: identity && sphere ? `${identity.name} / ${sphere.labelFr}` : 'Chargement...',
+  };
+  
+  return {
+    currentState: machineContext.currentLocation || 'entry',
+    selection: {
+      identityId: identity?.id || null,
+      sphereId: sphere?.id || null,
+      projectId: null,
+      workspaceId: workspaceId || null,
+    },
+    prefilled: {
+      identityId: null,
+      sphereId: null,
+      projectId: null,
+    },
+    data: {
+      identities: data.identities,
+      spheresByIdentity: data.spheresByIdentity,
+      projectsByIdentitySphere: data.projectsByIdentitySphere,
+      workspacesByIdentitySphere: data.workspacesByIdentitySphere,
+    },
+    contextSummary: {
+      urgentTasks: 3,
+      pendingMeetings: 1,
+      activeThreads: 5,
+    },
+    contextLocked: machineContext.currentLocation === 'workspace',
+    diamond,
+    visibleHubs: ['communication', 'navigation'],
+    actionSuggestions: ['Review pending tasks', 'Check messages'],
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MAIN APP COMPONENT
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export function App() {
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ALL HOOKS MUST BE CALLED FIRST (before any conditional returns)
+  // ═══════════════════════════════════════════════════════════════════════════
+  const [state, send] = useMachine(navMachine);
+  const machineCtx = state.context;
+  const [novaOpen, setNovaOpen] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
+  const [isSetupComplete, setIsSetupComplete] = useState<boolean | null>(null);
+  const [adminEmail, setAdminEmail] = useState<string | null>(null);
+
+  // Compute currentLocation (needed for useMemo dependency)
+  const currentLocation = typeof state.value === 'string' 
+    ? state.value 
+    : machineCtx.currentLocation;
+
+  // useMemo MUST be called before any conditional returns
+  const ctx = useMemo(
+    () => buildNavContext(machineCtx, MOCK_DATA),
+    [machineCtx]
+  );
+
+  useEffect(() => {
+    // Check if setup has been completed
+    const setupComplete = localStorage.getItem('chenu-setup-complete');
+    const storedAdminEmail = localStorage.getItem('chenu-admin-email');
+    
+    setIsSetupComplete(setupComplete === 'true');
+    setAdminEmail(storedAdminEmail);
+    
+    // Check URL for admin panel access
+    if (window.location.hash === '#admin') {
+      setShowAdmin(true);
+    }
+  }, []);
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // HANDLERS (not hooks, can be defined anywhere)
+  // ═══════════════════════════════════════════════════════════════════════════
+  const handleSetupComplete = (adminData: any) => {
+    setIsSetupComplete(true);
+    setAdminEmail(adminData.email);
+    setShowAdmin(true);
+    console.log('Admin account created:', adminData);
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CONDITIONAL RENDERS (after all hooks)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // Show loading while checking setup status
+  if (isSetupComplete === null) {
+    return (
+      <div style={{
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#0D1117',
+        color: '#D8B26A',
+        fontSize: 24,
+      }}>
+        <span style={{ marginRight: 12 }}>◆</span>
+        Chargement...
+      </div>
+    );
+  }
+
+  // Show SetupScreen if first time
+  if (!isSetupComplete) {
+    return <SetupScreen onSetupComplete={handleSetupComplete} />;
+  }
+
+  // Show Admin Dashboard if requested
+  if (showAdmin) {
+    return (
+      <AdminDashboard 
+        apiUrl="/api/v1"
+        onClose={() => {
+          setShowAdmin(false);
+          window.location.hash = '';
+        }}
+      />
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // NORMAL APP FLOW
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // Whether to show full chrome (services bar, minimap, comm bar)
+  const showChrome = currentLocation !== 'entry';
+
+  const renderScreen = () => {
+    switch (currentLocation) {
+      case "entry":
+        return (
+          <EntryScreen 
+            onEnter={() => send({ type: "ENTER_BUREAU" })} 
+          />
+        );
+
+      case "context_bureau":
+        return (
+          <ContextBureauScreen
+            ctx={ctx}
+            onSelectIdentity={(id) => console.log('Select identity:', id)}
+            onSelectSphere={(id) => send({ type: "SWITCH_SPHERE", sphereId: id as any })}
+            onSelectProject={(id) => console.log('Select project:', id)}
+            onClearProject={() => console.log('Clear project')}
+            onConfirm={() => send({ type: "CONFIRM_CONTEXT" })}
+          />
+        );
+
+      case "action_bureau":
+        return (
+          <ActionBureauScreen
+            ctx={ctx}
+            onOpenWorkspace={(id) => send({ type: "OPEN_WORKSPACE", workspaceId: id })}
+            onCreateNote={() => console.log('Create note')}
+            onCreateTask={() => console.log('Create task')}
+            onStartMeeting={() => console.log('Start meeting')}
+            onChangeContext={() => send({ type: "CHANGE_CONTEXT" })}
+          />
+        );
+
+      case "workspace":
+        return (
+          <WorkspaceScreen
+            ctx={ctx}
+            onBack={() => send({ type: "GO_BACK" })}
+            onChangeContext={() => send({ type: "CHANGE_CONTEXT" })}
+          />
+        );
+
+      default:
+        return (
+          <EntryScreen 
+            onEnter={() => send({ type: "ENTER_BUREAU" })} 
+          />
+        );
+    }
+  };
+
+  return (
+    <div className={`chenu-app ${showChrome ? 'with-chrome' : 'entry-mode'}`}>
+      {/* ════════════════════════════════════════════════════════════════════
+          TOP: SERVICES BAR
+          ════════════════════════════════════════════════════════════════════ */}
+      {showChrome && (
+        <header className="chenu-header">
+          <ServicesBar 
+            userName={ctx.diamond.identity?.name || 'Utilisateur'} 
+            tokenBalance={12500}
+            onAdminClick={() => setShowAdmin(true)}
+          />
+        </header>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════════════
+          MIDDLE: MINIMAP + MAIN CONTENT
+          ════════════════════════════════════════════════════════════════════ */}
+      <div className="chenu-body">
+        {/* LEFT: Orbital Minimap - 9 Spheres */}
+        {showChrome && (
+          <aside className="chenu-sidebar">
+            <OrbitalMinimap
+              activeSphere={machineCtx.sphereId as any}
+              onSphereClick={(sphereId) => send({ type: "SWITCH_SPHERE", sphereId })}
+              size={200}
+              backgroundImage="/assets/images/orbital-ring-bg.png"
+            />
+            
+            {/* Current Context Diamond */}
+            <div className="context-diamond">
+              <div className="diamond-shape">◆</div>
+              <div className="diamond-content">
+                <span className="diamond-identity">
+                  {ctx.diamond.identity?.name || 'Non sélectionné'}
+                </span>
+                <span className="diamond-sphere">
+                  {ctx.diamond.sphere?.labelFr || 'Aucune sphère'}
+                </span>
+              </div>
+            </div>
+
+            {/* Quick Bureau Navigation */}
+            <nav className="bureau-nav">
+              <h4 className="bureau-nav-title">Bureau</h4>
+              <ul className="bureau-nav-list">
+                <li className="bureau-nav-item active">Dashboard</li>
+                <li className="bureau-nav-item">Notes</li>
+                <li className="bureau-nav-item">Tasks</li>
+                <li className="bureau-nav-item">Projects</li>
+                <li className="bureau-nav-item">Threads</li>
+                <li className="bureau-nav-item">Meetings</li>
+              </ul>
+            </nav>
+          </aside>
+        )}
+
+        {/* CENTER: Main Content */}
+        <main className="chenu-main">
+          <div className="screen-wrapper">
+            {renderScreen()}
+          </div>
+        </main>
+      </div>
+
+      {/* ════════════════════════════════════════════════════════════════════
+          BOTTOM: COMMUNICATION BAR
+          ════════════════════════════════════════════════════════════════════ */}
+      {showChrome && (
+        <footer className="chenu-footer">
+          <CommunicationBar onNovaClick={() => setNovaOpen(!novaOpen)} />
+        </footer>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════════════
+          FLOATING: NOVA WIDGET (Always Accessible)
+          ════════════════════════════════════════════════════════════════════ */}
+      <NovaWidget isAuthenticated={true} />
+
+      {/* ════════════════════════════════════════════════════════════════════
+          DEV: State Indicator
+          ════════════════════════════════════════════════════════════════════ */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="dev-indicator">
+          <span className="dev-badge location">{currentLocation.toUpperCase()}</span>
+          <span className="dev-badge sphere">{machineCtx.sphereId}</span>
+          {machineCtx.hasUnsavedWork && <span className="dev-badge unsaved">⚠️</span>}
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════════════
+          INLINE STYLES (Can be moved to global.css)
+          ════════════════════════════════════════════════════════════════════ */}
+      <style>{`
+        /* ═══════════════════════════════════════════════════════════════════
+           APP LAYOUT
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        .chenu-app {
+          height: 100vh;
+          display: flex;
+          flex-direction: column;
+          background: var(--bg-primary, #0a0a0a);
+          overflow: hidden;
+        }
+
+        .chenu-app.entry-mode {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           HEADER - SERVICES BAR
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        .chenu-header {
+          flex-shrink: 0;
+          height: 56px;
+          border-bottom: 1px solid var(--border-default, #333);
+          background: var(--bg-secondary, #111);
+        }
+
+        .services-bar {
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0 var(--space-lg, 24px);
+        }
+
+        .services-left {
+          display: flex;
+          align-items: center;
+        }
+
+        .logo-mark {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .logo-symbol {
+          font-size: 24px;
+          color: var(--sacred-gold, #D8B26A);
+        }
+
+        .logo-text {
+          font-size: 18px;
+          font-weight: 700;
+          color: var(--text-primary, #e0e0e0);
+          letter-spacing: 0.05em;
+        }
+
+        .services-center {
+          flex: 1;
+          display: flex;
+          justify-content: center;
+          max-width: 480px;
+          margin: 0 var(--space-lg, 24px);
+        }
+
+        .quick-search {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          padding: 8px 16px;
+          background: var(--bg-surface, #1a1a1a);
+          border: 1px solid var(--border-default, #333);
+          border-radius: var(--radius-md, 10px);
+          gap: 10px;
+          transition: border-color 0.2s;
+        }
+
+        .quick-search:focus-within {
+          border-color: var(--sacred-gold, #D8B26A);
+        }
+
+        .search-icon {
+          color: var(--text-muted, #555);
+        }
+
+        .search-input {
+          flex: 1;
+          background: transparent;
+          border: none;
+          color: var(--text-primary, #e0e0e0);
+          outline: none;
+        }
+
+        .search-input::placeholder {
+          color: var(--text-muted, #555);
+        }
+
+        .shortcut {
+          padding: 3px 8px;
+          background: var(--bg-elevated, #222);
+          border-radius: 4px;
+          font-size: 11px;
+          color: var(--text-muted, #555);
+        }
+
+        .services-right {
+          display: flex;
+          align-items: center;
+          gap: var(--space-sm, 8px);
+        }
+
+        .token-display {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 12px;
+          background: rgba(216, 178, 106, 0.1);
+          border: 1px solid rgba(216, 178, 106, 0.2);
+          border-radius: var(--radius-full, 9999px);
+          color: var(--sacred-gold, #D8B26A);
+          font-size: 13px;
+          font-weight: 600;
+        }
+
+        .token-icon {
+          font-size: 16px;
+        }
+
+        .service-btn {
+          position: relative;
+          width: 40px;
+          height: 40px;
+          border-radius: var(--radius-md, 10px);
+          background: var(--bg-surface, #1a1a1a);
+          border: 1px solid var(--border-default, #333);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s;
+        }
+
+        .service-btn:hover {
+          border-color: var(--sacred-gold, #D8B26A);
+          transform: scale(1.05);
+        }
+
+        .btn-icon {
+          font-size: 18px;
+        }
+
+        .notification-badge {
+          position: absolute;
+          top: -4px;
+          right: -4px;
+          min-width: 18px;
+          height: 18px;
+          background: var(--error, #EF4444);
+          color: white;
+          font-size: 10px;
+          font-weight: 700;
+          border-radius: 9px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .user-profile {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 4px 12px 4px 4px;
+          background: var(--bg-surface, #1a1a1a);
+          border: 1px solid var(--border-default, #333);
+          border-radius: var(--radius-full, 9999px);
+          cursor: pointer;
+          transition: border-color 0.2s;
+        }
+
+        .user-profile:hover {
+          border-color: var(--sacred-gold, #D8B26A);
+        }
+
+        .user-avatar {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, var(--sacred-gold, #D8B26A), var(--earth-ember, #7A593A));
+          color: var(--bg-primary, #0a0a0a);
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .user-name {
+          font-size: 13px;
+          color: var(--text-secondary, #888);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           BODY - MINIMAP + MAIN
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        .chenu-body {
+          flex: 1;
+          display: flex;
+          overflow: hidden;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           SIDEBAR - ORBITAL MINIMAP
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        .chenu-sidebar {
+          width: 260px;
+          flex-shrink: 0;
+          background: var(--bg-secondary, #111);
+          border-right: 1px solid var(--border-default, #333);
+          display: flex;
+          flex-direction: column;
+          padding: var(--space-md, 16px);
+          overflow-y: auto;
+        }
+
+        .context-diamond {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: var(--space-md, 16px);
+          margin-top: var(--space-md, 16px);
+          background: var(--bg-surface, #1a1a1a);
+          border-radius: var(--radius-md, 10px);
+          border: 1px solid var(--border-default, #333);
+        }
+
+        .diamond-shape {
+          font-size: 28px;
+          color: var(--sacred-gold, #D8B26A);
+        }
+
+        .diamond-content {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .diamond-identity {
+          font-size: 14px;
+          font-weight: 600;
+          color: var(--text-primary, #e0e0e0);
+        }
+
+        .diamond-sphere {
+          font-size: 12px;
+          color: var(--text-secondary, #888);
+        }
+
+        .bureau-nav {
+          margin-top: var(--space-lg, 24px);
+        }
+
+        .bureau-nav-title {
+          font-size: 11px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          color: var(--text-muted, #555);
+          margin-bottom: var(--space-sm, 8px);
+        }
+
+        .bureau-nav-list {
+          list-style: none;
+        }
+
+        .bureau-nav-item {
+          padding: 10px 12px;
+          margin: 2px 0;
+          border-radius: var(--radius-sm, 6px);
+          color: var(--text-secondary, #888);
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .bureau-nav-item:hover {
+          background: var(--bg-surface, #1a1a1a);
+          color: var(--text-primary, #e0e0e0);
+        }
+
+        .bureau-nav-item.active {
+          background: rgba(216, 178, 106, 0.1);
+          color: var(--sacred-gold, #D8B26A);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           MAIN CONTENT
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        .chenu-main {
+          flex: 1;
+          overflow-y: auto;
+        }
+
+        .screen-wrapper {
+          padding: var(--space-lg, 24px);
+          height: 100%;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           FOOTER - COMMUNICATION BAR
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        .chenu-footer {
+          flex-shrink: 0;
+          height: 56px;
+          border-top: 1px solid var(--border-default, #333);
+          background: var(--bg-secondary, #111);
+        }
+
+        .communication-bar {
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0 var(--space-lg, 24px);
+        }
+
+        .comm-links {
+          display: flex;
+          gap: var(--space-xs, 4px);
+        }
+
+        .comm-link {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 14px;
+          background: transparent;
+          border: 1px solid transparent;
+          border-radius: var(--radius-md, 10px);
+          color: var(--text-secondary, #888);
+          cursor: pointer;
+          transition: all 0.2s;
+          position: relative;
+        }
+
+        .comm-link:hover,
+        .comm-link.hovered {
+          background: var(--bg-surface, #1a1a1a);
+          border-color: var(--border-default, #333);
+          color: var(--text-primary, #e0e0e0);
+        }
+
+        .link-icon {
+          font-size: 16px;
+        }
+
+        .link-label {
+          font-size: 13px;
+        }
+
+        .link-badge {
+          min-width: 18px;
+          height: 18px;
+          padding: 0 5px;
+          background: var(--cenote-turquoise, #3EB4A2);
+          color: var(--bg-primary, #0a0a0a);
+          font-size: 11px;
+          font-weight: 700;
+          border-radius: 9px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .status-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: var(--text-muted, #555);
+        }
+
+        .status-dot.online {
+          background: var(--success, #22C55E);
+          animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+
+        .comm-quick-actions {
+          display: flex;
+          gap: var(--space-sm, 8px);
+        }
+
+        .quick-action {
+          padding: 6px 14px;
+          background: var(--bg-surface, #1a1a1a);
+          border: 1px solid var(--border-default, #333);
+          border-radius: var(--radius-sm, 6px);
+          color: var(--text-secondary, #888);
+          font-size: 12px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .quick-action:hover {
+          border-color: var(--sacred-gold, #D8B26A);
+          color: var(--sacred-gold, #D8B26A);
+        }
+
+        .comm-nova {
+          display: flex;
+        }
+
+        .nova-comm-btn {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 8px 16px;
+          background: linear-gradient(135deg, var(--sacred-gold, #D8B26A), var(--earth-ember, #7A593A));
+          border: none;
+          border-radius: var(--radius-full, 9999px);
+          color: var(--bg-primary, #0a0a0a);
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s;
+          box-shadow: 0 4px 20px rgba(216, 178, 106, 0.3);
+        }
+
+        .nova-comm-btn:hover {
+          transform: scale(1.05);
+          box-shadow: 0 6px 30px rgba(216, 178, 106, 0.4);
+        }
+
+        .nova-symbol {
+          font-size: 20px;
+        }
+
+        .nova-label {
+          font-size: 14px;
+        }
+
+        .nova-status {
+          font-size: 11px;
+          opacity: 0.8;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           DEV INDICATOR
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        .dev-indicator {
+          position: fixed;
+          top: var(--space-md, 16px);
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          gap: var(--space-xs, 4px);
+          z-index: 9999;
+        }
+
+        .dev-badge {
+          padding: 4px 10px;
+          border-radius: var(--radius-sm, 6px);
+          font-size: 10px;
+          font-weight: 700;
+          text-transform: uppercase;
+        }
+
+        .dev-badge.location {
+          background: var(--cenote-turquoise, #3EB4A2);
+          color: #000;
+        }
+
+        .dev-badge.sphere {
+          background: var(--jungle-emerald, #3F7249);
+          color: #fff;
+        }
+
+        .dev-badge.unsaved {
+          background: var(--warning, #FFB04D);
+          color: #000;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           RESPONSIVE
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        @media (max-width: 1024px) {
+          .chenu-sidebar {
+            width: 220px;
+          }
+          
+          .services-center {
+            display: none;
+          }
+
+          .link-label {
+            display: none;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .chenu-sidebar {
+            position: fixed;
+            left: -260px;
+            top: 56px;
+            bottom: 56px;
+            z-index: 100;
+            transition: left 0.3s;
+          }
+
+          .chenu-sidebar.open {
+            left: 0;
+          }
+
+          .services-right .token-display,
+          .services-right .user-name {
+            display: none;
+          }
+
+          .comm-quick-actions {
+            display: none;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+export default App;

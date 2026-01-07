@@ -1,0 +1,48 @@
+{
+  "name": "Natural",
+  "id": "natural",
+  "default": false,
+  "description": "Organic, warm, comfortable, grounding. Wood, stone, and textile materials with soft daylight.",
+  "character": {
+    "materials": ["wood (light oak/birch)", "stone", "textile", "paper"],
+    "lighting": "Soft daylight, warm white",
+    "geometry": "Slightly rounded (6-8px), organic curves"
+  },
+  "tokens": {
+    "color": {
+      "background": {
+        "primary": "#F8F7F4",
+        "secondary": "#F0EDE8",
+        "surface": "#FFFEFA"
+      },
+      "border": {
+        "default": "#E5DED5",
+        "subtle": "#D6CFC5"
+      }
+    },
+    "radius": {
+      "base": "8px"
+    },
+    "shadow": {
+      "sm": "0 1px 2px rgba(100, 70, 40, 0.06)",
+      "md": "0 4px 12px rgba(100, 70, 40, 0.08)",
+      "lg": "0 12px 24px rgba(100, 70, 40, 0.10)"
+    }
+  },
+  "textures": {
+    "surface": "subtle paper texture",
+    "overlay": "optional: wood grain (very subtle)"
+  },
+  "illustrations": {
+    "style": "hand-drawn, botanical, organic shapes"
+  },
+  "sphereColorAdjustments": {
+    "temperature": "+5% yellow/orange (warmer)",
+    "saturation": "unchanged"
+  },
+  "restrictions": [
+    "No heavy wood textures",
+    "No skeuomorphism",
+    "No overly rustic"
+  ]
+}

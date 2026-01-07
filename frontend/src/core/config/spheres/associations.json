@@ -1,0 +1,104 @@
+{
+  "$schema": "chenu://sphere/v2",
+  "id": "associations",
+  "version": "1.0.0",
+  
+  "name": "Associations",
+  "displayName": "Associations",
+  "emoji": "🤝",
+  "icon": "users",
+  
+  "description": {
+    "fr": "Organisations collaboratives, clubs et communautés",
+    "en": "Collaborative organizations, clubs and communities"
+  },
+  
+  "colors": {
+    "primary": "#3F7249",
+    "secondary": "#3EB4A2",
+    "accent": "#D8B26A",
+    "background": "#1E1F22",
+    "surface": "#2A2B2F"
+  },
+  
+  "scope": {
+    "included": [
+      "membership-management",
+      "events",
+      "meetings",
+      "committees",
+      "voting",
+      "communications",
+      "documents",
+      "finances",
+      "volunteers",
+      "activities"
+    ],
+    "excluded": [
+      "personal-member-data-beyond-contact",
+      "political-lobbying",
+      "discriminatory-practices"
+    ]
+  },
+  
+  "features": {
+    "memberDirectory": true,
+    "eventCalendar": true,
+    "votingSystem": true,
+    "documentSharing": true,
+    "communicationHub": true,
+    "treasuryManagement": true,
+    "volunteerCoordination": true,
+    "meetingMinutes": true
+  },
+  
+  "agents": {
+    "enabled": true,
+    "types": [
+      "event-coordinator",
+      "member-liaison",
+      "meeting-facilitator",
+      "communication-assistant"
+    ],
+    "notes": "Association agents help coordinate activities without making governance decisions"
+  },
+  
+  "integrations": [
+    "projects",
+    "government",
+    "social"
+  ],
+  
+  "interSphereInteraction": true,
+  
+  "organizationTypes": [
+    "nonprofit",
+    "club",
+    "cooperative",
+    "community-group",
+    "professional-association",
+    "sports-league",
+    "cultural-organization"
+  ],
+  
+  "permissions": {
+    "canShareWithProjects": true,
+    "canShareWithGovernment": true,
+    "requiresAuth": true,
+    "memberDataProtection": "strict"
+  },
+  
+  "governance": {
+    "rolesSupported": ["president", "secretary", "treasurer", "board-member", "member", "volunteer"],
+    "votingMethods": ["simple-majority", "two-thirds", "consensus"],
+    "meetingTypes": ["general-assembly", "board-meeting", "committee-meeting", "annual-meeting"]
+  },
+  
+  "metadata": {
+    "safe": true,
+    "nonAutonomous": true,
+    "representational": true,
+    "createdAt": "2025-12-13",
+    "updatedAt": "2025-12-13"
+  }
+}

@@ -1,0 +1,307 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * CHE·NU™ — GLOBAL STYLES
+ * ═══════════════════════════════════════════════════════════════════════════
+ * Design System Colors:
+ * - Sacred Gold: #D8B26A
+ * - Ancient Stone: #8D8371
+ * - Jungle Emerald: #3F7249
+ * - Cenote Turquoise: #3EB4A2
+ * - Shadow Moss: #2F4C39
+ * - Earth Ember: #7A593A
+ * - UI Slate: #1E1F22
+ * - Soft Sand: #E9E4D6
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Root Variables */
+:root {
+  /* Brand Colors */
+  --chenu-gold: #D8B26A;
+  --chenu-stone: #8D8371;
+  --chenu-emerald: #3F7249;
+  --chenu-turquoise: #3EB4A2;
+  --chenu-moss: #2F4C39;
+  --chenu-ember: #7A593A;
+  --chenu-slate: #1E1F22;
+  --chenu-sand: #E9E4D6;
+  
+  /* UI Colors */
+  --bg-primary: #1E1F22;
+  --bg-secondary: #2A2B2E;
+  --bg-tertiary: #3A3B3E;
+  --text-primary: #E9E4D6;
+  --text-secondary: #8D8371;
+  --border-color: #3A3B3E;
+  
+  /* Status Colors */
+  --success: #3F7249;
+  --warning: #D8B26A;
+  --error: #EF4444;
+  --info: #3B82F6;
+  
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+  
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
+}
+
+/* Base Styles */
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text-primary);
+}
+
+h1 { font-size: 2rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1rem; }
+h5 { font-size: 0.875rem; }
+h6 { font-size: 0.75rem; }
+
+p {
+  color: var(--text-secondary);
+}
+
+a {
+  color: var(--chenu-gold);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--chenu-turquoise);
+}
+
+/* Focus Styles */
+:focus-visible {
+  outline: 2px solid var(--chenu-gold);
+  outline-offset: 2px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--chenu-stone);
+}
+
+/* Selection */
+::selection {
+  background: var(--chenu-gold);
+  color: var(--bg-primary);
+}
+
+/* Utility Classes */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn var(--transition-normal) ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp var(--transition-normal) ease-out;
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* CHE·NU Specific */
+.chenu-gold-text {
+  color: var(--chenu-gold);
+}
+
+.chenu-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+}
+
+.chenu-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.chenu-button:hover {
+  background: var(--chenu-gold);
+  color: var(--bg-primary);
+  border-color: var(--chenu-gold);
+}
+
+.chenu-button-primary {
+  background: var(--chenu-gold);
+  color: var(--bg-primary);
+  border-color: var(--chenu-gold);
+}
+
+.chenu-button-primary:hover {
+  background: var(--chenu-turquoise);
+  border-color: var(--chenu-turquoise);
+}
+
+.chenu-input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  transition: border-color var(--transition-fast);
+}
+
+.chenu-input:focus {
+  border-color: var(--chenu-gold);
+  outline: none;
+}
+
+.chenu-input::placeholder {
+  color: var(--text-secondary);
+}
+
+/* Nova Glow Effect */
+.nova-glow {
+  box-shadow: 0 0 20px rgba(216, 178, 106, 0.3);
+}
+
+/* Governance Badge */
+.governance-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: rgba(63, 114, 73, 0.2);
+  border-radius: var(--radius-full);
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--chenu-emerald);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

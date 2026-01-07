@@ -1,0 +1,1398 @@
+openapi: 3.1.0
+info:
+  title: CHE·NU Governance & XR API
+  description: |
+    API endpoints for CHE·NU's Governed Intelligence Operating System.
+    
+    ## Core Principles
+    - **HTTP 423 LOCKED**: Checkpoint required - action needs human approval
+    - **HTTP 403 FORBIDDEN**: Identity boundary violation - access denied
+    - **Governance > Execution**: All sensitive actions require explicit approval
+    
+    ## Authentication
+    All endpoints require JWT Bearer token authentication.
+    
+    ## R&D Compliance
+    All responses include traceability fields (id, created_at, created_by).
+  version: 1.0.0
+  contact:
+    name: CHE·NU R&D Team
+    email: rnd@che-nu.com
+  license:
+    name: Proprietary
+    url: https://che-nu.com/license
+
+servers:
+  - url: https://api.che-nu.com/api/v2
+    description: Production
+  - url: https://staging-api.che-nu.com/api/v2
+    description: Staging
+  - url: http://localhost:8000/api/v2
+    description: Local Development
+
+tags:
+  - name: Governance
+    description: CEA signals, orchestrator decisions, checkpoints
+  - name: Backlog
+    description: Error backlog, governance debt management
+  - name: XR
+    description: XR blueprint generation and interactions
+  - name: Maturity
+    description: Thread maturity scoring and levels
+  - name: Thread Lobby
+    description: Thread entry point and mode selection
+
+security:
+  - bearerAuth: []
+
+paths:
+  # ============================================================================
+  # GOVERNANCE ENDPOINTS
+  # ============================================================================
+  
+  /governance/signals:
+    get:
+      tags: [Governance]
+      summary: List governance signals
+      description: |
+        Returns recent CEA (Continuous Evaluation Array) signals.
+        Signals indicate governance events: warnings, corrections, blocks, etc.
+      operationId: listGovernanceSignals
+      parameters:
+        - $ref: '#/components/parameters/ThreadIdQuery'
+        - name: level
+          in: query
+          schema:
+            $ref: '#/components/schemas/GovernanceSignalLevel'
+        - name: criterion
+          in: query
+          schema:
+            $ref: '#/components/schemas/GovernanceCriterion'
+        - name: processed
+          in: query
+          schema:
+            type: boolean
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+      responses:
+        '200':
+          description: List of governance signals
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  signals:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GovernanceSignal'
+                  total:
+                    type: integer
+                  has_more:
+                    type: boolean
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/IdentityBoundary'
+
+  /governance/signals/{signal_id}/acknowledge:
+    post:
+      tags: [Governance]
+      summary: Acknowledge a governance signal
+      description: Mark a signal as acknowledged by the user
+      operationId: acknowledgeSignal
+      parameters:
+        - name: signal_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Signal acknowledged
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GovernanceSignal'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /governance/decisions:
+    get:
+      tags: [Governance]
+      summary: List orchestrator decisions
+      description: |
+        Returns audit log of orchestrator decisions.
+        Each decision includes QCT, SES, and RDC results.
+      operationId: listOrchestratorDecisions
+      parameters:
+        - $ref: '#/components/parameters/ThreadIdQuery'
+        - name: decision
+          in: query
+          schema:
+            $ref: '#/components/schemas/OrchestratorDecision'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+      responses:
+        '200':
+          description: List of decisions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  decisions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OrchestratorDecisionRecord'
+                  total:
+                    type: integer
+
+  /governance/dashboard:
+    get:
+      tags: [Governance]
+      summary: Get governance dashboard data
+      description: Aggregated governance metrics and recent activity
+      operationId: getGovernanceDashboard
+      parameters:
+        - $ref: '#/components/parameters/ThreadIdQuery'
+      responses:
+        '200':
+          description: Dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GovernanceDashboard'
+
+  /governance/checkpoints/{checkpoint_id}/approve:
+    post:
+      tags: [Governance]
+      summary: Approve a checkpoint
+      description: |
+        Approves a pending checkpoint (HTTP 423 resolution).
+        **Human Gate**: This action requires explicit user decision.
+      operationId: approveCheckpoint
+      parameters:
+        - name: checkpoint_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  description: Optional reason for approval
+      responses:
+        '200':
+          description: Checkpoint approved, action executed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckpointResolution'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Checkpoint already resolved
+
+  /governance/checkpoints/{checkpoint_id}/reject:
+    post:
+      tags: [Governance]
+      summary: Reject a checkpoint
+      description: |
+        Rejects a pending checkpoint.
+        **Human Gate**: This action requires explicit user decision.
+      operationId: rejectCheckpoint
+      parameters:
+        - name: checkpoint_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+                  description: Required reason for rejection
+      responses:
+        '200':
+          description: Checkpoint rejected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckpointResolution'
+
+  # ============================================================================
+  # BACKLOG ENDPOINTS
+  # ============================================================================
+
+  /backlog:
+    get:
+      tags: [Backlog]
+      summary: List backlog items
+      description: Returns filtered list of backlog items (errors, signals, governance debt)
+      operationId: listBacklogItems
+      parameters:
+        - $ref: '#/components/parameters/ThreadIdQuery'
+        - name: type
+          in: query
+          schema:
+            $ref: '#/components/schemas/BacklogType'
+        - name: severity
+          in: query
+          schema:
+            $ref: '#/components/schemas/BacklogSeverity'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/BacklogStatus'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+      responses:
+        '200':
+          description: List of backlog items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BacklogItem'
+                  total:
+                    type: integer
+                  by_severity:
+                    type: object
+                    additionalProperties:
+                      type: integer
+
+    post:
+      tags: [Backlog]
+      summary: Create backlog item
+      description: Manually create a backlog item
+      operationId: createBacklogItem
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BacklogItemCreate'
+      responses:
+        '201':
+          description: Backlog item created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BacklogItem'
+
+  /backlog/{item_id}:
+    get:
+      tags: [Backlog]
+      summary: Get backlog item
+      operationId: getBacklogItem
+      parameters:
+        - name: item_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Backlog item details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BacklogItem'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /backlog/{item_id}/resolve:
+    post:
+      tags: [Backlog]
+      summary: Resolve backlog item
+      description: |
+        Mark a backlog item as resolved.
+        **Human Gate**: Requires explicit resolution description.
+      operationId: resolveBacklogItem
+      parameters:
+        - name: item_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [resolution]
+              properties:
+                resolution:
+                  type: string
+                  minLength: 10
+                  description: Description of how the issue was resolved
+                status:
+                  $ref: '#/components/schemas/BacklogStatus'
+                  default: resolved
+      responses:
+        '200':
+          description: Item resolved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BacklogItem'
+
+  # ============================================================================
+  # MATURITY ENDPOINTS
+  # ============================================================================
+
+  /threads/{thread_id}/maturity:
+    get:
+      tags: [Maturity]
+      summary: Get thread maturity
+      description: |
+        Returns the maturity score and level for a thread.
+        Results are cached server-side (60s TTL).
+      operationId: getThreadMaturity
+      parameters:
+        - $ref: '#/components/parameters/ThreadIdPath'
+      responses:
+        '200':
+          description: Maturity score
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaturityResult'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /threads/{thread_id}/maturity/recompute:
+    post:
+      tags: [Maturity]
+      summary: Force recompute maturity
+      description: |
+        Forces a fresh maturity computation, bypassing cache.
+        Use sparingly - computation is moderately expensive.
+      operationId: recomputeMaturity
+      parameters:
+        - $ref: '#/components/parameters/ThreadIdPath'
+      responses:
+        '200':
+          description: Fresh maturity score
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaturityResult'
+
+  # ============================================================================
+  # THREAD LOBBY ENDPOINTS
+  # ============================================================================
+
+  /threads/{thread_id}/lobby:
+    get:
+      tags: [Thread Lobby]
+      summary: Get thread lobby data
+      description: |
+        Returns all data needed to render the Thread Lobby:
+        - Thread summary and metadata
+        - Maturity score and level
+        - Available modes and recommendations
+        - Live session info (if active)
+      operationId: getThreadLobby
+      parameters:
+        - $ref: '#/components/parameters/ThreadIdPath'
+      responses:
+        '200':
+          description: Lobby data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadLobbyData'
+        '403':
+          $ref: '#/components/responses/IdentityBoundary'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /threads/{thread_id}/enter-mode:
+    post:
+      tags: [Thread Lobby]
+      summary: Enter thread in specific mode
+      description: |
+        Records mode entry for analytics and initializes mode-specific state.
+        For XR mode, returns preflight requirements.
+      operationId: enterThreadMode
+      parameters:
+        - $ref: '#/components/parameters/ThreadIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mode]
+              properties:
+                mode:
+                  $ref: '#/components/schemas/ThreadEntryMode'
+      responses:
+        '200':
+          description: Mode entry successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mode:
+                    $ref: '#/components/schemas/ThreadEntryMode'
+                  session_id:
+                    type: string
+                    format: uuid
+                  preflight:
+                    $ref: '#/components/schemas/XRPreflightData'
+                    description: Only present for XR mode
+        '403':
+          $ref: '#/components/responses/IdentityBoundary'
+        '423':
+          $ref: '#/components/responses/CheckpointRequired'
+
+  # ============================================================================
+  # XR ENDPOINTS
+  # ============================================================================
+
+  /threads/{thread_id}/xr/preflight:
+    get:
+      tags: [XR]
+      summary: Get XR preflight requirements
+      description: |
+        Returns requirements and permissions for XR entry.
+        Should be called before rendering XR environment.
+      operationId: getXRPreflight
+      parameters:
+        - $ref: '#/components/parameters/ThreadIdPath'
+      responses:
+        '200':
+          description: Preflight data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/XRPreflightData'
+        '403':
+          $ref: '#/components/responses/IdentityBoundary'
+
+  /threads/{thread_id}/xr/blueprint:
+    get:
+      tags: [XR]
+      summary: Generate XR blueprint
+      description: |
+        Generates the XR environment blueprint for a thread.
+        
+        **Important**: XR is a PROJECTION of the Thread, not a source of truth.
+        All displayed data derives from ThreadEvents.
+      operationId: getXRBlueprint
+      parameters:
+        - $ref: '#/components/parameters/ThreadIdPath'
+        - name: template
+          in: query
+          schema:
+            $ref: '#/components/schemas/XRTemplate'
+        - name: viewer_role
+          in: query
+          schema:
+            $ref: '#/components/schemas/ViewerRole'
+      responses:
+        '200':
+          description: XR blueprint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/XRBlueprint'
+        '403':
+          $ref: '#/components/responses/IdentityBoundary'
+
+  /threads/{thread_id}/xr/actions/{action_id}:
+    patch:
+      tags: [XR]
+      summary: Update action from XR
+      description: |
+        Updates an action's status from within XR environment.
+        Creates a ThreadEvent (action.updated) - does NOT modify directly.
+        
+        **Governance**: May trigger checkpoint (HTTP 423) for sensitive changes.
+      operationId: updateXRAction
+      parameters:
+        - $ref: '#/components/parameters/ThreadIdPath'
+        - name: action_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/XRActionUpdate'
+      responses:
+        '200':
+          description: Action updated (event created)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadEvent'
+        '423':
+          $ref: '#/components/responses/CheckpointRequired'
+
+  /threads/{thread_id}/xr/actions:
+    post:
+      tags: [XR]
+      summary: Create action from XR
+      description: |
+        Creates a new action from within XR environment.
+        Creates a ThreadEvent (action.created).
+      operationId: createXRAction
+      parameters:
+        - $ref: '#/components/parameters/ThreadIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/XRActionCreate'
+      responses:
+        '201':
+          description: Action created (event created)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadEvent'
+        '423':
+          $ref: '#/components/responses/CheckpointRequired'
+
+  /threads/{thread_id}/xr/notes:
+    post:
+      tags: [XR]
+      summary: Add note from XR
+      description: |
+        Adds a note to the thread from within XR environment.
+        Creates a ThreadEvent (note.added).
+      operationId: addXRNote
+      parameters:
+        - $ref: '#/components/parameters/ThreadIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/XRNoteCreate'
+      responses:
+        '201':
+          description: Note added (event created)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadEvent'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    ThreadIdPath:
+      name: thread_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Thread UUID
+
+    ThreadIdQuery:
+      name: thread_id
+      in: query
+      schema:
+        type: string
+        format: uuid
+      description: Filter by thread
+
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+    Offset:
+      name: offset
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+
+  schemas:
+    # --------------------------------------------------------------------------
+    # ENUMS
+    # --------------------------------------------------------------------------
+    
+    GovernanceSignalLevel:
+      type: string
+      enum: [WARN, CORRECT, PAUSE, BLOCK, ESCALATE]
+      description: |
+        - WARN: Informational warning
+        - CORRECT: Auto-correctable issue
+        - PAUSE: Requires review before continuing
+        - BLOCK: Action blocked, checkpoint created
+        - ESCALATE: Requires human intervention
+
+    GovernanceCriterion:
+      type: string
+      enum:
+        - canon_guard
+        - security_guard
+        - budget_guard
+        - identity_guard
+        - sphere_guard
+        - consent_guard
+        - rate_guard
+        - quality_guard
+        - compliance_guard
+        - audit_guard
+
+    OrchestratorDecision:
+      type: string
+      enum:
+        - proceed
+        - proceed_with_observation
+        - checkpoint_required
+        - block
+        - escalate
+
+    BacklogType:
+      type: string
+      enum: [error, signal, decision, cost, governance_debt]
+
+    BacklogSeverity:
+      type: string
+      enum: [low, medium, high, critical]
+
+    BacklogStatus:
+      type: string
+      enum: [open, in_progress, resolved, wont_fix, duplicate]
+
+    MaturityLevel:
+      type: integer
+      minimum: 0
+      maximum: 5
+      description: |
+        - 0: Seed (0-9 points)
+        - 1: Sprout (10-24 points)
+        - 2: Workshop (25-44 points)
+        - 3: Studio (45-64 points)
+        - 4: Org (65-84 points)
+        - 5: Ecosystem (85-100 points)
+
+    ThreadEntryMode:
+      type: string
+      enum: [chat, live, xr]
+
+    ViewerRole:
+      type: string
+      enum: [owner, collaborator, viewer, auditor]
+
+    XRTemplate:
+      type: string
+      enum: [personal_room, business_room, cause_room, lab_room, custom_room]
+
+    ActionStatus:
+      type: string
+      enum: [pending, in_progress, completed, blocked, cancelled]
+
+    RedactionLevel:
+      type: string
+      enum: [none, partial, full]
+
+    ZoneType:
+      type: string
+      enum:
+        - intent_wall
+        - decision_wall
+        - action_table
+        - memory_kiosk
+        - timeline_strip
+        - resource_shelf
+
+    ItemKind:
+      type: string
+      enum: [intent, decision, action, note, link, memory, portal]
+
+    # --------------------------------------------------------------------------
+    # GOVERNANCE SCHEMAS
+    # --------------------------------------------------------------------------
+
+    GovernanceSignal:
+      type: object
+      required: [id, level, criterion, message, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        thread_id:
+          type: string
+          format: uuid
+        event_id:
+          type: string
+          format: uuid
+        level:
+          $ref: '#/components/schemas/GovernanceSignalLevel'
+        criterion:
+          $ref: '#/components/schemas/GovernanceCriterion'
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+        patch_instruction:
+          $ref: '#/components/schemas/PatchInstruction'
+        processed:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    PatchInstruction:
+      type: object
+      properties:
+        action:
+          type: string
+          enum: [replace, remove, add, transform]
+        target:
+          type: string
+        value:
+          type: object
+        reason:
+          type: string
+
+    OrchestratorDecisionRecord:
+      type: object
+      required: [id, decision, reason, created_at, created_by]
+      properties:
+        id:
+          type: string
+          format: uuid
+        thread_id:
+          type: string
+          format: uuid
+        event_id:
+          type: string
+          format: uuid
+        decision:
+          $ref: '#/components/schemas/OrchestratorDecision'
+        reason:
+          type: string
+        qct_result:
+          type: object
+          description: Quality-Cost-Time routing result
+        ses_result:
+          type: object
+          description: Smart Escalation Scoring result
+        rdc_result:
+          type: object
+          description: Real-time Decision Core result
+        checkpoint_id:
+          type: string
+          format: uuid
+        execution_result:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+        created_by:
+          type: string
+          format: uuid
+
+    CheckpointResolution:
+      type: object
+      properties:
+        checkpoint_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [approved, rejected]
+        resolved_by:
+          type: string
+          format: uuid
+        resolved_at:
+          type: string
+          format: date-time
+        reason:
+          type: string
+        execution_result:
+          type: object
+          description: Result of executing the approved action
+
+    GovernanceDashboard:
+      type: object
+      properties:
+        thread_id:
+          type: string
+          format: uuid
+        summary:
+          type: object
+          properties:
+            total_signals:
+              type: integer
+            unprocessed_signals:
+              type: integer
+            total_decisions:
+              type: integer
+            checkpoints_pending:
+              type: integer
+            backlog_items_open:
+              type: integer
+        recent_signals:
+          type: array
+          items:
+            $ref: '#/components/schemas/GovernanceSignal'
+        recent_decisions:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrchestratorDecisionRecord'
+        health_score:
+          type: number
+          minimum: 0
+          maximum: 100
+
+    # --------------------------------------------------------------------------
+    # BACKLOG SCHEMAS
+    # --------------------------------------------------------------------------
+
+    BacklogItem:
+      type: object
+      required: [id, thread_id, backlog_type, severity, title, status, created_at, created_by]
+      properties:
+        id:
+          type: string
+          format: uuid
+        thread_id:
+          type: string
+          format: uuid
+        identity_id:
+          type: string
+          format: uuid
+        backlog_type:
+          $ref: '#/components/schemas/BacklogType'
+        severity:
+          $ref: '#/components/schemas/BacklogSeverity'
+        title:
+          type: string
+        description:
+          type: string
+        context:
+          type: object
+          additionalProperties: true
+        source_spec:
+          type: string
+          description: Reference to source (e.g., "CEA:budget_guard")
+        status:
+          $ref: '#/components/schemas/BacklogStatus'
+        resolution:
+          type: string
+        linked_events:
+          type: array
+          items:
+            type: object
+            properties:
+              event_id:
+                type: string
+                format: uuid
+              relation:
+                type: string
+                enum: [source, related, resolution]
+        created_at:
+          type: string
+          format: date-time
+        created_by:
+          type: string
+          format: uuid
+        updated_at:
+          type: string
+          format: date-time
+
+    BacklogItemCreate:
+      type: object
+      required: [thread_id, backlog_type, severity, title]
+      properties:
+        thread_id:
+          type: string
+          format: uuid
+        backlog_type:
+          $ref: '#/components/schemas/BacklogType'
+        severity:
+          $ref: '#/components/schemas/BacklogSeverity'
+        title:
+          type: string
+          minLength: 5
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 2000
+        context:
+          type: object
+        source_spec:
+          type: string
+
+    # --------------------------------------------------------------------------
+    # MATURITY SCHEMAS
+    # --------------------------------------------------------------------------
+
+    MaturitySignals:
+      type: object
+      description: 10 signals × 10 points each = 100 max
+      properties:
+        has_founding_intent:
+          type: integer
+          minimum: 0
+          maximum: 10
+        has_decisions:
+          type: integer
+        has_actions:
+          type: integer
+        has_active_actions:
+          type: integer
+        has_completed_actions:
+          type: integer
+        has_collaborators:
+          type: integer
+        has_xr_sessions:
+          type: integer
+        has_live_sessions:
+          type: integer
+        has_linked_threads:
+          type: integer
+        has_memory_compressions:
+          type: integer
+
+    MaturityResult:
+      type: object
+      required: [thread_id, score, level, signals, computed_at]
+      properties:
+        thread_id:
+          type: string
+          format: uuid
+        score:
+          type: integer
+          minimum: 0
+          maximum: 100
+        level:
+          $ref: '#/components/schemas/MaturityLevel'
+        level_name:
+          type: string
+          enum: [Seed, Sprout, Workshop, Studio, Org, Ecosystem]
+        signals:
+          $ref: '#/components/schemas/MaturitySignals'
+        computed_at:
+          type: string
+          format: date-time
+        cached:
+          type: boolean
+          description: Whether this result was from cache
+
+    # --------------------------------------------------------------------------
+    # THREAD LOBBY SCHEMAS
+    # --------------------------------------------------------------------------
+
+    ThreadLobbyData:
+      type: object
+      required: [thread, maturity, modes, summary]
+      properties:
+        thread:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            founding_intent:
+              type: string
+            thread_type:
+              type: string
+              enum: [personal, collective, institutional]
+            sphere_id:
+              type: string
+              format: uuid
+            sphere_name:
+              type: string
+            status:
+              type: string
+            created_at:
+              type: string
+              format: date-time
+        maturity:
+          $ref: '#/components/schemas/MaturityResult'
+        modes:
+          type: object
+          properties:
+            chat:
+              type: object
+              properties:
+                available:
+                  type: boolean
+                recommended:
+                  type: boolean
+            live:
+              type: object
+              properties:
+                available:
+                  type: boolean
+                recommended:
+                  type: boolean
+                requires_maturity:
+                  $ref: '#/components/schemas/MaturityLevel'
+            xr:
+              type: object
+              properties:
+                available:
+                  type: boolean
+                recommended:
+                  type: boolean
+                requires_maturity:
+                  $ref: '#/components/schemas/MaturityLevel'
+        summary:
+          type: object
+          properties:
+            total_events:
+              type: integer
+            total_decisions:
+              type: integer
+            total_actions:
+              type: integer
+            active_actions:
+              type: integer
+            last_activity:
+              type: string
+              format: date-time
+        live_session:
+          type: object
+          nullable: true
+          properties:
+            session_id:
+              type: string
+              format: uuid
+            participant_count:
+              type: integer
+            started_at:
+              type: string
+              format: date-time
+
+    # --------------------------------------------------------------------------
+    # XR SCHEMAS
+    # --------------------------------------------------------------------------
+
+    XRPreflightData:
+      type: object
+      required: [thread_id, available, zones, features]
+      properties:
+        thread_id:
+          type: string
+          format: uuid
+        available:
+          type: boolean
+          description: Whether XR is available for this thread
+        unavailable_reason:
+          type: string
+          description: Reason if not available
+        zones:
+          type: array
+          items:
+            $ref: '#/components/schemas/ZoneType'
+          description: Zones that will be visible
+        features:
+          type: object
+          properties:
+            can_create_actions:
+              type: boolean
+            can_update_actions:
+              type: boolean
+            can_add_notes:
+              type: boolean
+            can_view_decisions:
+              type: boolean
+            can_access_memory:
+              type: boolean
+        device_requirements:
+          type: object
+          properties:
+            webxr_required:
+              type: boolean
+            recommended_device:
+              type: string
+        estimated_load_time_ms:
+          type: integer
+        privacy_notice:
+          type: string
+
+    XRBlueprint:
+      type: object
+      required: [thread_id, template, zones, generated_at]
+      properties:
+        thread_id:
+          type: string
+          format: uuid
+        template:
+          $ref: '#/components/schemas/XRTemplate'
+        zones:
+          type: array
+          items:
+            $ref: '#/components/schemas/BlueprintZone'
+        portals:
+          type: array
+          items:
+            $ref: '#/components/schemas/ThreadPortal'
+        ambient:
+          type: object
+          properties:
+            lighting:
+              type: string
+            skybox:
+              type: string
+            audio:
+              type: string
+        generated_at:
+          type: string
+          format: date-time
+        projection_notice:
+          type: string
+          default: "XR is a projection. All changes create ThreadEvents."
+
+    BlueprintZone:
+      type: object
+      required: [zone_type, position, items]
+      properties:
+        zone_type:
+          $ref: '#/components/schemas/ZoneType'
+        label:
+          type: string
+        position:
+          type: object
+          properties:
+            x:
+              type: number
+            y:
+              type: number
+            z:
+              type: number
+        rotation:
+          type: object
+          properties:
+            x:
+              type: number
+            y:
+              type: number
+            z:
+              type: number
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/BlueprintItem'
+
+    BlueprintItem:
+      type: object
+      required: [id, kind, content]
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          $ref: '#/components/schemas/ItemKind'
+        content:
+          type: object
+          additionalProperties: true
+        position:
+          type: object
+        style:
+          type: object
+        interactions:
+          type: array
+          items:
+            type: string
+        redacted:
+          type: boolean
+          default: false
+
+    ThreadPortal:
+      type: object
+      properties:
+        target_thread_id:
+          type: string
+          format: uuid
+        target_thread_title:
+          type: string
+        relation:
+          type: string
+        position:
+          type: object
+
+    XRActionUpdate:
+      type: object
+      required: [status]
+      properties:
+        status:
+          $ref: '#/components/schemas/ActionStatus'
+        notes:
+          type: string
+
+    XRActionCreate:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 200
+        description:
+          type: string
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+        due_date:
+          type: string
+          format: date-time
+
+    XRNoteCreate:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+          minLength: 1
+          maxLength: 5000
+        zone:
+          $ref: '#/components/schemas/ZoneType'
+          description: Zone where note was created
+
+    ThreadEvent:
+      type: object
+      required: [id, thread_id, event_type, created_at, created_by]
+      properties:
+        id:
+          type: string
+          format: uuid
+        thread_id:
+          type: string
+          format: uuid
+        event_type:
+          type: string
+        payload:
+          type: object
+        parent_event_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        created_by:
+          type: string
+          format: uuid
+
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: unauthorized
+              message:
+                type: string
+                example: Valid authentication required
+
+    IdentityBoundary:
+      description: |
+        Identity boundary violation (HTTP 403).
+        Access denied because resource belongs to different identity.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: identity_boundary_violation
+              message:
+                type: string
+                example: Access denied - resource belongs to different identity
+              requested_identity:
+                type: string
+                format: uuid
+              resource_identity:
+                type: string
+                format: uuid
+
+    CheckpointRequired:
+      description: |
+        Checkpoint required (HTTP 423 LOCKED).
+        Action requires human approval before execution.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: checkpoint_pending
+              checkpoint:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  type:
+                    type: string
+                    enum: [governance, cost, identity, sensitive]
+                  reason:
+                    type: string
+                  requires_approval:
+                    type: boolean
+                  options:
+                    type: array
+                    items:
+                      type: string
+                    example: [approve, reject]
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: not_found
+              message:
+                type: string

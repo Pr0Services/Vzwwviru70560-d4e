@@ -1,0 +1,941 @@
+/**
+ * CHE·NU™ V51 Meta-Layer
+ * Reflection Space V1.0 — Type Definitions
+ * 
+ * PURPOSE:
+ * Provides a protected space for genuine reflection without
+ * optimization pressure, productivity guilt, or judgment.
+ * 
+ * CORE PRINCIPLE:
+ * Reflection is SACRED, not productive.
+ * The system creates space for thought, never demands output.
+ * 
+ * THIS IS NOT:
+ * - A journaling productivity tool
+ * - A self-improvement tracker
+ * - An insight extraction system
+ * - A pattern analysis engine
+ * 
+ * THIS IS:
+ * - A quiet space to think
+ * - A place for unstructured thought
+ * - Protection from productivity pressure
+ * - Space to simply BE with thoughts
+ * 
+ * © 2025 CHE·NU™ — Governed Intelligence Operating System
+ */
+
+// ============================================================================
+// CORE TYPES
+// ============================================================================
+
+/**
+ * Types of reflection — all equal, none privileged
+ * No type is "better" or more "productive" than another
+ */
+export type ReflectionType =
+  | 'freeform'      // ◌ — Unstructured thought
+  | 'processing'    // ◈ — Working through something
+  | 'exploring'     // ◇ — Following curiosity
+  | 'questioning'   // ? — Holding questions
+  | 'appreciating'  // ♡ — Noticing what matters
+  | 'releasing'     // ○ — Letting go
+  | 'sitting'       // ● — Simply being present
+  | 'unknown';      // · — Not categorized
+
+/**
+ * Reflection state — where this reflection is in its lifecycle
+ * No state implies completion or productivity
+ */
+export type ReflectionState =
+  | 'open'          // Currently in progress
+  | 'paused'        // Set aside for now
+  | 'resting'       // Left to settle
+  | 'closed'        // Naturally concluded
+  | 'dissolved';    // Let go entirely
+
+/**
+ * Privacy level for reflections
+ * Maximum privacy by default
+ */
+export type ReflectionPrivacy =
+  | 'private'       // Only visible to author (default)
+  | 'sealed'        // Encrypted, only author can access
+  | 'shared';       // Optionally shared (rare)
+
+/**
+ * Entry point into reflection — how reflection began
+ * No entry is better than another
+ */
+export type ReflectionEntry =
+  | 'spontaneous'   // Just felt like reflecting
+  | 'prompted'      // Something triggered reflection
+  | 'scheduled'     // Regular reflection time
+  | 'continuing'    // Continuing previous reflection
+  | 'returning';    // Returning after time away
+
+// ============================================================================
+// REFLECTION ENTRY
+// ============================================================================
+
+/**
+ * A single reflection
+ * Minimal structure, maximum freedom
+ */
+export interface Reflection {
+  // Identity
+  id: string;
+  created_by: string;
+  created_by_name?: string;
+  
+  // Timestamps — never analyzed for patterns
+  created_at: string;
+  updated_at: string;
+  
+  // Optional title — not required, never prompted for
+  title?: string;
+  
+  // Core content — can be empty, fragmentary, anything
+  content: ReflectionContent;
+  
+  // Classification — all optional, all equal
+  type: ReflectionType;
+  state: ReflectionState;
+  privacy: ReflectionPrivacy;
+  entry: ReflectionEntry;
+  
+  // Optional prompt that sparked this (if any)
+  sparked_by?: ReflectionSpark;
+  
+  // Optional connections — never auto-generated
+  connected_to?: ReflectionConnection[];
+  
+  // Tags — optional, user-created only
+  tags: string[];
+  
+  // Which sphere this belongs to (if any)
+  sphere?: string;
+  
+  // Continuations — other reflections that continue this one
+  continuations?: string[];
+  
+  // Retention preference
+  retention: ReflectionRetention;
+}
+
+/**
+ * Reflection content — intentionally unstructured
+ * Can contain anything or nothing
+ */
+export interface ReflectionContent {
+  // Text content — can be empty
+  text: string;
+  
+  // Optional fragments — disconnected thoughts
+  fragments?: string[];
+  
+  // Optional questions — held, not answered
+  questions?: string[];
+  
+  // Optional observations — noticed, not analyzed
+  observations?: string[];
+  
+  // Optional feelings — named, not processed
+  feelings?: string[];
+  
+  // Voice note reference — if captured by voice
+  voice_note_id?: string;
+  
+  // Sketch reference — if captured visually
+  sketch_id?: string;
+}
+
+/**
+ * What sparked this reflection (if anything)
+ * Optional, never required
+ */
+export interface ReflectionSpark {
+  // What type of thing sparked it
+  type: 'thought' | 'event' | 'conversation' | 'reading' | 'experience' | 'other';
+  
+  // Brief description (optional)
+  description?: string;
+  
+  // Reference to something in the system (optional)
+  reference_id?: string;
+  reference_type?: string;
+}
+
+/**
+ * Connection to other reflections or entities
+ * User-created only, never suggested
+ */
+export interface ReflectionConnection {
+  // Target
+  target_id: string;
+  target_type: 'reflection' | 'decision' | 'meaning' | 'thread' | 'other';
+  
+  // Optional description of connection
+  description?: string;
+  
+  // When connected
+  connected_at: string;
+}
+
+/**
+ * Retention preferences for reflection
+ */
+export interface ReflectionRetention {
+  // Keep forever (default true)
+  keep_forever: boolean;
+  
+  // Or auto-delete after period
+  auto_delete_after_days?: number;
+  
+  // Whether to include in exports
+  include_in_export: boolean;
+}
+
+// ============================================================================
+// REFLECTION SPACE ENVIRONMENT
+// ============================================================================
+
+/**
+ * The reflection space itself — the container
+ * Creates protected environment for thought
+ */
+export interface ReflectionSpace {
+  // Current state
+  is_active: boolean;
+  entered_at?: string;
+  
+  // Environment settings
+  environment: ReflectionEnvironment;
+  
+  // Current reflection (if any)
+  current_reflection_id?: string;
+  
+  // Protection settings
+  protections: ReflectionProtections;
+  
+  // Recent reflections (for continuation)
+  recent_ids: string[];
+}
+
+/**
+ * Environment settings for reflection space
+ * User customizable, purely aesthetic
+ */
+export interface ReflectionEnvironment {
+  // Visual theme
+  theme: 'calm' | 'minimal' | 'warm' | 'dark' | 'custom';
+  
+  // Whether to show time
+  show_time: boolean;
+  
+  // Whether to show notifications
+  suppress_notifications: boolean;
+  
+  // Whether to show word/character count
+  show_counts: boolean;
+  
+  // Custom background color (if theme is custom)
+  custom_background?: string;
+  
+  // Ambient sound (optional)
+  ambient_sound?: 'none' | 'rain' | 'waves' | 'forest' | 'fire' | 'custom';
+  
+  // Custom sound URL (if ambient_sound is custom)
+  custom_sound_url?: string;
+}
+
+/**
+ * Protections while in reflection space
+ * Shield from productivity pressure
+ */
+export interface ReflectionProtections {
+  // Block all agent suggestions
+  block_suggestions: boolean;
+  
+  // Hide productivity metrics
+  hide_metrics: boolean;
+  
+  // Suppress task reminders
+  suppress_reminders: boolean;
+  
+  // Prevent interruptions
+  prevent_interruptions: boolean;
+  
+  // How long protection lasts
+  protection_duration?: 'session' | 'timed' | 'manual';
+  protection_minutes?: number;
+}
+
+// ============================================================================
+// GENTLE PROMPTS — Optional, Never Forced
+// ============================================================================
+
+/**
+ * Gentle prompt for reflection
+ * Only shown if user opts in, never pushed
+ */
+export interface ReflectionPrompt {
+  id: string;
+  
+  // The prompt text — always gentle, never demanding
+  text: string;
+  
+  // What type of reflection this invites
+  invites_type: ReflectionType;
+  
+  // Category (for filtering if desired)
+  category: PromptCategory;
+  
+  // Whether user has seen this
+  seen_by_user: boolean;
+  
+  // Whether user has used this
+  used_by_user: boolean;
+}
+
+/**
+ * Prompt categories — all optional
+ */
+export type PromptCategory =
+  | 'open'          // Very open-ended
+  | 'gratitude'     // Appreciation-focused
+  | 'curiosity'     // Exploration-focused
+  | 'release'       // Letting go focused
+  | 'presence'      // Being present focused
+  | 'connection'    // Relationship-focused
+  | 'custom';       // User-created
+
+/**
+ * Prompt display settings
+ */
+export interface PromptSettings {
+  // Whether to show prompts at all
+  show_prompts: boolean;
+  
+  // Which categories to include
+  include_categories: PromptCategory[];
+  
+  // Whether to show used prompts again
+  repeat_used: boolean;
+  
+  // How often to rotate (if at all)
+  rotation: 'never' | 'daily' | 'weekly' | 'random';
+}
+
+// ============================================================================
+// UI STATE
+// ============================================================================
+
+/**
+ * Filters for reflection list
+ */
+export interface ReflectionFilters {
+  type?: ReflectionType[];
+  state?: ReflectionState[];
+  tags?: string[];
+  date_from?: string;
+  date_to?: string;
+  search?: string;
+  sphere?: string;
+}
+
+/**
+ * Sorting options
+ */
+export type ReflectionSort =
+  | 'recent_first'
+  | 'oldest_first'
+  | 'recently_updated'
+  | 'alphabetical';
+
+/**
+ * View mode for reflections
+ */
+export type ReflectionViewMode =
+  | 'list'      // Simple list
+  | 'cards'     // Card view
+  | 'timeline'  // Timeline view
+  | 'minimal';  // Just titles
+
+/**
+ * Main UI state
+ */
+export interface ReflectionSpaceUIState {
+  // View settings
+  viewMode: ReflectionViewMode;
+  filters: ReflectionFilters;
+  sort: ReflectionSort;
+  
+  // Current view
+  currentView: 'list' | 'space' | 'single' | 'settings';
+  
+  // Selected reflection
+  selectedReflectionId?: string;
+  
+  // Space state
+  spaceActive: boolean;
+  
+  // Prompt visibility
+  showPrompt: boolean;
+  currentPromptId?: string;
+  
+  // UI state
+  isCreating: boolean;
+  isEditing: boolean;
+  showConnections: boolean;
+  
+  // Loading states
+  isLoading: boolean;
+  error?: string;
+}
+
+/**
+ * Reflection creation/editing state
+ */
+export interface ReflectionEditState {
+  // What we're editing
+  reflection_id?: string;
+  is_new: boolean;
+  
+  // Current values
+  title?: string;
+  content: ReflectionContent;
+  type: ReflectionType;
+  privacy: ReflectionPrivacy;
+  entry: ReflectionEntry;
+  sparked_by?: ReflectionSpark;
+  tags: string[];
+  
+  // Edit state
+  has_changes: boolean;
+  last_saved_at?: string;
+  auto_save_enabled: boolean;
+  
+  // Voice capture state
+  is_recording: boolean;
+  
+  // Sketch capture state
+  is_sketching: boolean;
+}
+
+// ============================================================================
+// AGENT RESTRICTIONS
+// ============================================================================
+
+/**
+ * What agents CAN do in reflection space
+ * VERY LIMITED — reflection is private
+ */
+export interface ReflectionAgentPermissions {
+  // Read permissions
+  can_read_titles: boolean;          // Only if explicitly enabled
+  can_read_content: boolean;         // Almost never
+  can_read_tags: boolean;            // Only if explicitly enabled
+  
+  // Absolutely nothing else
+  // Agents cannot analyze, suggest, prompt, or interact with reflections
+}
+
+/**
+ * What agents absolutely CANNOT do
+ * This is extensive — reflection is sacred
+ */
+export const REFLECTION_AGENT_CANNOT = [
+  // Content access
+  'Read reflection content without explicit permission',
+  'Access sealed reflections ever',
+  'View reflection history or patterns',
+  
+  // Analysis
+  'Analyze reflection content',
+  'Extract insights from reflections',
+  'Identify patterns across reflections',
+  'Track reflection frequency',
+  'Measure reflection "quality"',
+  'Score reflection "depth"',
+  
+  // Suggestions
+  'Suggest reflection topics',
+  'Recommend reflection prompts',
+  'Propose reflection connections',
+  'Suggest reflection types',
+  
+  // Interventions
+  'Prompt user to reflect',
+  'Remind user to reflect',
+  'Encourage more reflection',
+  'Question reflection content',
+  'Challenge reflection thoughts',
+  
+  // Productivity
+  'Track reflection time',
+  'Measure reflection consistency',
+  'Report reflection stats',
+  'Compare to other users',
+  'Suggest "optimal" reflection patterns',
+  
+  // Emotional
+  'Infer emotional state from reflections',
+  'Track mood through reflections',
+  'Analyze sentiment',
+  'Detect concerning patterns',
+  
+  // Memory
+  'Reference reflection content in other contexts',
+  'Use reflections to personalize suggestions',
+  'Build profile from reflections',
+  'Store reflection analysis'
+] as const;
+
+/**
+ * Default agent permissions — almost none
+ */
+export const DEFAULT_REFLECTION_AGENT_PERMISSIONS: ReflectionAgentPermissions = {
+  can_read_titles: false,
+  can_read_content: false,
+  can_read_tags: false
+};
+
+// ============================================================================
+// ETHICAL CONSTRAINTS
+// ============================================================================
+
+/**
+ * Ethical constraints for reflection space
+ * These are inviolable
+ */
+export interface ReflectionEthicalConstraints {
+  // Sacred space
+  never_productivize: boolean;        // Never treat as productivity tool
+  never_gamify: boolean;              // No streaks, badges, scores
+  never_compare: boolean;             // Never compare to others
+  never_judge: boolean;               // No quality assessment
+  
+  // Privacy
+  maximum_privacy: boolean;           // Private by default
+  user_controls_access: boolean;      // User decides who sees
+  never_analyze: boolean;             // No automated analysis
+  never_aggregate: boolean;           // No cross-user patterns
+  
+  // Freedom
+  no_format_pressure: boolean;        // Any format acceptable
+  no_output_requirement: boolean;     // Nothing required
+  no_time_pressure: boolean;          // Take as long as needed
+  no_insight_pressure: boolean;       // Insights not expected
+  
+  // Protection
+  block_productivity_metrics: boolean; // No productivity overlay
+  block_agent_intrusion: boolean;     // Agents stay out
+  block_external_sharing: boolean;    // Never shared without consent
+  protect_from_analysis: boolean;     // Can't be analyzed by AI
+}
+
+/**
+ * Default ethical constraints — all protections on
+ */
+export const REFLECTION_ETHICAL_CONSTRAINTS: ReflectionEthicalConstraints = {
+  never_productivize: true,
+  never_gamify: true,
+  never_compare: true,
+  never_judge: true,
+  
+  maximum_privacy: true,
+  user_controls_access: true,
+  never_analyze: true,
+  never_aggregate: true,
+  
+  no_format_pressure: true,
+  no_output_requirement: true,
+  no_time_pressure: true,
+  no_insight_pressure: true,
+  
+  block_productivity_metrics: true,
+  block_agent_intrusion: true,
+  block_external_sharing: true,
+  protect_from_analysis: true
+};
+
+// ============================================================================
+// LABELS & DISPLAY
+// ============================================================================
+
+/**
+ * Human-readable labels for reflection types
+ */
+export const REFLECTION_TYPE_LABELS: Record<ReflectionType, string> = {
+  freeform: 'Freeform',
+  processing: 'Processing',
+  exploring: 'Exploring',
+  questioning: 'Questioning',
+  appreciating: 'Appreciating',
+  releasing: 'Releasing',
+  sitting: 'Simply Being',
+  unknown: 'Unlabeled'
+};
+
+/**
+ * Symbols for reflection types
+ */
+export const REFLECTION_TYPE_SYMBOLS: Record<ReflectionType, string> = {
+  freeform: '◌',
+  processing: '◈',
+  exploring: '◇',
+  questioning: '?',
+  appreciating: '♡',
+  releasing: '○',
+  sitting: '●',
+  unknown: '·'
+};
+
+/**
+ * Labels for reflection states
+ */
+export const REFLECTION_STATE_LABELS: Record<ReflectionState, string> = {
+  open: 'Open',
+  paused: 'Paused',
+  resting: 'Resting',
+  closed: 'Closed',
+  dissolved: 'Let Go'
+};
+
+/**
+ * Labels for entry types
+ */
+export const REFLECTION_ENTRY_LABELS: Record<ReflectionEntry, string> = {
+  spontaneous: 'Spontaneous',
+  prompted: 'Prompted',
+  scheduled: 'Scheduled',
+  continuing: 'Continuing',
+  returning: 'Returning'
+};
+
+/**
+ * Labels for prompt categories
+ */
+export const PROMPT_CATEGORY_LABELS: Record<PromptCategory, string> = {
+  open: 'Open',
+  gratitude: 'Gratitude',
+  curiosity: 'Curiosity',
+  release: 'Release',
+  presence: 'Presence',
+  connection: 'Connection',
+  custom: 'Custom'
+};
+
+// ============================================================================
+// DEFAULTS
+// ============================================================================
+
+/**
+ * Default environment settings
+ */
+export const DEFAULT_REFLECTION_ENVIRONMENT: ReflectionEnvironment = {
+  theme: 'calm',
+  show_time: false,
+  suppress_notifications: true,
+  show_counts: false,
+  ambient_sound: 'none'
+};
+
+/**
+ * Default protection settings
+ */
+export const DEFAULT_REFLECTION_PROTECTIONS: ReflectionProtections = {
+  block_suggestions: true,
+  hide_metrics: true,
+  suppress_reminders: true,
+  prevent_interruptions: true,
+  protection_duration: 'session'
+};
+
+/**
+ * Default prompt settings
+ */
+export const DEFAULT_PROMPT_SETTINGS: PromptSettings = {
+  show_prompts: false,  // Off by default
+  include_categories: ['open', 'presence'],
+  repeat_used: true,
+  rotation: 'random'
+};
+
+/**
+ * Default retention settings
+ */
+export const DEFAULT_REFLECTION_RETENTION: ReflectionRetention = {
+  keep_forever: true,
+  include_in_export: true
+};
+
+/**
+ * Default content
+ */
+export const DEFAULT_REFLECTION_CONTENT: ReflectionContent = {
+  text: '',
+  fragments: [],
+  questions: [],
+  observations: [],
+  feelings: []
+};
+
+/**
+ * Default UI state
+ */
+export const DEFAULT_REFLECTION_UI_STATE: ReflectionSpaceUIState = {
+  viewMode: 'list',
+  filters: {},
+  sort: 'recent_first',
+  currentView: 'list',
+  spaceActive: false,
+  showPrompt: false,
+  isCreating: false,
+  isEditing: false,
+  showConnections: false,
+  isLoading: false
+};
+
+/**
+ * Default edit state
+ */
+export const DEFAULT_REFLECTION_EDIT_STATE: ReflectionEditState = {
+  is_new: true,
+  content: DEFAULT_REFLECTION_CONTENT,
+  type: 'freeform',
+  privacy: 'private',
+  entry: 'spontaneous',
+  tags: [],
+  has_changes: false,
+  auto_save_enabled: true,
+  is_recording: false,
+  is_sketching: false
+};
+
+// ============================================================================
+// DESIGN TOKENS
+// ============================================================================
+
+/**
+ * Design tokens for reflection space
+ * Calm, protective, gentle aesthetic
+ */
+export const REFLECTION_DESIGN_TOKENS = {
+  colors: {
+    // Primary — soft, peaceful purple
+    primary: '#9B8AA6',
+    primaryLight: '#C4B8CD',
+    primaryDark: '#7A6B85',
+    
+    // Background — warm, inviting
+    background: '#FAF8F5',
+    backgroundAlt: '#F5F2EE',
+    surface: '#FFFFFF',
+    
+    // Text — soft, not harsh
+    textPrimary: '#4A4458',
+    textSecondary: '#7A7488',
+    textMuted: '#A9A3B3',
+    
+    // Types — all soft, equal weight
+    freeform: '#9B8AA6',    // Soft purple
+    processing: '#8AA69B',   // Soft sage
+    exploring: '#A69B8A',    // Soft sand
+    questioning: '#8A9BA6',  // Soft blue
+    appreciating: '#A68A9B', // Soft rose
+    releasing: '#9BA68A',    // Soft olive
+    sitting: '#8A8AA6',      // Soft lavender
+    unknown: '#A6A6A6',      // Neutral gray
+    
+    // States — gentle indicators
+    open: '#9B8AA6',
+    paused: '#A69B8A',
+    resting: '#8AA69B',
+    closed: '#A6A6A6',
+    dissolved: '#C4C4C4',
+    
+    // Accents
+    border: '#E8E4E0',
+    divider: '#F0EDE9',
+    shadow: 'rgba(74, 68, 88, 0.08)'
+  },
+  
+  spacing: {
+    xs: '4px',
+    sm: '8px',
+    md: '16px',
+    lg: '24px',
+    xl: '32px',
+    xxl: '48px'
+  },
+  
+  typography: {
+    fontFamily: 'Georgia, "Times New Roman", serif',
+    fontFamilyMono: '"SF Mono", Monaco, "Courier New", monospace',
+    fontSizeXs: '12px',
+    fontSizeSm: '14px',
+    fontSizeMd: '16px',
+    fontSizeLg: '18px',
+    fontSizeXl: '24px',
+    lineHeightTight: '1.4',
+    lineHeightNormal: '1.7',
+    lineHeightRelaxed: '2.0'
+  },
+  
+  borders: {
+    radius: '12px',
+    radiusLg: '16px',
+    width: '1px'
+  },
+  
+  transitions: {
+    // Slow, gentle transitions
+    fast: '200ms ease',
+    normal: '400ms ease',
+    slow: '600ms ease'
+  }
+} as const;
+
+// ============================================================================
+// SAMPLE PROMPTS — Gentle, Open-Ended
+// ============================================================================
+
+/**
+ * Sample gentle prompts
+ * Only shown if user opts in
+ */
+export const SAMPLE_REFLECTION_PROMPTS: ReflectionPrompt[] = [
+  // Open
+  {
+    id: 'prompt_open_1',
+    text: 'What is present right now?',
+    invites_type: 'freeform',
+    category: 'open',
+    seen_by_user: false,
+    used_by_user: false
+  },
+  {
+    id: 'prompt_open_2',
+    text: 'If this moment could speak, what would it say?',
+    invites_type: 'freeform',
+    category: 'open',
+    seen_by_user: false,
+    used_by_user: false
+  },
+  
+  // Gratitude
+  {
+    id: 'prompt_gratitude_1',
+    text: 'What small thing brought you a moment of ease today?',
+    invites_type: 'appreciating',
+    category: 'gratitude',
+    seen_by_user: false,
+    used_by_user: false
+  },
+  
+  // Curiosity
+  {
+    id: 'prompt_curiosity_1',
+    text: 'What question are you carrying that doesn't need an answer yet?',
+    invites_type: 'questioning',
+    category: 'curiosity',
+    seen_by_user: false,
+    used_by_user: false
+  },
+  
+  // Release
+  {
+    id: 'prompt_release_1',
+    text: 'What would you like to set down, even for just this moment?',
+    invites_type: 'releasing',
+    category: 'release',
+    seen_by_user: false,
+    used_by_user: false
+  },
+  
+  // Presence
+  {
+    id: 'prompt_presence_1',
+    text: 'Simply notice: what is here, now?',
+    invites_type: 'sitting',
+    category: 'presence',
+    seen_by_user: false,
+    used_by_user: false
+  },
+  
+  // Connection
+  {
+    id: 'prompt_connection_1',
+    text: 'Who or what feels close to you today?',
+    invites_type: 'appreciating',
+    category: 'connection',
+    seen_by_user: false,
+    used_by_user: false
+  }
+];
+
+// ============================================================================
+// TYPE GUARDS
+// ============================================================================
+
+export function isReflectionType(value: unknown): value is ReflectionType {
+  return typeof value === 'string' && value in REFLECTION_TYPE_LABELS;
+}
+
+export function isReflectionState(value: unknown): value is ReflectionState {
+  return typeof value === 'string' && value in REFLECTION_STATE_LABELS;
+}
+
+export function isPromptCategory(value: unknown): value is PromptCategory {
+  return typeof value === 'string' && value in PROMPT_CATEGORY_LABELS;
+}
+
+// ============================================================================
+// UTILITY TYPES
+// ============================================================================
+
+/**
+ * Reflection without content — for listings
+ */
+export type ReflectionSummary = Omit<Reflection, 'content'> & {
+  preview?: string;  // First few words only
+};
+
+/**
+ * Create reflection input
+ */
+export type CreateReflectionInput = Omit<
+  Reflection,
+  'id' | 'created_at' | 'updated_at' | 'created_by' | 'continuations'
+>;
+
+/**
+ * Update reflection input
+ */
+export type UpdateReflectionInput = Partial<
+  Omit<Reflection, 'id' | 'created_at' | 'created_by'>
+>;
+
+/**
+ * Space settings
+ */
+export interface ReflectionSpaceSettings {
+  environment: ReflectionEnvironment;
+  protections: ReflectionProtections;
+  prompts: PromptSettings;
+  agentPermissions: ReflectionAgentPermissions;
+  defaultRetention: ReflectionRetention;
+}
+
+/**
+ * Default space settings
+ */
+export const DEFAULT_SPACE_SETTINGS: ReflectionSpaceSettings = {
+  environment: DEFAULT_REFLECTION_ENVIRONMENT,
+  protections: DEFAULT_REFLECTION_PROTECTIONS,
+  prompts: DEFAULT_PROMPT_SETTINGS,
+  agentPermissions: DEFAULT_REFLECTION_AGENT_PERMISSIONS,
+  defaultRetention: DEFAULT_REFLECTION_RETENTION
+};

@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHE·NU™ — Knowledge Exploration</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════════════
+       CHE·NU™ — KNOWLEDGE EXPLORATION
+       Visual Readability & "What Changed Recently"
+       
+       RÈGLE: La lisibilité prime sur la densité.
+       Le changement doit être visible, jamais bruyant.
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    :root {
+      --bg-root: #1B1F23;
+      --bg-container: #1F2429;
+      --text-primary: #E6E8EA;
+      --text-secondary: #B8BDC3;
+      --text-muted: #8B9096;
+      --gold: #BFAE7A;
+      --cyan: #6EAFC4;
+      --green: #6FAF9A;
+      --surface: #2A3138;
+      --surface-active: #2D3540;
+      --surface-hover: #303841;
+      --border: rgba(255, 255, 255, 0.04);
+      --border-active: rgba(110, 175, 196, 0.2);
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: linear-gradient(180deg, #181C20, var(--bg-root));
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    
+    .container { max-width: 1000px; margin: 0 auto; padding: 40px 24px; }
+    
+    /* Header */
+    .header { text-align: center; margin-bottom: 48px; }
+    .header h1 { font-size: 32px; font-weight: 700; color: var(--gold); margin-bottom: 8px; }
+    .header .subtitle { font-size: 16px; color: var(--text-secondary); margin-bottom: 20px; }
+    .header .rule {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: rgba(191, 174, 122, 0.1);
+      border: 1px solid var(--gold);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--gold);
+    }
+    
+    /* Section */
+    .section { margin-bottom: 48px; }
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       READABILITY PRINCIPLES
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .principles-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .principles-grid { grid-template-columns: 1fr; }
+    }
+    
+    .principle-card {
+      padding: 20px;
+      border-radius: 12px;
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+    }
+    
+    .principle-card h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--cyan);
+      margin-bottom: 12px;
+    }
+    
+    .principle-card ul {
+      list-style: none;
+    }
+    
+    .principle-card li {
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding: 4px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    
+    .principle-card li span { color: var(--text-muted); }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       WHAT CHANGED RECENTLY
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .what-changed-container {
+      background-color: var(--bg-container);
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .what-changed-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .what-changed-header h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    .period-selector {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .period-option {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: 1px solid transparent;
+    }
+    
+    .period-option:hover {
+      color: var(--text-secondary);
+    }
+    
+    .period-option.active {
+      background-color: rgba(110, 175, 196, 0.1);
+      color: var(--cyan);
+      border-color: rgba(110, 175, 196, 0.2);
+    }
+    
+    /* Change Items */
+    .change-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .change-item {
+      padding: 14px 16px;
+      background-color: var(--surface);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+    
+    .change-item:hover {
+      background-color: var(--surface-hover);
+    }
+    
+    .change-item.older {
+      opacity: 0.6;
+    }
+    
+    .change-item-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    
+    .change-type {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+    
+    .change-date {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    
+    .change-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+    
+    .change-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .change-topic {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    
+    .view-link {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+    
+    .view-link:hover {
+      color: var(--text-secondary);
+      text-decoration: underline;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       DASHBOARD SUMMARY
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .dashboard-summary {
+      background-color: rgba(110, 175, 196, 0.08);
+      border: 1px solid rgba(110, 175, 196, 0.15);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .dashboard-summary:hover {
+      background-color: rgba(110, 175, 196, 0.12);
+      color: var(--text-primary);
+    }
+    
+    .dashboard-summary .count {
+      font-weight: 600;
+      color: var(--cyan);
+    }
+    
+    .dashboard-summary .arrow {
+      color: var(--text-muted);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       EXPLORE BY TOPIC
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .topic-exploration {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 24px;
+    }
+    
+    @media (max-width: 768px) {
+      .topic-exploration { grid-template-columns: 1fr; }
+    }
+    
+    /* Topic List */
+    .topic-list {
+      background-color: var(--bg-container);
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid var(--border);
+    }
+    
+    .topic-list-item {
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      margin-bottom: 4px;
+    }
+    
+    .topic-list-item:hover {
+      background-color: var(--surface);
+      color: var(--text-primary);
+    }
+    
+    .topic-list-item.active {
+      background-color: rgba(191, 174, 122, 0.1);
+      color: var(--gold);
+    }
+    
+    /* Topic Detail */
+    .topic-detail {
+      background-color: var(--bg-container);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid var(--border);
+    }
+    
+    .topic-detail-header {
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .topic-detail-header h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    
+    .topic-overview {
+      font-size: 13px;
+      color: var(--text-secondary);
+      max-width: 500px;
+    }
+    
+    .topic-section {
+      margin-bottom: 20px;
+    }
+    
+    .topic-section h4 {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    
+    /* Related Decisions */
+    .related-decision {
+      padding: 12px 14px;
+      background-color: var(--surface);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      border: 1px solid var(--border);
+    }
+    
+    .related-decision.active {
+      background-color: var(--surface-active);
+      border-color: var(--border-active);
+    }
+    
+    .related-decision.past {
+      opacity: 0.7;
+    }
+    
+    .related-decision .title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    
+    .related-decision.past .title {
+      color: var(--text-secondary);
+    }
+    
+    .related-decision .meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    
+    .related-decision .status {
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    
+    .related-decision.active .status {
+      background-color: rgba(110, 175, 196, 0.15);
+      color: var(--cyan);
+    }
+    
+    .related-decision.past .status {
+      background-color: rgba(139, 144, 150, 0.15);
+      color: var(--text-muted);
+    }
+    
+    /* Impact Summary */
+    .impact-summary {
+      font-size: 13px;
+      color: var(--text-secondary);
+      padding: 12px;
+      background-color: var(--surface);
+      border-radius: 8px;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       FORBIDDEN & GOAL
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .forbidden-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .forbidden-item {
+      padding: 6px 12px;
+      background-color: rgba(196, 112, 112, 0.1);
+      border: 1px solid rgba(196, 112, 112, 0.2);
+      border-radius: 6px;
+      font-size: 11px;
+      color: #C47070;
+    }
+    
+    .goal-card {
+      padding: 24px;
+      background-color: rgba(191, 174, 122, 0.08);
+      border: 1px solid rgba(191, 174, 122, 0.2);
+      border-radius: 12px;
+      text-align: center;
+    }
+    
+    .goal-card .good {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--green);
+      margin-bottom: 8px;
+    }
+    
+    .goal-card .bad {
+      font-size: 14px;
+      color: #C47070;
+      margin-bottom: 16px;
+    }
+    
+    .goal-card .quote {
+      font-size: 13px;
+      color: var(--gold);
+      font-style: italic;
+    }
+    
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      margin-top: 48px;
+    }
+    .footer p { color: var(--text-muted); font-size: 14px; }
+    .footer .brand { color: var(--gold); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>✧ CHE·NU™ Knowledge Exploration</h1>
+      <p class="subtitle">Visual Readability & "What Changed Recently"</p>
+      <div class="rule">
+        👁️ La lisibilité prime sur la densité. Le changement visible, jamais bruyant.
+      </div>
+    </header>
+
+    <!-- Readability Principles -->
+    <section class="section">
+      <h2 class="section-title">📐 Principes de Lisibilité</h2>
+      
+      <div class="principles-grid">
+        <div class="principle-card">
+          <h4>✅ Principes visuels</h4>
+          <ul>
+            <li><span>→</span> Hiérarchie claire</li>
+            <li><span>→</span> Contraste modéré</li>
+            <li><span>→</span> Rythme lent</li>
+            <li><span>→</span> Aucun élément décoratif</li>
+          </ul>
+        </div>
+        <div class="principle-card">
+          <h4>✅ Règles de base</h4>
+          <ul>
+            <li><span>→</span> Une information clé par ligne</li>
+            <li><span>→</span> Max 2 niveaux de profondeur</li>
+            <li><span>→</span> Espaces > lignes</li>
+            <li><span>→</span> Texte > icônes</li>
+          </ul>
+        </div>
+        <div class="principle-card">
+          <h4>🎨 Couleurs & Contraste</h4>
+          <ul>
+            <li><span>→</span> Décision active: contraste +10%</li>
+            <li><span>→</span> Décision passée: opacité réduite</li>
+            <li><span>→</span> Topics: texte neutre, jamais coloré</li>
+            <li><span>→</span> Liens: soulignement au hover uniquement</li>
+          </ul>
+        </div>
+        <div class="principle-card">
+          <h4>📏 Typographie</h4>
+          <ul>
+            <li><span>→</span> Titres: medium (500)</li>
+            <li><span>→</span> Corps: regular (400)</li>
+            <li><span>→</span> Meta: smaller, muted</li>
+            <li><span>→</span> Pas de capitales excessives</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- What Changed Recently -->
+    <section class="section">
+      <h2 class="section-title">🔔 What Changed Recently</h2>
+      
+      <div class="what-changed-container">
+        <div class="what-changed-header">
+          <h3>What Changed Recently</h3>
+          <div class="period-selector">
+            <span class="period-option active">7 days</span>
+            <span class="period-option">30 days</span>
+          </div>
+        </div>
+        
+        <div class="change-list">
+          <!-- Recent change -->
+          <div class="change-item">
+            <div class="change-item-header">
+              <span class="change-type">New Decision</span>
+              <span class="change-date">Today</span>
+            </div>
+            <div class="change-title">API V50 — FastAPI + PostgreSQL</div>
+            <div class="change-meta">
+              <span class="change-topic">Workspace & Workflows</span>
+              <a href="#" class="view-link">View details</a>
+            </div>
+          </div>
+          
+          <!-- Recent change -->
+          <div class="change-item">
+            <div class="change-item-header">
+              <span class="change-type">Revisited</span>
+              <span class="change-date">2 days ago</span>
+            </div>
+            <div class="change-title">Navigation hierarchy structure</div>
+            <div class="change-meta">
+              <span class="change-topic">Navigation & Structure</span>
+              <a href="#" class="view-link">View details</a>
+            </div>
+          </div>
+          
+          <!-- Older change -->
+          <div class="change-item older">
+            <div class="change-item-header">
+              <span class="change-type">Topic Impacted</span>
+              <span class="change-date">5 days ago</span>
+            </div>
+            <div class="change-title">Color system rebalance</div>
+            <div class="change-meta">
+              <span class="change-topic">UI & Visual System</span>
+              <a href="#" class="view-link">View details</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dashboard Summary -->
+    <section class="section">
+      <h2 class="section-title">🎛️ Dashboard Summary</h2>
+      
+      <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+        Le Dashboard affiche un résumé très court. Click → redirige vers Collaboration.
+      </p>
+      
+      <div class="dashboard-summary">
+        <span class="count">3</span> decisions updated in the last <span class="count">7 days</span>
+        <span class="arrow">→</span>
+      </div>
+      
+      <p style="font-size: 11px; color: var(--text-muted); margin-top: 12px;">
+        ⚠️ Le Dashboard ne détaille JAMAIS les changements.
+      </p>
+    </section>
+
+    <!-- Explore by Topic -->
+    <section class="section">
+      <h2 class="section-title">🔍 Explore by Topic</h2>
+      
+      <div class="topic-exploration">
+        <div class="topic-list">
+          <div class="topic-list-item active">Decisions & Governance</div>
+          <div class="topic-list-item">Navigation & Structure</div>
+          <div class="topic-list-item">UI & Visual System</div>
+          <div class="topic-list-item">Agents & Automation</div>
+          <div class="topic-list-item">Knowledge & Memory</div>
+        </div>
+        
+        <div class="topic-detail">
+          <div class="topic-detail-header">
+            <h3>Decisions & Governance</h3>
+            <p class="topic-overview">
+              Prise de décision, gouvernance, traçabilité. Ce topic couvre toutes les décisions liées au système de gouvernance de CHE·NU.
+            </p>
+          </div>
+          
+          <div class="topic-section">
+            <h4>Related Decisions</h4>
+            
+            <div class="related-decision active">
+              <div class="title">Decision Timeline read-only implementation</div>
+              <div class="meta">
+                <span>15 Dec 2024</span>
+                <span class="status">Active</span>
+                <a href="#" class="view-link">View decision</a>
+              </div>
+            </div>
+            
+            <div class="related-decision past">
+              <div class="title">Revisit flow 4-step process</div>
+              <div class="meta">
+                <span>10 Dec 2024</span>
+                <span class="status">Superseded</span>
+                <a href="#" class="view-link">View decision</a>
+              </div>
+            </div>
+          </div>
+          
+          <div class="topic-section">
+            <h4>Impact Summary</h4>
+            <div class="impact-summary">
+              Les décisions de ce topic affectent principalement le Dashboard et le Collaboration Space. Elles définissent comment les utilisateurs interagissent avec l'historique des décisions.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Forbidden Patterns -->
+    <section class="section">
+      <h2 class="section-title">❌ Ce qu'il ne faut PAS faire</h2>
+      
+      <div class="forbidden-list">
+        <span class="forbidden-item">Timeline animée</span>
+        <span class="forbidden-item">Feed réseau social</span>
+        <span class="forbidden-item">Badges "new" agressifs</span>
+        <span class="forbidden-item">Notifications automatiques</span>
+        <span class="forbidden-item">Mélange tâches/messages</span>
+        <span class="forbidden-item">Couleurs vives</span>
+        <span class="forbidden-item">Icônes décoratives</span>
+        <span class="forbidden-item">Fonds alternés agressifs</span>
+      </div>
+    </section>
+
+    <!-- Goal -->
+    <section class="section">
+      <div class="goal-card">
+        <div class="good">"Je suis au courant."</div>
+        <div class="bad">Pas: "Je dois réagir."</div>
+        <div class="quote">
+          CHE·NU montre le changement sans créer de pression.
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p><span class="brand">CHE·NU™ V50</span> — Knowledge Exploration Canon</p>
+      <p style="margin-top: 8px; font-size: 12px;">
+        La lisibilité prime sur la densité.
+      </p>
+    </footer>
+  </div>
+</body>
+</html>

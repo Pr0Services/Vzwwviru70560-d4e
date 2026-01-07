@@ -1,0 +1,109 @@
+/**
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║              CHE·NU™ — WEB APPLICATION                                       ║
+ * ║              Main App with Canonical Flow                                    ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ */
+
+import React from "react";
+import { useMachine } from "@xstate/react";
+import { navMachine } from "@/navigation/navMachine";
+import { MOCK_DATA } from "./utils/mockData";
+
+// Screens
+import { EntryScreen } from "./screens/EntryScreen";
+import { ContextBureauScreen } from "./screens/ContextBureauScreen";
+import { ActionBureauScreen } from "./screens/ActionBureauScreen";
+import { WorkspaceScreen } from "./screens/WorkspaceScreen";
+
+// Components
+import { DiamondHub } from "@/components/hubs/DiamondHub";
+import { CommunicationHub } from "@/components/hubs/CommunicationHub";
+
+// Styles
+import "./styles/global.css";
+
+export function App() {
+  const [state, send] = useMachine(navMachine, {
+    input: { data: MOCK_DATA },
+  });
+
+  const ctx = state.context;
+  const currentState = ctx.currentState;
+
+  // Render current screen based on state
+  const renderScreen = () => {
+    switch (currentState) {
+      case "entry":
+        return <EntryScreen onEnter={() => send({ type: "ENTER_APP" })} />;
+
+      case "context_bureau":
+        return (
+          <ContextBureauScreen
+            ctx={ctx}
+            onSelectIdentity={(id) => send({ type: "SELECT_IDENTITY", identityId: id })}
+            onSelectSphere={(id) => send({ type: "SELECT_SPHERE", sphereId: id })}
+            onSelectProject={(id) => send({ type: "SELECT_PROJECT", projectId: id })}
+            onClearProject={() => send({ type: "CLEAR_PROJECT" })}
+            onConfirm={() => send({ type: "CONFIRM_CONTEXT" })}
+          />
+        );
+
+      case "action_bureau":
+        return (
+          <ActionBureauScreen
+            ctx={ctx}
+            onOpenWorkspace={(id) => send({ type: "OPEN_WORKSPACE", workspaceId: id })}
+            onCreateNote={() => send({ type: "CREATE_NOTE" })}
+            onCreateTask={() => send({ type: "CREATE_TASK" })}
+            onStartMeeting={() => send({ type: "START_MEETING" })}
+            onChangeContext={() => send({ type: "CHANGE_CONTEXT" })}
+          />
+        );
+
+      case "workspace":
+        return (
+          <WorkspaceScreen
+            ctx={ctx}
+            onBack={() => send({ type: "BACK_TO_ACTIONS" })}
+            onChangeContext={() => send({ type: "CHANGE_CONTEXT" })}
+          />
+        );
+
+      default:
+        return <EntryScreen onEnter={() => send({ type: "ENTER_APP" })} />;
+    }
+  };
+
+  return (
+    <div className="app-shell">
+      {/* Communication Hub (Left) */}
+      {ctx.visibleHubs.includes("communication") && (
+        <aside className="hub-left">
+          <CommunicationHub />
+        </aside>
+      )}
+
+      {/* Main Content */}
+      <main className="main-content">
+        {/* Diamond Hub - Always visible */}
+        <DiamondHub
+          diamond={ctx.diamond}
+          visibleHubs={ctx.visibleHubs}
+          onToggleHub={(hub) => send({ type: "TOGGLE_HUB", hub })}
+        />
+
+        {/* Current Screen */}
+        <div className="screen-container">{renderScreen()}</div>
+      </main>
+
+      {/* State indicator (dev) */}
+      <div className="state-indicator">
+        <span className="state-badge">{currentState.toUpperCase()}</span>
+        {ctx.contextLocked && <span className="lock-badge">🔒 LOCKED</span>}
+      </div>
+    </div>
+  );
+}
+
+export default App;

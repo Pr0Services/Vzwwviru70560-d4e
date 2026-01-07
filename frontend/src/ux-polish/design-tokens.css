@@ -1,0 +1,502 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   CHE·NU — UX POLISH DESIGN TOKENS
+   CSS Variables implementing the UX Philosophy
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ═══════════════════════════════════════════════════════════════════════════
+     TIMING & RHYTHM
+     Le silence UX est une fonction, pas un bug.
+     ═══════════════════════════════════════════════════════════════════════════ */
+  
+  /* Transitions */
+  --timing-instant: 100ms;           /* Direct feedback */
+  --timing-quick: 200ms;             /* Hover states */
+  --timing-normal: 400ms;            /* Standard transitions */
+  --timing-slow: 800ms;              /* Major view changes */
+  --timing-deliberate: 1200ms;       /* Immersive transitions */
+  
+  /* Breathing animations */
+  --breathing-slow: 4s;              /* Ambient, calm */
+  --breathing-medium: 2s;            /* Subtle pulses */
+  --breathing-gentle: 3s;            /* Default breathing */
+  
+  /* Pauses */
+  --pause-micro: 50ms;
+  --pause-short: 200ms;
+  --pause-medium: 500ms;
+  --pause-long: 1000ms;
+  
+  /* Easings - All calm, never aggressive */
+  --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-gentle: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-breathing: cubic-bezier(0.37, 0, 0.63, 1);
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     SPACING & BREATHING ROOM
+     La complexité se révèle progressivement
+     ═══════════════════════════════════════════════════════════════════════════ */
+  
+  --space-xs: 0.25rem;    /* 4px */
+  --space-sm: 0.5rem;     /* 8px */
+  --space-md: 1rem;       /* 16px */
+  --space-lg: 1.5rem;     /* 24px */
+  --space-xl: 2rem;       /* 32px */
+  --space-2xl: 3rem;      /* 48px */
+  --space-3xl: 4rem;      /* 64px */
+  
+  /* Breathing space - intentional emptiness */
+  --breathing-margin: 15%;
+  --content-max-width: 1200px;
+  --sidebar-width: 280px;
+  
+  /* ═══════════════════════════════════════════════════════════════════════════
+     COLORS - CALM PALETTE
+     Benevolent and calm
+     ═══════════════════════════════════════════════════════════════════════════ */
+  
+  /* Primary - Calm blues */
+  --color-primary-50: #f0f7ff;
+  --color-primary-100: #e0efff;
+  --color-primary-200: #b8dbff;
+  --color-primary-300: #7ac0ff;
+  --color-primary-400: #36a3ff;
+  --color-primary-500: #0084ff;
+  --color-primary-600: #0066cc;
+  --color-primary-700: #004d99;
+  --color-primary-800: #003366;
+  --color-primary-900: #001a33;
+  
+  /* Neutral - Soft grays */
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #e8e8e8;
+  --color-neutral-300: #d4d4d4;
+  --color-neutral-400: #a3a3a3;
+  --color-neutral-500: #737373;
+  --color-neutral-600: #525252;
+  --color-neutral-700: #404040;
+  --color-neutral-800: #262626;
+  --color-neutral-900: #171717;
+  
+  /* Success - Gentle green (not alarming) */
+  --color-success-light: #ecfdf5;
+  --color-success: #10b981;
+  --color-success-dark: #059669;
+  
+  /* Warning - Soft yellow (not alarming) */
+  --color-warning-light: #fffbeb;
+  --color-warning: #f59e0b;
+  --color-warning-dark: #d97706;
+  
+  /* Error - Soft red (helpful, not scary) */
+  --color-error-light: #fef2f2;
+  --color-error: #ef4444;
+  --color-error-soft: #f87171;
+  --color-error-dark: #dc2626;
+  
+  /* Background gradients - Calm */
+  --bg-gradient-calm: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  --bg-gradient-focus: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     TYPOGRAPHY - READABLE & CALM
+     ═══════════════════════════════════════════════════════════════════════════ */
+  
+  --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-family-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  
+  /* Font sizes */
+  --text-xs: 0.75rem;     /* 12px */
+  --text-sm: 0.875rem;    /* 14px */
+  --text-base: 1rem;      /* 16px */
+  --text-lg: 1.125rem;    /* 18px */
+  --text-xl: 1.25rem;     /* 20px */
+  --text-2xl: 1.5rem;     /* 24px */
+  --text-3xl: 1.875rem;   /* 30px */
+  --text-4xl: 2.25rem;    /* 36px */
+  
+  /* Line heights - comfortable reading */
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+  
+  /* Font weights */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     SHADOWS - SUBTLE, NEVER HARSH
+     ═══════════════════════════════════════════════════════════════════════════ */
+  
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.10);
+  --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.12);
+  
+  /* Glow effects - soft, inviting */
+  --glow-primary: 0 0 20px rgba(0, 132, 255, 0.15);
+  --glow-success: 0 0 20px rgba(16, 185, 129, 0.15);
+  --glow-focus: 0 0 0 3px rgba(0, 132, 255, 0.2);
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     BORDERS - SOFT EDGES
+     ═══════════════════════════════════════════════════════════════════════════ */
+  
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+  
+  --border-light: 1px solid var(--color-neutral-200);
+  --border-default: 1px solid var(--color-neutral-300);
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     Z-INDEX SCALE
+     ═══════════════════════════════════════════════════════════════════════════ */
+  
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal: 300;
+  --z-popover: 400;
+  --z-tooltip: 500;
+  --z-toast: 600;
+  --z-always-top: 9999;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   CALM MODE OVERRIDES
+   Mode Calme - Reduced stimulation
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+[data-calm-mode="true"] {
+  --timing-normal: 600ms;
+  --timing-slow: 1200ms;
+  
+  --color-primary-500: #6b9bd1;  /* Softer blue */
+  
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   ANIMATIONS
+   Slow, fluid, never "aggressive"
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Gentle pulse - for breathing elements */
+@keyframes gentle-pulse {
+  0%, 100% { 
+    transform: scale(1); 
+    opacity: 1;
+  }
+  50% { 
+    transform: scale(1.02); 
+    opacity: 0.95;
+  }
+}
+
+/* Soft fade in */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Soft fade in up */
+@keyframes fade-in-up {
+  from { 
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Gentle shake - for errors (not aggressive) */
+@keyframes gentle-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+/* Success checkmark */
+@keyframes checkmark {
+  0% { 
+    stroke-dashoffset: 100;
+  }
+  100% { 
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Breathing sphere */
+@keyframes sphere-breathe {
+  0%, 100% { 
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(0, 132, 255, 0);
+  }
+  50% { 
+    transform: scale(1.02);
+    box-shadow: 0 0 20px 5px rgba(0, 132, 255, 0.1);
+  }
+}
+
+/* Loading - calm, not busy */
+@keyframes calm-loading {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   UTILITY CLASSES
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Animation utilities */
+.animate-breathe {
+  animation: gentle-pulse var(--breathing-gentle) var(--ease-breathing) infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in var(--timing-normal) var(--ease-out);
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up var(--timing-normal) var(--ease-out);
+}
+
+.animate-gentle-shake {
+  animation: gentle-shake var(--timing-quick) var(--ease-default);
+}
+
+/* Transition utilities */
+.transition-default {
+  transition: all var(--timing-normal) var(--ease-default);
+}
+
+.transition-quick {
+  transition: all var(--timing-quick) var(--ease-default);
+}
+
+.transition-slow {
+  transition: all var(--timing-slow) var(--ease-gentle);
+}
+
+/* Focus styles - visible but gentle */
+.focus-visible:focus-visible {
+  outline: none;
+  box-shadow: var(--glow-focus);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   COMPONENT PATTERNS
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Primary button - clear single action */
+.btn-primary {
+  background: var(--color-primary-500);
+  color: white;
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-md);
+  font-weight: var(--font-medium);
+  transition: all var(--timing-quick) var(--ease-default);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-600);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Secondary button - available but not competing */
+.btn-secondary {
+  background: transparent;
+  color: var(--color-neutral-600);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  border: var(--border-light);
+  transition: all var(--timing-quick) var(--ease-default);
+}
+
+.btn-secondary:hover {
+  background: var(--color-neutral-50);
+  color: var(--color-neutral-800);
+}
+
+/* Back button - always visible, never scary */
+.btn-back {
+  position: fixed;
+  top: var(--space-lg);
+  left: var(--space-lg);
+  z-index: var(--z-sticky);
+  
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  
+  background: white;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-md);
+  
+  transition: all var(--timing-quick) var(--ease-default);
+}
+
+.btn-back:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateX(-2px);
+}
+
+/* Card - with breathing space */
+.card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-sm);
+  
+  /* Breathing space inside */
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Toast notification - subtle, not alarming */
+.toast {
+  position: fixed;
+  bottom: var(--space-xl);
+  right: var(--space-xl);
+  
+  background: var(--color-neutral-800);
+  color: white;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-lg);
+  
+  animation: fade-in-up var(--timing-normal) var(--ease-out);
+  
+  /* Auto-dismiss */
+  opacity: 1;
+  transition: opacity var(--timing-slow) var(--ease-out);
+}
+
+.toast.dismissing {
+  opacity: 0;
+}
+
+/* Loading state - calm, not busy */
+.loading {
+  animation: calm-loading var(--breathing-medium) var(--ease-breathing) infinite;
+}
+
+.loading-text::after {
+  content: "Un moment...";
+  color: var(--color-neutral-500);
+}
+
+/* Skeleton loader - gentle pulse */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-neutral-100) 0%,
+    var(--color-neutral-200) 50%,
+    var(--color-neutral-100) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-wave 1.5s var(--ease-gentle) infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes skeleton-wave {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   COGNITIVE LOAD INDICATOR
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.cognitive-load {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+}
+
+.cognitive-load[data-level="low"] {
+  background: var(--color-success-light);
+  color: var(--color-success-dark);
+}
+
+.cognitive-load[data-level="medium"] {
+  background: var(--color-warning-light);
+  color: var(--color-warning-dark);
+}
+
+.cognitive-load[data-level="high"] {
+  background: var(--color-error-light);
+  color: var(--color-error-dark);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   AGENT PRESENCE - SUBTLE
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.agent-presence {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  
+  font-size: var(--text-sm);
+  color: var(--color-neutral-500);
+  
+  /* Subtle, not prominent */
+  opacity: 0.8;
+  transition: opacity var(--timing-quick) var(--ease-default);
+}
+
+.agent-presence:hover {
+  opacity: 1;
+}
+
+.agent-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  
+  /* Gentle breathing */
+  animation: gentle-pulse var(--breathing-slow) var(--ease-breathing) infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   BREATHING SPACE UTILITIES
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.breathing-space {
+  min-height: var(--space-3xl);
+}
+
+.breathing-margin {
+  margin: var(--space-xl) 0;
+}
+
+.silent-zone {
+  /* Intentionally empty space */
+  padding: var(--space-2xl);
+  background: transparent;
+}

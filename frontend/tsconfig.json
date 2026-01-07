@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": false,
+    "noImplicitAny": false,
+    "allowJs": true,
+    "baseUrl": ".",
+    "paths": { "@/*": ["src/*"] }
+  },
+  "include": [
+    "src/types/modules.d.ts",
+    "src/constants/CANON.ts",
+    "src/constants/colors.ts",
+    "src/constants/routes.ts",
+    "src/components/bureau-canonical/**/*.tsx",
+    "src/components/nova-canonical/**/*.tsx"
+  ],
+  "exclude": ["node_modules", "**/_archive*/**", "**/__tests__/**"]
+}

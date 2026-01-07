@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHE·NU™ — Color Palette + Micro-Patch</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════════════
+       CHE·NU™ UI COLOR REBALANCE CANON + MICRO-PATCH
+       DARK CALM / BIOPHILIC / LONG-WORK FRIENDLY
+       
+       🧮 RÈGLE DE CONTRASTE CHE·NU (ΔL*)
+       Chaque couche UI = +6% à +10% de luminosité perçue maximum
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    :root {
+      /* === BASE === */
+      --bg-root: #1B1F23;
+      --bg-root-deeper: #181C20;
+      
+      /* Surfaces (stratification ΔL* = +6-10%) */
+      --surface-1: #2A3138;
+      --surface-2: #323A42;
+      --surface-3: #39424A;
+      
+      /* Texte */
+      --text-primary: #E6E8EA;
+      --text-secondary: #B8BDC3;
+      --text-muted: #8B9096;
+      --text-disabled: #6F747A;
+      
+      /* Accents Désaturés */
+      --gold: #BFAE7A;
+      --gold-light: #D4C89A;
+      --green: #6FAF9A;
+      --cyan: #6EAFC4;
+      --violet: #8C87B0;
+      --ember: #8A6B4A;
+      
+      /* Semantic */
+      --success: #6FAF9A;
+      --warning: #C4A060;
+      --error: #C47070;
+      --info: #6EAFC4;
+      
+      /* Borders & Shadows (MICRO-PATCH) */
+      --border-default: rgba(255, 255, 255, 0.04);
+      --border-hover: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(191, 174, 122, 0.3);
+      --shadow-surface: 0 10px 28px rgba(0, 0, 0, 0.28);
+      --shadow-surface-hover: 0 12px 32px rgba(0, 0, 0, 0.32);
+      --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+      --shadow-inset-hover: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: linear-gradient(180deg, var(--bg-root-deeper), var(--bg-root));
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    
+    .container { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+    
+    /* Header */
+    .header { text-align: center; margin-bottom: 48px; }
+    .header h1 { font-size: 36px; font-weight: 700; color: var(--gold); margin-bottom: 8px; }
+    .header .subtitle { font-size: 16px; color: var(--text-secondary); margin-bottom: 16px; }
+    .header .badges { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .header .badge {
+      padding: 6px 16px;
+      background-color: var(--surface-1);
+      border: 1px solid var(--border-default);
+      border-radius: 20px;
+      font-size: 13px;
+      box-shadow: var(--shadow-inset);
+    }
+    .header .badge.gold { color: var(--gold); }
+    .header .badge.cyan { color: var(--cyan); }
+    
+    /* Sections */
+    .section { margin-bottom: 48px; }
+    .section-title {
+      font-size: 20px; font-weight: 600; color: var(--text-primary);
+      margin-bottom: 20px; padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-default);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .section-title .number {
+      width: 32px; height: 32px;
+      background-color: var(--gold); color: var(--bg-root);
+      border-radius: 8px; font-size: 14px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    
+    /* UI Surface (MICRO-PATCH core) */
+    .ui-surface {
+      background-color: var(--surface-1);
+      border: 1px solid var(--border-default);
+      box-shadow: var(--shadow-inset), var(--shadow-surface);
+      border-radius: 12px;
+      transition: all 0.2s ease;
+    }
+    .ui-surface:hover {
+      background-color: var(--surface-2);
+      box-shadow: var(--shadow-inset-hover), var(--shadow-surface-hover);
+    }
+    
+    /* Cards */
+    .rule-card {
+      background-color: var(--surface-1);
+      border-radius: 12px; padding: 24px;
+      border-left: 4px solid var(--gold);
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-inset), var(--shadow-surface);
+    }
+    .rule-card.error { border-left-color: var(--error); }
+    .rule-card.success { border-left-color: var(--success); }
+    .rule-card h3 {
+      font-size: 14px; font-weight: 600; color: var(--gold);
+      margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .rule-card.error h3 { color: var(--error); }
+    .rule-card.success h3 { color: var(--success); }
+    .rule-card p { font-size: 15px; color: var(--text-secondary); }
+    .rule-card code {
+      background-color: var(--bg-root); padding: 2px 6px;
+      border-radius: 4px; font-size: 13px; color: var(--cyan);
+    }
+    
+    /* Formula */
+    .formula {
+      background-color: var(--surface-1);
+      border-radius: 12px; padding: 24px; text-align: center;
+      border: 1px solid var(--border-default);
+      box-shadow: var(--shadow-inset), var(--shadow-surface);
+      margin-bottom: 24px;
+    }
+    .formula h3 { font-size: 16px; color: var(--gold); margin-bottom: 12px; }
+    .formula .equation {
+      font-size: 24px; font-weight: 600; color: var(--text-primary);
+      font-family: 'SF Mono', monospace;
+    }
+    .formula .note { font-size: 13px; color: var(--text-muted); margin-top: 12px; }
+    
+    /* Surface Demo */
+    .surface-demo { display: flex; gap: 16px; flex-wrap: wrap; }
+    .surface-card {
+      flex: 1; min-width: 160px; padding: 24px;
+      border-radius: 12px; text-align: center;
+      border: 1px solid var(--border-default);
+      box-shadow: var(--shadow-inset), var(--shadow-surface);
+      transition: all 0.2s ease;
+    }
+    .surface-card:hover { transform: translateY(-2px); }
+    .surface-card .label { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
+    .surface-card .hex { font-size: 12px; color: var(--text-muted); font-family: monospace; }
+    .surface-card .lum { font-size: 11px; color: var(--gold); margin-top: 4px; }
+    
+    /* Text Demo */
+    .text-demo {
+      background-color: var(--surface-1);
+      border-radius: 12px; padding: 32px;
+      border: 1px solid var(--border-default);
+      box-shadow: var(--shadow-inset), var(--shadow-surface);
+    }
+    .text-demo p { margin-bottom: 16px; }
+    .text-demo p:last-child { margin-bottom: 0; }
+    
+    /* Color Grid */
+    .color-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+    .color-card { overflow: hidden; }
+    .color-swatch {
+      height: 80px; display: flex; align-items: center; justify-content: center;
+      font-size: 24px; font-weight: 600; border-radius: 12px 12px 0 0;
+    }
+    .color-info {
+      padding: 14px; background-color: var(--surface-1);
+      border-radius: 0 0 12px 12px; border: 1px solid var(--border-default); border-top: none;
+    }
+    .color-name { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+    .color-hex { font-size: 12px; color: var(--text-muted); font-family: monospace; }
+    
+    /* Comparison */
+    .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 768px) { .comparison-grid { grid-template-columns: 1fr; } }
+    .comparison-card { padding: 32px; border-radius: 12px; border: 1px solid var(--border-default); }
+    .comparison-card h4 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+    .comparison-card p { font-size: 13px; }
+    .comparison-card.old { background-color: #0A0D0B; }
+    .comparison-card.old h4 { color: #E9E4D6; }
+    .comparison-card.old p { color: #8D8371; }
+    .comparison-card.new {
+      background-color: var(--surface-1);
+      box-shadow: var(--shadow-inset), var(--shadow-surface);
+    }
+    .comparison-card.new h4 { color: var(--text-primary); }
+    .comparison-card.new p { color: var(--text-secondary); }
+    
+    /* Interactive Demo */
+    .interactive-demo {
+      background-color: var(--surface-1);
+      border-radius: 16px; padding: 32px;
+      border: 1px solid var(--border-default);
+      box-shadow: var(--shadow-inset), var(--shadow-surface);
+    }
+    .demo-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 24px; padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-default);
+    }
+    .demo-header .avatar {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--cyan), var(--gold));
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .demo-header .title { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+    .demo-header .status { font-size: 12px; color: var(--cyan); }
+    .demo-content {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 12px; margin-bottom: 24px;
+    }
+    @media (max-width: 768px) { .demo-content { grid-template-columns: repeat(2, 1fr); } }
+    .demo-card {
+      background-color: var(--surface-2);
+      border-radius: 10px; padding: 16px; text-align: center;
+      border: 1px solid var(--border-default);
+      transition: all 0.2s; cursor: pointer;
+      box-shadow: var(--shadow-inset);
+    }
+    .demo-card:hover {
+      background-color: var(--surface-3);
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-inset-hover), var(--shadow-surface);
+    }
+    .demo-card .icon { font-size: 24px; margin-bottom: 8px; }
+    .demo-card .label { font-size: 12px; color: var(--text-secondary); }
+    .demo-input { display: flex; gap: 12px; }
+    .demo-input input {
+      flex: 1; padding: 14px 18px;
+      background-color: var(--surface-2);
+      border: 1px solid var(--border-default);
+      border-radius: 10px; color: var(--text-primary);
+      font-size: 14px; font-family: inherit; outline: none;
+      transition: all 0.2s; box-shadow: var(--shadow-inset);
+    }
+    .demo-input input::placeholder { color: var(--text-muted); }
+    .demo-input input:focus {
+      border-color: var(--border-focus);
+      background-color: var(--surface-3);
+    }
+    .demo-input button {
+      padding: 14px 24px;
+      background-color: var(--gold); color: var(--bg-root);
+      border: none; border-radius: 10px;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .demo-input button:hover {
+      background-color: var(--gold-light);
+      transform: translateY(-1px);
+    }
+    
+    /* Test Grid */
+    .test-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    @media (max-width: 768px) { .test-grid { grid-template-columns: repeat(2, 1fr); } }
+    .test-item {
+      background-color: var(--surface-1);
+      border-radius: 12px; padding: 20px; text-align: center;
+      border: 1px solid var(--border-default);
+      box-shadow: var(--shadow-inset), var(--shadow-surface);
+    }
+    .test-item .check { font-size: 32px; margin-bottom: 8px; }
+    .test-item p { font-size: 13px; color: var(--text-secondary); }
+    
+    /* Objective */
+    .objective-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 768px) { .objective-grid { grid-template-columns: 1fr; } }
+    .objective-card {
+      background-color: var(--surface-1);
+      border-radius: 12px; padding: 32px; text-align: center;
+      box-shadow: var(--shadow-inset), var(--shadow-surface);
+    }
+    .objective-card.positive { border: 2px solid var(--success); }
+    .objective-card.negative { border: 2px solid var(--error); }
+    .objective-card .emoji { font-size: 48px; margin-bottom: 16px; }
+    .objective-card h4 {
+      font-size: 14px; font-weight: 600; margin-bottom: 8px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .objective-card.positive h4 { color: var(--success); }
+    .objective-card.negative h4 { color: var(--error); }
+    .objective-card p { font-size: 18px; font-weight: 600; color: var(--text-primary); }
+    
+    /* Footer */
+    .footer {
+      text-align: center; padding: 40px 0;
+      border-top: 1px solid var(--border-default); margin-top: 48px;
+    }
+    .footer p { color: var(--text-muted); font-size: 14px; }
+    .footer .brand { color: var(--gold); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>✧ CHE·NU™ Color Palette</h1>
+      <p class="subtitle">DARK CALM / BIOPHILIC / LONG-WORK FRIENDLY</p>
+      <div class="badges">
+        <span class="badge gold">UI Rebalance Canon</span>
+        <span class="badge cyan">Micro-Patch v1</span>
+      </div>
+    </header>
+
+    <!-- Règle Mathématique -->
+    <section class="section">
+      <h2 class="section-title">
+        <span class="number">Δ</span>
+        Règle Mathématique (ΔL*)
+      </h2>
+      <div class="formula">
+        <h3>🧮 RÈGLE DE CONTRASTE CHE·NU</h3>
+        <div class="equation">+6% → +10% par couche</div>
+        <div class="note">Si tu vois 2 crans d'un coup → c'est trop</div>
+      </div>
+      <div class="rule-card">
+        <h3>En pratique</h3>
+        <p>
+          <strong>Surface</strong> = fond + 1 cran<br>
+          <strong>Focus</strong> = surface + 1 cran<br>
+          <strong>Actif</strong> = focus + 1 cran<br><br>
+          Le contraste vient de la <em>stratification</em>, pas de la violence.
+        </p>
+      </div>
+    </section>
+
+    <!-- Stratification -->
+    <section class="section">
+      <h2 class="section-title">
+        <span class="number">1</span>
+        Stratification des Surfaces
+      </h2>
+      <div class="surface-demo">
+        <div class="surface-card" style="background-color: #181C20;">
+          <div class="label">Root Deeper</div>
+          <div class="hex">#181C20</div>
+          <div class="lum">L ≈ 10%</div>
+        </div>
+        <div class="surface-card" style="background-color: #1B1F23;">
+          <div class="label">Root (Fond)</div>
+          <div class="hex">#1B1F23</div>
+          <div class="lum">L ≈ 12%</div>
+        </div>
+        <div class="surface-card" style="background-color: #2A3138;">
+          <div class="label">Surface 1</div>
+          <div class="hex">#2A3138</div>
+          <div class="lum">L ≈ 20%</div>
+        </div>
+        <div class="surface-card" style="background-color: #323A42;">
+          <div class="label">Surface 2</div>
+          <div class="hex">#323A42</div>
+          <div class="lum">L ≈ 25%</div>
+        </div>
+        <div class="surface-card" style="background-color: #39424A;">
+          <div class="label">Surface 3</div>
+          <div class="hex">#39424A</div>
+          <div class="lum">L ≈ 28%</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Shadows -->
+    <section class="section">
+      <h2 class="section-title">
+        <span class="number">2</span>
+        Shadows & Borders (Micro-Patch)
+      </h2>
+      <div class="rule-card">
+        <h3>💡 Séparation invisible mais lisible</h3>
+        <p>
+          <code>border: 1px solid rgba(255,255,255,0.04)</code><br>
+          <code>box-shadow: inset 0 1px 0 rgba(255,255,255,0.03)</code><br>
+          <code>box-shadow: 0 10px 28px rgba(0,0,0,0.28)</code>
+        </p>
+      </div>
+      <div class="rule-card success">
+        <h3>✨ Hover Subtil</h3>
+        <p>
+          <code>background-color: var(--surface-2)</code><br>
+          <code>box-shadow: 0 12px 32px rgba(0,0,0,0.32)</code>
+        </p>
+      </div>
+    </section>
+
+    <!-- Text -->
+    <section class="section">
+      <h2 class="section-title">
+        <span class="number">3</span>
+        Texte (Lecture longue)
+      </h2>
+      <div class="text-demo">
+        <p style="font-size: 18px; color: #E6E8EA; font-weight: 500;">
+          Principal — #E6E8EA — Titres et contenus
+        </p>
+        <p style="font-size: 15px; color: #B8BDC3;">
+          Secondaire — #B8BDC3 — Descriptions
+        </p>
+        <p style="font-size: 14px; color: #8B9096;">
+          Discret — #8B9096 — Timestamps
+        </p>
+        <p style="font-size: 13px; color: #6F747A;">
+          Désactivé — #6F747A — Éléments inactifs
+        </p>
+      </div>
+    </section>
+
+    <!-- Accents -->
+    <section class="section">
+      <h2 class="section-title">
+        <span class="number">4</span>
+        Accents Désaturés
+      </h2>
+      <div class="color-grid">
+        <div class="color-card ui-surface">
+          <div class="color-swatch" style="background: #BFAE7A; color: #1B1F23;">Aa</div>
+          <div class="color-info">
+            <div class="color-name">Or Biophilique</div>
+            <div class="color-hex">#BFAE7A</div>
+          </div>
+        </div>
+        <div class="color-card ui-surface">
+          <div class="color-swatch" style="background: #6FAF9A; color: #1B1F23;">Aa</div>
+          <div class="color-info">
+            <div class="color-name">Vert Calme</div>
+            <div class="color-hex">#6FAF9A</div>
+          </div>
+        </div>
+        <div class="color-card ui-surface">
+          <div class="color-swatch" style="background: #6EAFC4; color: #1B1F23;">Aa</div>
+          <div class="color-info">
+            <div class="color-name">Cyan Nova</div>
+            <div class="color-hex">#6EAFC4</div>
+          </div>
+        </div>
+        <div class="color-card ui-surface">
+          <div class="color-swatch" style="background: #8C87B0; color: #1B1F23;">Aa</div>
+          <div class="color-info">
+            <div class="color-name">Violet Discret</div>
+            <div class="color-hex">#8C87B0</div>
+          </div>
+        </div>
+        <div class="color-card ui-surface">
+          <div class="color-swatch" style="background: #8A6B4A; color: #E6E8EA;">Aa</div>
+          <div class="color-info">
+            <div class="color-name">Terre Douce</div>
+            <div class="color-hex">#8A6B4A</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Comparison -->
+    <section class="section">
+      <h2 class="section-title">
+        <span class="number">5</span>
+        Avant / Après
+      </h2>
+      <div class="comparison-grid">
+        <div class="comparison-card old">
+          <h4>❌ AVANT</h4>
+          <p>Noir pur #0A0D0B — Tout se mélange, tension visuelle</p>
+        </div>
+        <div class="comparison-card new">
+          <h4>✅ APRÈS</h4>
+          <p>Stratifié — Fond recule, surfaces flottent, contenu guide l'œil</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Demo -->
+    <section class="section">
+      <h2 class="section-title">
+        <span class="number">6</span>
+        Démonstration Interactive
+      </h2>
+      <div class="interactive-demo">
+        <div class="demo-header">
+          <div class="avatar">✧</div>
+          <div>
+            <div class="title">Communication Hub</div>
+            <div class="status">● Nova active</div>
+          </div>
+        </div>
+        <div class="demo-content">
+          <div class="demo-card"><div class="icon">💬</div><div class="label">Threads</div></div>
+          <div class="demo-card"><div class="icon">📧</div><div class="label">Emails</div></div>
+          <div class="demo-card"><div class="icon">👤</div><div class="label">Contacts</div></div>
+          <div class="demo-card"><div class="icon">📞</div><div class="label">Appels</div></div>
+        </div>
+        <div class="demo-input">
+          <input type="text" placeholder="Demandez à Nova...">
+          <button>Envoyer</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Test -->
+    <section class="section">
+      <h2 class="section-title">
+        <span class="number">✓</span>
+        Test en 30 Secondes
+      </h2>
+      <div class="test-grid">
+        <div class="test-item"><div class="check">👁️</div><p>Plisse les yeux</p></div>
+        <div class="test-item"><div class="check">⬇️</div><p>Fond recule</p></div>
+        <div class="test-item"><div class="check">🔲</div><p>Surfaces flottent</p></div>
+        <div class="test-item"><div class="check">👆</div><p>Contenu guide</p></div>
+      </div>
+      <div class="rule-card error">
+        <h3>❌ Erreurs à éviter</h3>
+        <p>
+          ✕ Noir pur • ✕ Blanc pur • ✕ Saturation excessive • ✕ Ombres dures
+        </p>
+      </div>
+    </section>
+
+    <!-- Objective -->
+    <section class="section">
+      <h2 class="section-title">
+        <span class="number">🎯</span>
+        Objectif Final
+      </h2>
+      <div class="objective-grid">
+        <div class="objective-card positive">
+          <div class="emoji">✅</div>
+          <h4>L'utilisateur pense:</h4>
+          <p>"Je peux rester ici longtemps."</p>
+        </div>
+        <div class="objective-card negative">
+          <div class="emoji">❌</div>
+          <h4>PAS:</h4>
+          <p>"C'est stylé mais fatigant."</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p><span class="brand">CHE·NU™ V50</span> — Dark Calm + Micro-Patch</p>
+      <p style="margin-top: 8px; font-size: 12px;">90 tests ✅ • 4,298 lignes</p>
+    </footer>
+  </div>
+</body>
+</html>

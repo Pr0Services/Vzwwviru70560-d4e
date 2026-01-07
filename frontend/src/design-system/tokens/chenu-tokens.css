@@ -1,0 +1,322 @@
+/*
+═══════════════════════════════════════════════════════════════════════════════
+CHE·NU UI DESIGN TOKENS
+CSS Custom Properties (Variables)
+═══════════════════════════════════════════════════════════════════════════════
+
+Usage:
+  background-color: var(--chenu-bg-primary);
+  color: var(--chenu-text-body);
+  border-radius: var(--chenu-radius-md);
+
+Theme Switching:
+  <html data-theme="futuristic">
+  <html data-theme="natural">
+  <html data-theme="astral">
+  <html data-theme="serious"> (default)
+*/
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BASE TOKENS (SERIOUS THEME - DEFAULT)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ─────────────────────────────────────────────────────────────────────────
+     COLORS - BACKGROUNDS
+     ───────────────────────────────────────────────────────────────────────── */
+  --chenu-bg-primary: #F7F9FB;
+  --chenu-bg-secondary: #EFF3F6;
+  --chenu-bg-surface: #FFFFFF;
+  
+  /* ─────────────────────────────────────────────────────────────────────────
+     COLORS - TEXT
+     ───────────────────────────────────────────────────────────────────────── */
+  --chenu-text-title: #0F172A;
+  --chenu-text-body: #334155;
+  --chenu-text-secondary: #64748B;
+  --chenu-text-muted: #94A3B8;
+  --chenu-text-inverse: #FFFFFF;
+  
+  /* ─────────────────────────────────────────────────────────────────────────
+     COLORS - BORDERS
+     ───────────────────────────────────────────────────────────────────────── */
+  --chenu-border-default: #E2E8F0;
+  --chenu-border-subtle: #CBD5E1;
+  
+  /* ─────────────────────────────────────────────────────────────────────────
+     COLORS - SPHERES (8 FROZEN)
+     ───────────────────────────────────────────────────────────────────────── */
+  --chenu-sphere-personal: #3BA5A5;
+  --chenu-sphere-personal-light: #E6F6F6;
+  
+  --chenu-sphere-business: #2B5D9A;
+  --chenu-sphere-business-light: #E8F0FA;
+  
+  --chenu-sphere-government: #6B7280;
+  --chenu-sphere-government-light: #F1F3F5;
+  
+  --chenu-sphere-creative: #3EC6C6;
+  --chenu-sphere-creative-accent: #F4B740;
+  --chenu-sphere-creative-light: #E9FBFB;
+  
+  --chenu-sphere-community: #4CAF82;
+  --chenu-sphere-community-light: #EAF7F1;
+  
+  --chenu-sphere-social: #5B6EF5;
+  --chenu-sphere-social-light: #EEF0FF;
+  
+  --chenu-sphere-entertainment: #7C6AE6;
+  --chenu-sphere-entertainment-light: #F1EFFF;
+  
+  --chenu-sphere-team: #F59E0B;
+  --chenu-sphere-team-light: #FFF7E6;
+  
+  /* ─────────────────────────────────────────────────────────────────────────
+     SPACING
+     ───────────────────────────────────────────────────────────────────────── */
+  --chenu-space-xs: 4px;
+  --chenu-space-sm: 8px;
+  --chenu-space-md: 16px;
+  --chenu-space-lg: 24px;
+  --chenu-space-xl: 32px;
+  --chenu-space-2xl: 48px;
+  
+  /* ─────────────────────────────────────────────────────────────────────────
+     BORDER RADIUS
+     ───────────────────────────────────────────────────────────────────────── */
+  --chenu-radius-sm: 6px;
+  --chenu-radius-md: 10px;
+  --chenu-radius-lg: 16px;
+  --chenu-radius-xl: 24px;
+  
+  /* ─────────────────────────────────────────────────────────────────────────
+     SHADOWS
+     ───────────────────────────────────────────────────────────────────────── */
+  --chenu-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --chenu-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --chenu-shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.08);
+  
+  /* ─────────────────────────────────────────────────────────────────────────
+     TYPOGRAPHY
+     ───────────────────────────────────────────────────────────────────────── */
+  --chenu-font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  --chenu-font-size-xs: 12px;
+  --chenu-font-size-sm: 14px;
+  --chenu-font-size-md: 16px;
+  --chenu-font-size-lg: 18px;
+  --chenu-font-size-xl: 20px;
+  --chenu-font-size-2xl: 24px;
+  --chenu-font-size-3xl: 30px;
+  
+  --chenu-font-weight-normal: 400;
+  --chenu-font-weight-medium: 500;
+  --chenu-font-weight-semibold: 600;
+  --chenu-font-weight-bold: 700;
+  
+  --chenu-line-height-tight: 1.25;
+  --chenu-line-height-normal: 1.5;
+  --chenu-line-height-relaxed: 1.75;
+  
+  /* ─────────────────────────────────────────────────────────────────────────
+     Z-INDEX LAYERS
+     ───────────────────────────────────────────────────────────────────────── */
+  --chenu-z-base: 0;
+  --chenu-z-elevated: 10;
+  --chenu-z-dropdown: 50;
+  --chenu-z-header: 100;
+  --chenu-z-modal: 200;
+  --chenu-z-toast: 300;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THEME: FUTURISTIC
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+[data-theme="futuristic"] {
+  /* Backgrounds - slightly lighter, cooler */
+  --chenu-bg-primary: #FAFBFC;
+  --chenu-bg-secondary: #F2F4F7;
+  --chenu-bg-surface: #FFFFFF;
+  
+  /* Borders - lighter, cooler */
+  --chenu-border-default: #E8ECEF;
+  --chenu-border-subtle: #D1D7DD;
+  
+  /* Radius - more rounded */
+  --chenu-radius-sm: 8px;
+  --chenu-radius-md: 12px;
+  --chenu-radius-lg: 18px;
+  --chenu-radius-xl: 28px;
+  
+  /* Shadows - blue-tinted */
+  --chenu-shadow-sm: 0 1px 2px rgba(0, 50, 100, 0.04);
+  --chenu-shadow-md: 0 4px 12px rgba(0, 50, 100, 0.06);
+  --chenu-shadow-lg: 0 12px 24px rgba(0, 50, 100, 0.08);
+  
+  /* Sphere colors - cooler temperature (+5% blue) */
+  --chenu-sphere-personal: #36A3A8;
+  --chenu-sphere-business: #2760A0;
+  --chenu-sphere-creative: #3BC4CB;
+  --chenu-sphere-community: #48AD88;
+  --chenu-sphere-social: #5872F8;
+  --chenu-sphere-entertainment: #7A6EE8;
+  --chenu-sphere-team: #F3A00E;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THEME: NATURAL
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+[data-theme="natural"] {
+  /* Backgrounds - warmer, beige undertones */
+  --chenu-bg-primary: #F8F7F4;
+  --chenu-bg-secondary: #F0EDE8;
+  --chenu-bg-surface: #FFFEFA;
+  
+  /* Borders - warm gray */
+  --chenu-border-default: #E5DED5;
+  --chenu-border-subtle: #D6CFC5;
+  
+  /* Radius - organic curves */
+  --chenu-radius-sm: 6px;
+  --chenu-radius-md: 8px;
+  --chenu-radius-lg: 14px;
+  --chenu-radius-xl: 22px;
+  
+  /* Shadows - brown-tinted */
+  --chenu-shadow-sm: 0 1px 2px rgba(100, 70, 40, 0.06);
+  --chenu-shadow-md: 0 4px 12px rgba(100, 70, 40, 0.08);
+  --chenu-shadow-lg: 0 12px 24px rgba(100, 70, 40, 0.10);
+  
+  /* Sphere colors - warmer temperature (+5% yellow/orange) */
+  --chenu-sphere-personal: #3FA89E;
+  --chenu-sphere-business: #2E62A0;
+  --chenu-sphere-creative: #42C8BE;
+  --chenu-sphere-community: #50B285;
+  --chenu-sphere-social: #6073F7;
+  --chenu-sphere-entertainment: #8070E8;
+  --chenu-sphere-team: #F7A10D;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THEME: ASTRAL / COSMIC
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+[data-theme="astral"] {
+  /* Backgrounds - cooler, slight purple tint */
+  --chenu-bg-primary: #F5F6F8;
+  --chenu-bg-secondary: #ECEEF2;
+  --chenu-bg-surface: #FCFCFE;
+  
+  /* Borders - cool gray */
+  --chenu-border-default: #DFE2E8;
+  --chenu-border-subtle: #CFD3DB;
+  
+  /* Radius - very rounded, floating */
+  --chenu-radius-sm: 10px;
+  --chenu-radius-md: 14px;
+  --chenu-radius-lg: 20px;
+  --chenu-radius-xl: 30px;
+  
+  /* Shadows - purple-tinted, larger blur */
+  --chenu-shadow-sm: 0 1px 2px rgba(100, 80, 200, 0.05);
+  --chenu-shadow-md: 0 4px 12px rgba(100, 80, 200, 0.07);
+  --chenu-shadow-lg: 0 12px 24px rgba(100, 80, 200, 0.09);
+  
+  /* Sphere colors - slight desaturation (-10%) */
+  --chenu-sphere-personal: #4AACAC;
+  --chenu-sphere-business: #3D6BA3;
+  --chenu-sphere-creative: #50CCCC;
+  --chenu-sphere-community: #5DB88B;
+  --chenu-sphere-social: #6A7DF7;
+  --chenu-sphere-entertainment: #8879E8;
+  --chenu-sphere-team: #F7A820;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GLOBAL STYLES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--chenu-font-family);
+  font-size: var(--chenu-font-size-md);
+  font-weight: var(--chenu-font-weight-normal);
+  line-height: var(--chenu-line-height-normal);
+  color: var(--chenu-text-body);
+  background-color: var(--chenu-bg-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: var(--chenu-font-weight-semibold);
+  color: var(--chenu-text-title);
+  line-height: var(--chenu-line-height-tight);
+}
+
+p {
+  margin: 0;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* Focus styles for accessibility */
+:focus-visible {
+  outline: 2px solid var(--chenu-sphere-business);
+  outline-offset: 2px;
+}
+
+/* Smooth transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Remove transitions for reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   UTILITY CLASSES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.chenu-text-title { color: var(--chenu-text-title); }
+.chenu-text-body { color: var(--chenu-text-body); }
+.chenu-text-secondary { color: var(--chenu-text-secondary); }
+.chenu-text-muted { color: var(--chenu-text-muted); }
+
+.chenu-bg-primary { background-color: var(--chenu-bg-primary); }
+.chenu-bg-secondary { background-color: var(--chenu-bg-secondary); }
+.chenu-bg-surface { background-color: var(--chenu-bg-surface); }
+
+.chenu-border-default { border-color: var(--chenu-border-default); }
+.chenu-border-subtle { border-color: var(--chenu-border-subtle); }
+
+.chenu-shadow-sm { box-shadow: var(--chenu-shadow-sm); }
+.chenu-shadow-md { box-shadow: var(--chenu-shadow-md); }
+.chenu-shadow-lg { box-shadow: var(--chenu-shadow-lg); }
+
+.chenu-radius-sm { border-radius: var(--chenu-radius-sm); }
+.chenu-radius-md { border-radius: var(--chenu-radius-md); }
+.chenu-radius-lg { border-radius: var(--chenu-radius-lg); }
+.chenu-radius-xl { border-radius: var(--chenu-radius-xl); }

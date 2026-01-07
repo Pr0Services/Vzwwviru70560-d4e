@@ -1,0 +1,47 @@
+/**
+ * CHE·NU™ - STORES INDEX
+ * Central export for all Zustand stores
+ */
+
+// Auth Store
+export { 
+  useAuthStore, 
+  useUser, 
+  useIsAuthenticated, 
+  useAuthLoading, 
+  useAuthError,
+  useTokenBalance,
+} from './authStore';
+export type { User, UserPreferences, AuthTokens, RegisterData } from './authStore';
+
+// Thread Store
+export { 
+  useThreadStore,
+  useActiveThread,
+  useThreads,
+  useThreadById,
+} from './thread.store';
+export type { 
+  Thread, 
+  ThreadMessage, 
+  ThreadDecision, 
+  ThreadArtifact,
+  ThreadStatus,
+  EncodingMode,
+  AuditEntry,
+} from './thread.store';
+
+// Token Store
+export { 
+  useTokenStore,
+  useGlobalBalance,
+  useBudgets,
+  useTokenAnalytics,
+} from './token.store';
+export type { 
+  TokenBudget, 
+  TokenTransaction, 
+  TokenRule,
+  TokenAnalytics,
+  TokenUsageByAgent,
+} from './token.store';

@@ -1,0 +1,48 @@
+{
+  "name": "Serious / Institutional",
+  "id": "serious",
+  "default": true,
+  "description": "Professional, trustworthy, institutional. Default theme for safety and readability.",
+  "character": {
+    "materials": ["stone", "mineral", "matte finishes"],
+    "lighting": "Indirect, cool, even",
+    "geometry": "Strict, rectangular, clean edges"
+  },
+  "tokens": {
+    "color": {
+      "background": {
+        "primary": "#F7F9FB",
+        "secondary": "#EFF3F6",
+        "surface": "#FFFFFF"
+      },
+      "border": {
+        "default": "#E2E8F0",
+        "subtle": "#CBD5E1"
+      }
+    },
+    "radius": {
+      "base": "6px"
+    },
+    "shadow": {
+      "sm": "0 1px 2px rgba(0, 0, 0, 0.04)",
+      "md": "0 4px 12px rgba(0, 0, 0, 0.06)",
+      "lg": "0 12px 24px rgba(0, 0, 0, 0.08)"
+    }
+  },
+  "textures": {
+    "surface": "none",
+    "overlay": "none"
+  },
+  "illustrations": {
+    "style": "minimal, line-based, monochrome"
+  },
+  "sphereColorAdjustments": {
+    "temperature": "none",
+    "saturation": "none"
+  },
+  "restrictions": [
+    "No playful elements",
+    "No warm tones",
+    "No textures"
+  ]
+}

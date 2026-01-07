@@ -1,0 +1,296 @@
+{
+  "$schema": "https://schemas.designtokens.org/dtcg.json",
+  "chenu": {
+    "color": {
+      "background": {
+        "primary": {
+          "$type": "color",
+          "$value": "#F7F9FB",
+          "$description": "Primary background color"
+        },
+        "secondary": {
+          "$type": "color",
+          "$value": "#EFF3F6",
+          "$description": "Secondary background color"
+        },
+        "surface": {
+          "$type": "color",
+          "$value": "#FFFFFF",
+          "$description": "Surface/card background"
+        }
+      },
+      "text": {
+        "title": {
+          "$type": "color",
+          "$value": "#0F172A",
+          "$description": "Title/heading text"
+        },
+        "body": {
+          "$type": "color",
+          "$value": "#334155",
+          "$description": "Body/primary text"
+        },
+        "secondary": {
+          "$type": "color",
+          "$value": "#64748B",
+          "$description": "Secondary/muted text"
+        },
+        "muted": {
+          "$type": "color",
+          "$value": "#94A3B8",
+          "$description": "Placeholder/disabled text"
+        },
+        "inverse": {
+          "$type": "color",
+          "$value": "#FFFFFF",
+          "$description": "Text on dark backgrounds"
+        }
+      },
+      "border": {
+        "default": {
+          "$type": "color",
+          "$value": "#E2E8F0",
+          "$description": "Default border color"
+        },
+        "subtle": {
+          "$type": "color",
+          "$value": "#CBD5E1",
+          "$description": "Subtle border/divider"
+        }
+      },
+      "sphere": {
+        "personal": {
+          "$type": "color",
+          "$value": "#3BA5A5",
+          "$description": "Personal sphere accent"
+        },
+        "personal-light": {
+          "$type": "color",
+          "$value": "#E6F6F6",
+          "$description": "Personal sphere light background"
+        },
+        "business": {
+          "$type": "color",
+          "$value": "#2B5D9A",
+          "$description": "Business sphere accent"
+        },
+        "business-light": {
+          "$type": "color",
+          "$value": "#E8F0FA",
+          "$description": "Business sphere light background"
+        },
+        "government": {
+          "$type": "color",
+          "$value": "#6B7280",
+          "$description": "Government sphere accent"
+        },
+        "government-light": {
+          "$type": "color",
+          "$value": "#F1F3F5",
+          "$description": "Government sphere light background"
+        },
+        "creative": {
+          "$type": "color",
+          "$value": "#3EC6C6",
+          "$description": "Creative Studio sphere accent (primary)"
+        },
+        "creative-accent": {
+          "$type": "color",
+          "$value": "#F4B740",
+          "$description": "Creative Studio sphere accent (secondary)"
+        },
+        "creative-light": {
+          "$type": "color",
+          "$value": "#E9FBFB",
+          "$description": "Creative Studio sphere light background"
+        },
+        "community": {
+          "$type": "color",
+          "$value": "#4CAF82",
+          "$description": "Community sphere accent"
+        },
+        "community-light": {
+          "$type": "color",
+          "$value": "#EAF7F1",
+          "$description": "Community sphere light background"
+        },
+        "social": {
+          "$type": "color",
+          "$value": "#5B6EF5",
+          "$description": "Social & Media sphere accent"
+        },
+        "social-light": {
+          "$type": "color",
+          "$value": "#EEF0FF",
+          "$description": "Social & Media sphere light background"
+        },
+        "entertainment": {
+          "$type": "color",
+          "$value": "#7C6AE6",
+          "$description": "Entertainment sphere accent"
+        },
+        "entertainment-light": {
+          "$type": "color",
+          "$value": "#F1EFFF",
+          "$description": "Entertainment sphere light background"
+        },
+        "team": {
+          "$type": "color",
+          "$value": "#F59E0B",
+          "$description": "My Team sphere accent"
+        },
+        "team-light": {
+          "$type": "color",
+          "$value": "#FFF7E6",
+          "$description": "My Team sphere light background"
+        }
+      }
+    },
+    "spacing": {
+      "xs": {
+        "$type": "dimension",
+        "$value": "4px"
+      },
+      "sm": {
+        "$type": "dimension",
+        "$value": "8px"
+      },
+      "md": {
+        "$type": "dimension",
+        "$value": "16px"
+      },
+      "lg": {
+        "$type": "dimension",
+        "$value": "24px"
+      },
+      "xl": {
+        "$type": "dimension",
+        "$value": "32px"
+      },
+      "2xl": {
+        "$type": "dimension",
+        "$value": "48px"
+      }
+    },
+    "radius": {
+      "sm": {
+        "$type": "dimension",
+        "$value": "6px"
+      },
+      "md": {
+        "$type": "dimension",
+        "$value": "10px"
+      },
+      "lg": {
+        "$type": "dimension",
+        "$value": "16px"
+      },
+      "xl": {
+        "$type": "dimension",
+        "$value": "24px"
+      }
+    },
+    "shadow": {
+      "sm": {
+        "$type": "shadow",
+        "$value": {
+          "offsetX": "0px",
+          "offsetY": "1px",
+          "blur": "2px",
+          "spread": "0px",
+          "color": "rgba(0, 0, 0, 0.04)"
+        }
+      },
+      "md": {
+        "$type": "shadow",
+        "$value": {
+          "offsetX": "0px",
+          "offsetY": "4px",
+          "blur": "12px",
+          "spread": "0px",
+          "color": "rgba(0, 0, 0, 0.06)"
+        }
+      },
+      "lg": {
+        "$type": "shadow",
+        "$value": {
+          "offsetX": "0px",
+          "offsetY": "12px",
+          "blur": "24px",
+          "spread": "0px",
+          "color": "rgba(0, 0, 0, 0.08)"
+        }
+      }
+    },
+    "typography": {
+      "font-family": {
+        "body": {
+          "$type": "fontFamily",
+          "$value": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+        }
+      },
+      "font-size": {
+        "xs": {
+          "$type": "dimension",
+          "$value": "12px"
+        },
+        "sm": {
+          "$type": "dimension",
+          "$value": "14px"
+        },
+        "md": {
+          "$type": "dimension",
+          "$value": "16px"
+        },
+        "lg": {
+          "$type": "dimension",
+          "$value": "18px"
+        },
+        "xl": {
+          "$type": "dimension",
+          "$value": "20px"
+        },
+        "2xl": {
+          "$type": "dimension",
+          "$value": "24px"
+        },
+        "3xl": {
+          "$type": "dimension",
+          "$value": "30px"
+        }
+      },
+      "font-weight": {
+        "normal": {
+          "$type": "fontWeight",
+          "$value": "400"
+        },
+        "medium": {
+          "$type": "fontWeight",
+          "$value": "500"
+        },
+        "semibold": {
+          "$type": "fontWeight",
+          "$value": "600"
+        },
+        "bold": {
+          "$type": "fontWeight",
+          "$value": "700"
+        }
+      },
+      "line-height": {
+        "tight": {
+          "$type": "number",
+          "$value": "1.25"
+        },
+        "normal": {
+          "$type": "number",
+          "$value": "1.5"
+        },
+        "relaxed": {
+          "$type": "number",
+          "$value": "1.75"
+        }
+      }
+    }
+  }
+}

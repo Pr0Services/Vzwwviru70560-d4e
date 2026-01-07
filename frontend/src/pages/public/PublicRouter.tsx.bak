@@ -1,0 +1,160 @@
+/**
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║                    CHE·NU™ — PUBLIC ROUTER                                   ║
+ * ║                    Routes pour les pages publiques (avant login)             ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ */
+
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+
+// Pages Publiques
+import { LandingPage } from './LandingPage';
+import { FeaturesPage } from './FeaturesPage';
+import { PricingPage } from './PricingPage';
+import { DemoPage } from './DemoPage';
+import { FAQPage } from './FAQPage';
+import { InvestorPage } from './InvestorPage';
+import { LoginPage } from './LoginPage';
+import { SignupPage } from './SignupPage';
+import { ForgotPasswordPage } from './ForgotPasswordPage';
+import { PrivacyPage } from './PrivacyPage';
+import { TermsPage } from './TermsPage';
+import { SecurityPage } from './SecurityPage';
+import { OnboardingPage, OnboardingCompletePage } from './OnboardingPage';
+
+/**
+ * Routes publiques - accessibles sans authentification
+ */
+export const PublicRoutes: React.FC = () => {
+  return (
+    <Routes>
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      {/* PAGES PRINCIPALES */}
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/features" element={<FeaturesPage />} />
+      <Route path="/fonctionnalites" element={<Navigate to="/features" replace />} />
+      <Route path="/pricing" element={<PricingPage />} />
+      <Route path="/tarifs" element={<Navigate to="/pricing" replace />} />
+      <Route path="/demo" element={<DemoPage />} />
+      <Route path="/faq" element={<FAQPage />} />
+      <Route path="/help" element={<Navigate to="/faq" replace />} />
+      
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      {/* INVESTISSEURS */}
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      
+      <Route path="/investor" element={<InvestorPage />} />
+      <Route path="/investors" element={<Navigate to="/investor" replace />} />
+      <Route path="/invest" element={<Navigate to="/investor" replace />} />
+      
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      {/* AUTHENTIFICATION */}
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/signin" element={<Navigate to="/login" replace />} />
+      <Route path="/connexion" element={<Navigate to="/login" replace />} />
+      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/register" element={<Navigate to="/signup" replace />} />
+      <Route path="/join" element={<Navigate to="/signup" replace />} />
+      <Route path="/inscription" element={<Navigate to="/signup" replace />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<Navigate to="/forgot-password" replace />} />
+      <Route path="/mot-de-passe-oublie" element={<Navigate to="/forgot-password" replace />} />
+      
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      {/* ONBOARDING */}
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      
+      <Route path="/onboarding" element={<OnboardingPage />} />
+      <Route path="/onboarding/complete" element={<OnboardingCompletePage />} />
+      <Route path="/welcome" element={<Navigate to="/onboarding" replace />} />
+      
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      {/* PAGES LÉGALES & SÉCURITÉ */}
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      
+      <Route path="/privacy" element={<PrivacyPage />} />
+      <Route path="/confidentialite" element={<Navigate to="/privacy" replace />} />
+      <Route path="/terms" element={<TermsPage />} />
+      <Route path="/conditions" element={<Navigate to="/terms" replace />} />
+      <Route path="/cgu" element={<Navigate to="/terms" replace />} />
+      <Route path="/legal" element={<Navigate to="/terms" replace />} />
+      <Route path="/security" element={<SecurityPage />} />
+      <Route path="/securite" element={<Navigate to="/security" replace />} />
+      
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      {/* AUTRES PAGES (TODO) */}
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      
+      <Route path="/about" element={<LandingPage />} />
+      <Route path="/contact" element={<LandingPage />} />
+      <Route path="/careers" element={<LandingPage />} />
+      <Route path="/blog" element={<LandingPage />} />
+      <Route path="/press" element={<LandingPage />} />
+      
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      {/* FALLBACK */}
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      
+      <Route path="*" element={<LandingPage />} />
+    </Routes>
+  );
+};
+
+/**
+ * Liste des routes publiques pour référence
+ */
+export const PUBLIC_ROUTES = {
+  // Main
+  home: '/',
+  features: '/features',
+  pricing: '/pricing',
+  demo: '/demo',
+  faq: '/faq',
+  
+  // Investor
+  investor: '/investor',
+  
+  // Auth
+  login: '/login',
+  signup: '/signup',
+  forgotPassword: '/forgot-password',
+  
+  // Onboarding
+  onboarding: '/onboarding',
+  onboardingComplete: '/onboarding/complete',
+  
+  // Legal & Security
+  privacy: '/privacy',
+  terms: '/terms',
+  security: '/security',
+  
+  // Other
+  about: '/about',
+  contact: '/contact',
+  careers: '/careers',
+} as const;
+
+// Export all pages
+export { 
+  LandingPage, 
+  PricingPage, 
+  InvestorPage, 
+  FAQPage, 
+  DemoPage,
+  FeaturesPage,
+  LoginPage,
+  SignupPage,
+  ForgotPasswordPage,
+  PrivacyPage,
+  TermsPage,
+  SecurityPage,
+  OnboardingPage,
+  OnboardingCompletePage,
+};
+
+export default PublicRoutes;

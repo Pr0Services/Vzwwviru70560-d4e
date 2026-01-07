@@ -1,0 +1,98 @@
+{
+  "$schema": "chenu://sphere/v2",
+  "id": "realestate",
+  "version": "1.0.0",
+  
+  "name": "Immobilier",
+  "displayName": "Immobilier",
+  "emoji": "🏠",
+  "icon": "home",
+  
+  "description": {
+    "fr": "Gestion immobilière, propriétés et investissements",
+    "en": "Real estate management, properties and investments"
+  },
+  
+  "colors": {
+    "primary": "#7A593A",
+    "secondary": "#3F7249",
+    "accent": "#D8B26A",
+    "background": "#1E1F22",
+    "surface": "#2A2B2F"
+  },
+  
+  "scope": {
+    "included": [
+      "properties",
+      "mortgages",
+      "rentals",
+      "leases",
+      "property-maintenance",
+      "inspections",
+      "valuations",
+      "investments",
+      "tenant-management",
+      "property-documents"
+    ],
+    "excluded": [
+      "personal-finances-unrelated",
+      "private-tenant-communications",
+      "discriminatory-criteria"
+    ]
+  },
+  
+  "features": {
+    "propertyListing": true,
+    "mortgageCalculator": true,
+    "maintenanceTracker": true,
+    "tenantPortal": true,
+    "documentStorage": true,
+    "investmentAnalysis": true,
+    "3dVisualization": true
+  },
+  
+  "agents": {
+    "enabled": true,
+    "types": [
+      "property-advisor",
+      "maintenance-scheduler",
+      "investment-analyzer",
+      "lease-manager"
+    ],
+    "notes": "Real estate agents provide information and organization, not financial advice"
+  },
+  
+  "integrations": [
+    "government",
+    "business",
+    "construction"
+  ],
+  
+  "interSphereInteraction": true,
+  
+  "modules": {
+    "viewer3d": {
+      "enabled": true,
+      "component": "ImmobilierViewer"
+    },
+    "virtualTours": {
+      "enabled": true,
+      "xrSupport": true
+    }
+  },
+  
+  "permissions": {
+    "canShareWithGovernment": true,
+    "canShareWithBusiness": true,
+    "requiresAuth": true,
+    "financialDataHandling": "encrypted"
+  },
+  
+  "metadata": {
+    "safe": true,
+    "nonAutonomous": true,
+    "representational": true,
+    "createdAt": "2025-12-13",
+    "updatedAt": "2025-12-13"
+  }
+}

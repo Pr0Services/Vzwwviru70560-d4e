@@ -1,0 +1,410 @@
+/**
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║                    CHE·NU™ — INVESTOR PAGE                                   ║
+ * ║                    Page pour les investisseurs                               ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ */
+
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { 
+  TrendingUp, Users, Globe, Shield, Brain, Target,
+  DollarSign, Rocket, Award, BarChart3, ArrowRight,
+  CheckCircle2, Briefcase
+} from 'lucide-react';
+
+export const InvestorPage: React.FC = () => {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#1E1F22] to-[#2F4C39]">
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#1E1F22]/90 backdrop-blur-md border-b border-[#D8B26A]/20">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#D8B26A] to-[#7A593A] flex items-center justify-center">
+              <span className="text-white font-bold text-lg">C</span>
+            </div>
+            <span className="text-2xl font-bold text-white">
+              CHE<span className="text-[#D8B26A]">·</span>NU
+            </span>
+          </Link>
+          
+          <div className="flex items-center gap-4">
+            <Link to="/login" className="text-[#E9E4D6] hover:text-[#D8B26A] transition">
+              Connexion
+            </Link>
+            <a 
+              href="mailto:investors@chenu.ai" 
+              className="px-6 py-2 bg-[#D8B26A] text-[#1E1F22] font-semibold rounded-lg hover:bg-[#E9E4D6] transition"
+            >
+              Contacter
+            </a>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="pt-32 pb-20 px-6">
+        <div className="max-w-5xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#D8B26A]/20 rounded-full mb-8">
+            <Briefcase className="w-4 h-4 text-[#D8B26A]" />
+            <span className="text-[#D8B26A] text-sm font-medium">
+              Opportunité d'investissement
+            </span>
+          </div>
+          
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
+            Investissez dans le futur de<br />
+            <span className="text-[#D8B26A]">l'intelligence gouvernée</span>
+          </h1>
+          
+          <p className="text-xl text-[#E9E4D6]/80 max-w-3xl mx-auto mb-12">
+            CHE·NU redéfinit la relation humain-IA. Premier système d'exploitation 
+            d'intelligence où l'utilisateur garde le contrôle total. 
+            Un marché de <strong className="text-[#3EB4A2]">$200B+ d'ici 2030</strong>.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a 
+              href="mailto:investors@chenu.ai?subject=Investment%20Inquiry"
+              className="px-8 py-4 bg-[#D8B26A] text-[#1E1F22] font-bold text-lg rounded-xl hover:bg-[#E9E4D6] transition flex items-center gap-2"
+            >
+              Demander le deck investisseur
+              <ArrowRight className="w-5 h-5" />
+            </a>
+            <Link 
+              to="/demo"
+              className="px-8 py-4 border-2 border-[#D8B26A] text-[#D8B26A] font-bold text-lg rounded-xl hover:bg-[#D8B26A]/10 transition"
+            >
+              Voir la démo
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Key Metrics */}
+      <section className="py-16 px-6 bg-[#1E1F22]">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8">
+            {[
+              { value: '70K', label: 'Objectif utilisateurs Q4 2026', icon: <Users className="w-8 h-8" /> },
+              { value: '$5.2M', label: 'ARR projeté', icon: <DollarSign className="w-8 h-8" /> },
+              { value: '226', label: 'Agents IA spécialisés', icon: <Brain className="w-8 h-8" /> },
+              { value: '75%+', label: 'Marge brute cible', icon: <TrendingUp className="w-8 h-8" /> },
+            ].map((metric, idx) => (
+              <div 
+                key={idx}
+                className="p-8 bg-gradient-to-br from-[#2F4C39]/30 to-[#1E1F22] rounded-2xl border border-[#D8B26A]/20 text-center"
+              >
+                <div className="text-[#D8B26A] mb-4 flex justify-center">{metric.icon}</div>
+                <div className="text-4xl font-bold text-white mb-2">{metric.value}</div>
+                <div className="text-[#E9E4D6]/60 text-sm">{metric.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Market Opportunity */}
+      <section className="py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="text-4xl font-bold text-white mb-6">
+                Une opportunité de marché massive
+              </h2>
+              <p className="text-[#E9E4D6]/70 text-lg mb-8">
+                Le marché de l'IA grand public est dominé par des solutions qui 
+                ne respectent pas la vie privée et où l'utilisateur n'a aucun contrôle.
+                CHE·NU propose une alternative éthique et gouvernée.
+              </p>
+              
+              <div className="space-y-4">
+                {[
+                  'Marché IA générative: $200B+ d\'ici 2030',
+                  'Croissance 35% CAGR',
+                  'Demande croissante pour IA éthique et contrôlée',
+                  'Régulations EU AI Act favorables à notre modèle',
+                ].map((point, idx) => (
+                  <div key={idx} className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-[#3EB4A2]" />
+                    <span className="text-[#E9E4D6]">{point}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="bg-[#1E1F22] rounded-2xl p-8 border border-[#D8B26A]/20">
+              <h3 className="text-xl font-bold text-white mb-6">Marché adressable</h3>
+              <div className="space-y-6">
+                {[
+                  { label: 'TAM (Total)', value: '$200B', width: '100%' },
+                  { label: 'SAM (Serviceable)', value: '$50B', width: '60%' },
+                  { label: 'SOM (Obtainable)', value: '$500M', width: '25%' },
+                ].map((item, idx) => (
+                  <div key={idx}>
+                    <div className="flex justify-between mb-2">
+                      <span className="text-[#E9E4D6]/70">{item.label}</span>
+                      <span className="text-[#D8B26A] font-bold">{item.value}</span>
+                    </div>
+                    <div className="h-3 bg-[#2F4C39]/50 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-[#D8B26A] to-[#3EB4A2] rounded-full"
+                        style={{ width: item.width }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Competitive Advantage */}
+      <section className="py-20 px-6 bg-[#1E1F22]">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-white mb-4 text-center">
+            Avantages compétitifs
+          </h2>
+          <p className="text-[#E9E4D6]/70 text-center mb-12 max-w-2xl mx-auto">
+            CHE·NU se différencie sur des fondamentaux que les géants ne peuvent pas copier
+          </p>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: <Shield className="w-10 h-10" />,
+                title: 'Gouvernance > Exécution',
+                description: 'Philosophie unique: chaque action IA requiert approbation humaine. Checkpoint system breveté.',
+                color: '#3EB4A2',
+              },
+              {
+                icon: <Brain className="w-10 h-10" />,
+                title: '9 Sphères de Vie',
+                description: 'Organisation contextuelle de l\'intelligence. Séparation stricte des données par domaine de vie.',
+                color: '#D8B26A',
+              },
+              {
+                icon: <Target className="w-10 h-10" />,
+                title: 'Modèle économique sain',
+                description: 'Pas de vente de données. Pas d\'optimisation pour l\'addiction. Revenus 100% utilisateurs.',
+                color: '#3F7249',
+              },
+            ].map((advantage, idx) => (
+              <div 
+                key={idx}
+                className="p-8 rounded-2xl border border-[#8D8371]/30 bg-gradient-to-br from-[#2F4C39]/20 to-transparent"
+              >
+                <div 
+                  className="w-16 h-16 rounded-xl flex items-center justify-center mb-6"
+                  style={{ backgroundColor: `${advantage.color}20`, color: advantage.color }}
+                >
+                  {advantage.icon}
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">{advantage.title}</h3>
+                <p className="text-[#E9E4D6]/70">{advantage.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Business Model */}
+      <section className="py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-white mb-12 text-center">
+            Modèle économique
+          </h2>
+          
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Revenue Streams */}
+            <div className="p-8 bg-[#1E1F22] rounded-2xl border border-[#D8B26A]/20">
+              <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                <DollarSign className="w-6 h-6 text-[#D8B26A]" />
+                Sources de revenus
+              </h3>
+              <div className="space-y-4">
+                {[
+                  { name: 'Abonnements SaaS', pct: '70%', desc: '$9.99 - $999/mois' },
+                  { name: 'API & Intégrations', pct: '15%', desc: 'Usage-based' },
+                  { name: 'Marketplace agents', pct: '10%', desc: 'Commission 20%' },
+                  { name: 'Enterprise custom', pct: '5%', desc: 'On-premise, white-label' },
+                ].map((stream, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-4 bg-[#2F4C39]/20 rounded-xl">
+                    <div>
+                      <div className="text-white font-medium">{stream.name}</div>
+                      <div className="text-[#E9E4D6]/50 text-sm">{stream.desc}</div>
+                    </div>
+                    <div className="text-[#D8B26A] font-bold text-xl">{stream.pct}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Unit Economics */}
+            <div className="p-8 bg-[#1E1F22] rounded-2xl border border-[#3EB4A2]/20">
+              <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                <BarChart3 className="w-6 h-6 text-[#3EB4A2]" />
+                Unit Economics
+              </h3>
+              <div className="space-y-6">
+                {[
+                  { label: 'ARPU (moyen)', value: '$25', trend: '+15% YoY' },
+                  { label: 'CAC', value: '$35', trend: 'Cible: <$30' },
+                  { label: 'LTV', value: '$300', trend: '12 mois rétention' },
+                  { label: 'LTV:CAC', value: '8.5x', trend: 'Excellent' },
+                  { label: 'Marge brute', value: '75-85%', trend: 'Grâce aux optimisations' },
+                ].map((metric, idx) => (
+                  <div key={idx} className="flex items-center justify-between">
+                    <span className="text-[#E9E4D6]/70">{metric.label}</span>
+                    <div className="text-right">
+                      <span className="text-white font-bold text-lg">{metric.value}</span>
+                      <span className="text-[#3EB4A2] text-sm ml-2">{metric.trend}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Roadmap */}
+      <section className="py-20 px-6 bg-[#1E1F22]">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-white mb-12 text-center">
+            Roadmap
+          </h2>
+          
+          <div className="relative">
+            {/* Timeline line */}
+            <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#D8B26A]/30 hidden md:block" />
+            
+            <div className="space-y-12">
+              {[
+                { 
+                  quarter: 'Q1 2025', 
+                  title: 'MVP & Early Access', 
+                  items: ['Lancement beta privée', '1,000 utilisateurs test', 'Itération produit'],
+                  status: 'current'
+                },
+                { 
+                  quarter: 'Q2 2025', 
+                  title: 'Public Launch', 
+                  items: ['Lancement public', 'Marketplace agents', '10,000 utilisateurs'],
+                  status: 'upcoming'
+                },
+                { 
+                  quarter: 'Q3-Q4 2025', 
+                  title: 'Scale', 
+                  items: ['Enterprise features', 'API publique', '30,000 utilisateurs'],
+                  status: 'upcoming'
+                },
+                { 
+                  quarter: '2026', 
+                  title: 'Expansion', 
+                  items: ['International', 'Mobile apps', '70,000+ utilisateurs', '$5M+ ARR'],
+                  status: 'future'
+                },
+              ].map((phase, idx) => (
+                <div key={idx} className={`flex items-center gap-8 ${idx % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
+                  <div className={`flex-1 ${idx % 2 === 0 ? 'text-right' : 'text-left'}`}>
+                    <div className={`
+                      inline-block p-6 rounded-2xl border
+                      ${phase.status === 'current' 
+                        ? 'bg-[#D8B26A]/20 border-[#D8B26A]' 
+                        : 'bg-[#2F4C39]/20 border-[#8D8371]/30'}
+                    `}>
+                      <div className="text-[#D8B26A] font-bold mb-2">{phase.quarter}</div>
+                      <h3 className="text-xl font-bold text-white mb-3">{phase.title}</h3>
+                      <ul className={`space-y-1 ${idx % 2 === 0 ? 'text-right' : 'text-left'}`}>
+                        {phase.items.map((item, i) => (
+                          <li key={i} className="text-[#E9E4D6]/70 text-sm">{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="hidden md:flex w-4 h-4 rounded-full bg-[#D8B26A] border-4 border-[#1E1F22]" />
+                  <div className="flex-1" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Team */}
+      <section className="py-20 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <Award className="w-12 h-12 text-[#D8B26A] mx-auto mb-6" />
+          <h2 className="text-4xl font-bold text-white mb-4">
+            Une équipe passionnée
+          </h2>
+          <p className="text-[#E9E4D6]/70 text-lg mb-12">
+            Fondateurs avec 15+ ans d'expérience combinée en IA, produit et business.
+          </p>
+          
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="p-8 bg-[#1E1F22] rounded-2xl border border-[#D8B26A]/20">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#D8B26A] to-[#7A593A] mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-white">Jo</h3>
+              <p className="text-[#D8B26A] mb-2">Fondateur & CEO</p>
+              <p className="text-[#E9E4D6]/60 text-sm">
+                Visionnaire produit. 10+ ans en développement logiciel et gestion de projets complexes.
+              </p>
+            </div>
+            <div className="p-8 bg-[#1E1F22] rounded-2xl border border-[#3EB4A2]/20">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#3EB4A2] to-[#3F7249] mx-auto mb-4 flex items-center justify-center">
+                <Brain className="w-10 h-10 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-white">Nova</h3>
+              <p className="text-[#3EB4A2] mb-2">Intelligence Système</p>
+              <p className="text-[#E9E4D6]/60 text-sm">
+                L'IA qui orchestre tout. 226 agents spécialisés sous sa supervision.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20 px-6 bg-[#1E1F22]">
+        <div className="max-w-4xl mx-auto text-center">
+          <Rocket className="w-16 h-16 text-[#D8B26A] mx-auto mb-8" />
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            Rejoignez l'aventure
+          </h2>
+          <p className="text-xl text-[#E9E4D6]/70 mb-10">
+            Nous cherchons des partenaires qui partagent notre vision d'une IA éthique et gouvernée.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a 
+              href="mailto:investors@chenu.ai?subject=Investment%20Deck%20Request"
+              className="px-10 py-5 bg-[#D8B26A] text-[#1E1F22] font-bold text-xl rounded-xl hover:bg-[#E9E4D6] transition flex items-center gap-2"
+            >
+              Recevoir le deck
+              <ArrowRight className="w-6 h-6" />
+            </a>
+            <a 
+              href="mailto:jo@chenu.ai?subject=Meeting%20Request"
+              className="px-10 py-5 border-2 border-[#D8B26A] text-[#D8B26A] font-bold text-xl rounded-xl hover:bg-[#D8B26A]/10 transition"
+            >
+              Planifier un call
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 px-6 bg-[#1E1F22] border-t border-[#D8B26A]/20">
+        <div className="max-w-7xl mx-auto text-center">
+          <p className="text-[#E9E4D6]/40 text-sm">
+            © 2025 CHE·NU™. Tous droits réservés. | Document confidentiel pour investisseurs qualifiés uniquement.
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default InvestorPage;

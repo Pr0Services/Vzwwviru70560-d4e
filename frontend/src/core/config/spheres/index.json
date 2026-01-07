@@ -1,0 +1,56 @@
+{
+  "$schema": "chenu://sphere-registry/v2",
+  "version": "2.0.0",
+  "lastUpdated": "2025-12-13",
+  
+  "description": "CHE·NU Sphere Registry - 7 Espaces de Vie + Modules Cross-Cutting",
+  
+  "spheres": {
+    "personal": "./personal.json",
+    "business": "./business.json",
+    "projects": "./projects.json",
+    "creative": "./creative.json",
+    "government": "./government.json",
+    "realestate": "./realestate.json",
+    "associations": "./associations.json"
+  },
+  
+  "defaultOrder": [
+    "personal",
+    "business",
+    "projects",
+    "creative",
+    "government",
+    "realestate",
+    "associations"
+  ],
+  
+  "categories": {
+    "private": ["personal"],
+    "professional": ["business", "projects"],
+    "creative": ["creative"],
+    "administrative": ["government", "realestate"],
+    "collaborative": ["associations"]
+  },
+  
+  "crossCuttingModules": {
+    "nova": "Universal AI Assistant",
+    "scholar": "Learning & Research",
+    "social": "Social Network",
+    "xr": "Immersive Experience",
+    "streaming": "Video Streaming",
+    "forum": "Community Forums",
+    "construction": "Quebec Construction (RBQ/CCQ/CNESST)"
+  },
+  
+  "domains": {
+    "methodology": "../../../sdk/domains/methodology/index.json",
+    "architecture": "../../../sdk/domains/architecture/index.json"
+  },
+  
+  "metadata": {
+    "safe": true,
+    "nonAutonomous": true,
+    "representational": true
+  }
+}

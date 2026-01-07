@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHE·NU™ — Revisit Decision Flow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════════════
+       CHE·NU™ — REVISIT DECISION FLOW
+       SIMPLE & SAFE
+       
+       RÈGLE FONDAMENTALE:
+       Une décision CHE·NU est IMMUTABLE.
+       Revisiter crée TOUJOURS une nouvelle décision.
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    :root {
+      /* === GLOBAL === */
+      --bg-root: #1B1F23;
+      --bg-flow: #1F2429;
+      --text-primary: #E6E8EA;
+      --text-secondary: #B8BDC3;
+      --text-muted: #8B9096;
+      --gold: #BFAE7A;
+      --cyan: #6EAFC4;
+      --green: #6FAF9A;
+      --error: #C47070;
+      
+      /* === DECISION ACTIVE === */
+      --active-bg: #2A3138;
+      --active-surface: #2F363D;
+      --active-border: rgba(110, 175, 196, 0.3);
+      --active-accent: #6EAFC4;
+      
+      /* === DECISION SUPERSEDED === */
+      --superseded-bg: #252A30;
+      --superseded-surface: #2A3036;
+      --superseded-border: rgba(255, 255, 255, 0.03);
+      --superseded-accent: #8B9096;
+      
+      /* === FLOW === */
+      --flow-surface: #2A3138;
+      --flow-surface-focus: #303841;
+      --flow-border: rgba(255, 255, 255, 0.04);
+      --flow-radius: 12px;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: linear-gradient(180deg, #181C20, var(--bg-root));
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    
+    .container { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+    
+    /* Header */
+    .header { text-align: center; margin-bottom: 48px; }
+    .header h1 { font-size: 32px; font-weight: 700; color: var(--gold); margin-bottom: 8px; }
+    .header .subtitle { font-size: 16px; color: var(--text-secondary); margin-bottom: 20px; }
+    .header .rule {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: rgba(110, 175, 196, 0.1);
+      border: 1px solid var(--cyan);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--cyan);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       DECISION CARDS
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .decisions-section {
+      margin-bottom: 48px;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    
+    .decision-card {
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    
+    .decision-card:last-child {
+      margin-bottom: 0;
+    }
+    
+    /* Active Decision */
+    .decision-card.active {
+      background-color: var(--active-bg);
+      border: 1px solid var(--active-border);
+    }
+    
+    .decision-card.active .badge {
+      background-color: rgba(110, 175, 196, 0.15);
+      color: var(--cyan);
+    }
+    
+    /* Superseded Decision */
+    .decision-card.superseded {
+      background-color: var(--superseded-bg);
+      border: 1px solid var(--superseded-border);
+      opacity: 0.7;
+    }
+    
+    .decision-card.superseded .badge {
+      background-color: rgba(139, 144, 150, 0.15);
+      color: var(--superseded-accent);
+    }
+    
+    .decision-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .decision-header .icon { font-size: 20px; }
+    .decision-header .title { flex: 1; font-size: 14px; font-weight: 600; }
+    
+    .badge {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .decision-content {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      padding: 12px;
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+    }
+    
+    .decision-meta {
+      display: flex;
+      gap: 16px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    
+    .decision-link {
+      font-size: 11px;
+      color: var(--cyan);
+      margin-top: 8px;
+      font-style: italic;
+    }
+    
+    .decision-card.superseded .decision-link {
+      color: var(--superseded-accent);
+    }
+    
+    .revisit-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 8px 16px;
+      background-color: var(--cyan);
+      color: var(--bg-root);
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+    
+    .revisit-btn:hover {
+      background-color: #7EBFD4;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       FLOW STEPS
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .flow-section {
+      margin-bottom: 48px;
+    }
+    
+    .flow-steps {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      padding: 0 20px;
+    }
+    
+    .flow-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      position: relative;
+    }
+    
+    .flow-step::after {
+      content: '';
+      position: absolute;
+      top: 16px;
+      left: calc(50% + 20px);
+      width: calc(100% - 40px);
+      height: 2px;
+      background-color: rgba(255, 255, 255, 0.04);
+    }
+    
+    .flow-step:last-child::after {
+      display: none;
+    }
+    
+    .flow-step.active::after {
+      background-color: var(--cyan);
+    }
+    
+    .step-number {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      background-color: var(--flow-surface);
+      color: var(--text-muted);
+      border: 2px solid rgba(255, 255, 255, 0.04);
+      z-index: 1;
+    }
+    
+    .flow-step.active .step-number {
+      background-color: var(--cyan);
+      color: var(--bg-root);
+      border-color: var(--cyan);
+    }
+    
+    .flow-step.completed .step-number {
+      background-color: var(--green);
+      color: var(--bg-root);
+      border-color: var(--green);
+    }
+    
+    .step-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+    
+    .flow-step.active .step-label {
+      color: var(--cyan);
+      font-weight: 500;
+    }
+    
+    /* Flow Cards */
+    .flow-card {
+      background-color: var(--bg-flow);
+      border-radius: 16px;
+      padding: 32px;
+      border: 1px solid var(--flow-border);
+    }
+    
+    .flow-card-header {
+      margin-bottom: 24px;
+    }
+    
+    .flow-card-header h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    
+    .flow-card-header p {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    
+    .flow-card-header .warning {
+      margin-top: 12px;
+      padding: 12px;
+      background-color: rgba(196, 160, 96, 0.1);
+      border: 1px solid rgba(196, 160, 96, 0.3);
+      border-radius: 8px;
+      font-size: 12px;
+      color: #C4A060;
+    }
+    
+    /* Original Decision Preview */
+    .original-decision {
+      background-color: var(--flow-surface);
+      border-radius: var(--flow-radius);
+      padding: 16px;
+      margin-bottom: 24px;
+      border: 1px solid var(--flow-border);
+    }
+    
+    .original-decision .label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    
+    .original-decision .content {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    
+    .original-decision .meta {
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    
+    /* Reason Options */
+    .reason-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    @media (max-width: 600px) {
+      .reason-options { grid-template-columns: 1fr; }
+    }
+    
+    .reason-option {
+      padding: 14px;
+      background-color: var(--flow-surface);
+      border: 1px solid var(--flow-border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    
+    .reason-option:hover {
+      background-color: var(--flow-surface-focus);
+    }
+    
+    .reason-option.selected {
+      border-color: var(--cyan);
+      background-color: rgba(110, 175, 196, 0.08);
+    }
+    
+    .reason-option .name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    
+    .reason-option .desc {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    
+    /* Text Input */
+    .text-input {
+      width: 100%;
+      padding: 14px;
+      background-color: var(--flow-surface);
+      border: 1px solid var(--flow-border);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--text-primary);
+      font-family: inherit;
+      resize: vertical;
+      min-height: 80px;
+    }
+    
+    .text-input:focus {
+      outline: none;
+      border-color: var(--cyan);
+    }
+    
+    .text-input::placeholder {
+      color: var(--text-muted);
+    }
+    
+    .input-hint {
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    
+    /* Buttons */
+    .flow-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--flow-border);
+    }
+    
+    .btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: none;
+    }
+    
+    .btn-primary {
+      background-color: var(--cyan);
+      color: var(--bg-root);
+    }
+    
+    .btn-primary:hover {
+      background-color: #7EBFD4;
+    }
+    
+    .btn-secondary {
+      background-color: transparent;
+      color: var(--text-secondary);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .btn-secondary:hover {
+      background-color: rgba(255, 255, 255, 0.04);
+    }
+    
+    /* Meeting Creation */
+    .meeting-preview {
+      background-color: var(--flow-surface);
+      border-radius: var(--flow-radius);
+      padding: 20px;
+      border: 1px solid var(--flow-border);
+    }
+    
+    .meeting-preview .icon { font-size: 28px; margin-bottom: 12px; }
+    .meeting-preview .name { font-size: 14px; font-weight: 600; color: var(--cyan); margin-bottom: 8px; }
+    .meeting-preview .desc { font-size: 12px; color: var(--text-muted); }
+    
+    /* Complete */
+    .complete-card {
+      text-align: center;
+      padding: 40px;
+    }
+    
+    .complete-card .icon { font-size: 48px; margin-bottom: 16px; }
+    .complete-card h3 { font-size: 20px; font-weight: 600; color: var(--green); margin-bottom: 12px; }
+    .complete-card p { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       RULES SECTION
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .rules-section {
+      margin-bottom: 48px;
+    }
+    
+    .rules-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+    
+    @media (max-width: 768px) {
+      .rules-grid { grid-template-columns: 1fr; }
+    }
+    
+    .rules-card {
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    
+    .rules-card.allowed {
+      background-color: rgba(111, 175, 154, 0.08);
+      border-color: var(--green);
+    }
+    
+    .rules-card.forbidden {
+      background-color: rgba(196, 112, 112, 0.08);
+      border-color: var(--error);
+    }
+    
+    .rules-card h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    
+    .rules-card.allowed h3 { color: var(--green); }
+    .rules-card.forbidden h3 { color: var(--error); }
+    
+    .rules-card ul { list-style: none; }
+    
+    .rules-card li {
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding: 6px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 40px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      margin-top: 48px;
+    }
+    .footer p { color: var(--text-muted); font-size: 14px; }
+    .footer .brand { color: var(--gold); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>✧ CHE·NU™ Revisit Decision</h1>
+      <p class="subtitle">Simple & Safe — L'historique est protégé</p>
+      <div class="rule">
+        ⚖️ Une décision est IMMUTABLE — Revisiter crée une NOUVELLE décision
+      </div>
+    </header>
+
+    <!-- Decision Examples -->
+    <section class="decisions-section">
+      <h2 class="section-title">📋 Décisions dans le Dashboard</h2>
+      
+      <!-- Active Decision -->
+      <div class="decision-card active">
+        <div class="decision-header">
+          <span class="icon">⚖️</span>
+          <span class="title">Architecture API V50</span>
+          <span class="badge">Active</span>
+        </div>
+        <div class="decision-content">
+          Utiliser FastAPI avec PostgreSQL pour le backend. Architecture REST avec endpoints versionnés.
+        </div>
+        <div class="decision-meta">
+          <span>📅 15 Dec 2024</span>
+          <span>🏛️ Decision Meeting #42</span>
+          <span>💥 Impact: High</span>
+        </div>
+        <button class="revisit-btn">Revisit</button>
+      </div>
+      
+      <!-- Superseded Decision -->
+      <div class="decision-card superseded">
+        <div class="decision-header">
+          <span class="icon">⚖️</span>
+          <span class="title">Architecture API V49</span>
+          <span class="badge">Superseded</span>
+        </div>
+        <div class="decision-content">
+          Utiliser Express.js avec MongoDB pour le backend.
+        </div>
+        <div class="decision-meta">
+          <span>📅 1 Nov 2024</span>
+          <span>🏛️ Decision Meeting #38</span>
+        </div>
+        <div class="decision-link">Superseded by decision from 15 Dec 2024</div>
+      </div>
+    </section>
+
+    <!-- Flow Demo -->
+    <section class="flow-section">
+      <h2 class="section-title">🔄 Revisit Flow — 4 étapes</h2>
+      
+      <!-- Steps Indicator -->
+      <div class="flow-steps">
+        <div class="flow-step completed">
+          <div class="step-number">✓</div>
+          <div class="step-label">Contexte</div>
+        </div>
+        <div class="flow-step active">
+          <div class="step-number">2</div>
+          <div class="step-label">Raison</div>
+        </div>
+        <div class="flow-step">
+          <div class="step-number">3</div>
+          <div class="step-label">Meeting</div>
+        </div>
+        <div class="flow-step">
+          <div class="step-number">4</div>
+          <div class="step-label">Terminé</div>
+        </div>
+      </div>
+      
+      <!-- Step 1: Context -->
+      <div class="flow-card" style="margin-bottom: 24px;">
+        <div class="flow-card-header">
+          <h3>Step 1 — Contexte & Confirmation</h3>
+          <p>Cette décision est active et visible dans le Dashboard. Revisiter créera une nouvelle décision, pas une modification.</p>
+          <div class="warning">
+            ⚠️ La décision originale sera préservée dans l'historique.
+          </div>
+        </div>
+        
+        <div class="original-decision">
+          <div class="label">Décision originale</div>
+          <div class="content">Utiliser FastAPI avec PostgreSQL pour le backend. Architecture REST avec endpoints versionnés.</div>
+          <div class="meta">📅 15 Dec 2024 • Decision Meeting #42</div>
+        </div>
+        
+        <div class="flow-actions">
+          <button class="btn btn-secondary">Cancel</button>
+          <button class="btn btn-primary">Continue →</button>
+        </div>
+      </div>
+      
+      <!-- Step 2: Reason -->
+      <div class="flow-card" style="margin-bottom: 24px;">
+        <div class="flow-card-header">
+          <h3>Step 2 — Raison de la révision</h3>
+          <p>Qu'est-ce qui a changé depuis cette décision?</p>
+        </div>
+        
+        <div class="reason-options">
+          <div class="reason-option">
+            <div class="name">New Information</div>
+            <div class="desc">De nouveaux faits ont émergé</div>
+          </div>
+          <div class="reason-option selected">
+            <div class="name">Changed Constraints</div>
+            <div class="desc">Ressources ou délais ont changé</div>
+          </div>
+          <div class="reason-option">
+            <div class="name">Unexpected Impact</div>
+            <div class="desc">Conséquences imprévues</div>
+          </div>
+          <div class="reason-option">
+            <div class="name">Strategic Shift</div>
+            <div class="desc">Stratégie globale a changé</div>
+          </div>
+        </div>
+        
+        <textarea class="text-input" placeholder="What has changed since this decision was made?">Les besoins de scalabilité ont augmenté de façon significative.</textarea>
+        <div class="input-hint">Gardez-le bref — contexte, pas justification.</div>
+        
+        <div class="flow-actions">
+          <button class="btn btn-secondary">← Back</button>
+          <button class="btn btn-primary">Continue →</button>
+        </div>
+      </div>
+      
+      <!-- Step 3: Meeting -->
+      <div class="flow-card" style="margin-bottom: 24px;">
+        <div class="flow-card-header">
+          <h3>Step 3 — Decision Meeting requis</h3>
+          <p>Un Decision Meeting sera créé pour revisiter cette décision. La décision originale sera affichée en référence.</p>
+        </div>
+        
+        <div class="meeting-preview">
+          <div class="icon">⚖️</div>
+          <div class="name">New Decision Meeting</div>
+          <div class="desc">Revisit: Architecture API V50</div>
+          <div class="desc" style="margin-top: 8px; color: var(--text-secondary);">
+            Template Decision Meeting injecté automatiquement
+          </div>
+        </div>
+        
+        <div class="flow-actions">
+          <button class="btn btn-secondary">← Back</button>
+          <button class="btn btn-primary">Create Decision Meeting →</button>
+        </div>
+      </div>
+      
+      <!-- Step 4: Complete -->
+      <div class="flow-card">
+        <div class="complete-card">
+          <div class="icon">✅</div>
+          <h3>Decision Revisited</h3>
+          <p>La nouvelle décision est maintenant active.</p>
+          <p style="color: var(--text-muted);">L'ancienne décision a été marquée "Superseded".</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rules -->
+    <section class="rules-section">
+      <h2 class="section-title">📋 Règles</h2>
+      
+      <div class="rules-grid">
+        <div class="rules-card allowed">
+          <h3>✅ Points d'entrée autorisés</h3>
+          <ul>
+            <li><span>→</span> Dashboard → Decision → "Revisit"</li>
+            <li><span>→</span> Decision Meeting source</li>
+          </ul>
+        </div>
+        <div class="rules-card forbidden">
+          <h3>❌ Points d'entrée interdits</h3>
+          <ul>
+            <li><span>→</span> Notes</li>
+            <li><span>→</span> Working Sessions</li>
+            <li><span>→</span> Agents</li>
+            <li><span>→</span> Quick actions</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="rules-grid" style="margin-top: 24px;">
+        <div class="rules-card allowed">
+          <h3>✅ Agents autorisés à</h3>
+          <ul>
+            <li><span>→</span> Détecter qu'une décision est obsolète</li>
+            <li><span>→</span> Suggérer une révision (notification)</li>
+          </ul>
+        </div>
+        <div class="rules-card forbidden">
+          <h3>❌ Agents interdits de</h3>
+          <ul>
+            <li><span>→</span> Initier une révision</li>
+            <li><span>→</span> Créer une décision</li>
+            <li><span>→</span> Changer un statut</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p><span class="brand">CHE·NU™ V50</span> — Revisit Decision Flow</p>
+      <p style="margin-top: 8px; font-size: 12px;">
+        Revisiter une décision est simple, mais jamais banal.
+      </p>
+    </footer>
+  </div>
+</body>
+</html>

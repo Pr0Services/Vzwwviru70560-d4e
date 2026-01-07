@@ -1,0 +1,48 @@
+{
+  "name": "Astral / Cosmic",
+  "id": "astral",
+  "default": false,
+  "description": "Ethereal, spacious, contemplative, depth. Minimal matter with floating forms and soft glow.",
+  "character": {
+    "materials": ["minimal matter", "floating forms", "soft glow"],
+    "lighting": "Soft ambient, subtle glow, deep space",
+    "geometry": "Rounded (12-16px), floating, subtle blur"
+  },
+  "tokens": {
+    "color": {
+      "background": {
+        "primary": "#F5F6F8",
+        "secondary": "#ECEEF2",
+        "surface": "#FCFCFE"
+      },
+      "border": {
+        "default": "#DFE2E8",
+        "subtle": "#CFD3DB"
+      }
+    },
+    "radius": {
+      "base": "14px"
+    },
+    "shadow": {
+      "sm": "0 1px 2px rgba(100, 80, 200, 0.05)",
+      "md": "0 4px 12px rgba(100, 80, 200, 0.07)",
+      "lg": "0 12px 24px rgba(100, 80, 200, 0.09)"
+    }
+  },
+  "textures": {
+    "surface": "subtle gradient overlays",
+    "overlay": "soft nebula effects (very subtle)"
+  },
+  "illustrations": {
+    "style": "abstract, cosmic, flowing lines, particles"
+  },
+  "sphereColorAdjustments": {
+    "temperature": "cooler",
+    "saturation": "-10% (slight desaturation)"
+  },
+  "restrictions": [
+    "No heavy dark space",
+    "No aggressive gradients",
+    "No neon stars"
+  ]
+}

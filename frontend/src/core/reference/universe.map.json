@@ -1,0 +1,42 @@
+{
+  "$schema": "chenu://universe-map/v1",
+  "version": "1.0.0",
+  
+  "topology": {
+    "type": "radial",
+    "center": "trunk",
+    "layers": ["core", "extended", "peripheral"]
+  },
+
+  "trunk": {
+    "id": "nova",
+    "type": "orchestrator",
+    "position": { "layer": "center", "index": 0 }
+  },
+
+  "spheres": {
+    "order": ["personal", "business", "creative", "scholar", "social", "institutions", "methodology", "xr"],
+    "placement": {
+      "personal": { "layer": "core", "angle": 0 },
+      "business": { "layer": "core", "angle": 45 },
+      "creative": { "layer": "core", "angle": 90 },
+      "scholar": { "layer": "core", "angle": 135 },
+      "social": { "layer": "extended", "angle": 180 },
+      "institutions": { "layer": "extended", "angle": 225 },
+      "methodology": { "layer": "extended", "angle": 270 },
+      "xr": { "layer": "peripheral", "angle": 315 }
+    }
+  },
+
+  "layers": {
+    "center": { "radius": 0, "scale": 1.2 },
+    "core": { "radius": 180, "scale": 1.0 },
+    "extended": { "radius": 280, "scale": 0.9 },
+    "peripheral": { "radius": 380, "scale": 0.8 }
+  },
+
+  "connections": {
+    "trunk-to-sphere": { "type": "radial", "strength": 1.0 },
+    "sphere-to-sphere": { "type": "arc", "strength": 0.3 }
+  }
+}

@@ -1,0 +1,21 @@
+# ============================================================================
+# CHE·NU Backend Service
+# ============================================================================
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: chenu
+  labels:
+    app: backend
+    component: api
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http
+      protocol: TCP
+  selector:
+    app: backend

@@ -1,0 +1,39 @@
+# ============================================================================
+# CHE·NU Kubernetes - Base Kustomization
+# 
+# Usage:
+#   kubectl apply -k k8s/overlays/staging
+#   kubectl apply -k k8s/overlays/production
+#
+# R&D COMPLIANCE: ✅
+# - Namespace isolation
+# - Resource limits enforced
+# - Security contexts applied
+# ============================================================================
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: chenu
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - secrets.yaml
+  - backend-deployment.yaml
+  - backend-service.yaml
+  - frontend-deployment.yaml
+  - frontend-service.yaml
+  - ingress.yaml
+  - postgres-statefulset.yaml
+  - postgres-service.yaml
+  - redis-statefulset.yaml
+  - redis-service.yaml
+  - hpa.yaml
+  - pdb.yaml
+  - networkpolicy.yaml
+
+commonLabels:
+  app.kubernetes.io/name: chenu
+  app.kubernetes.io/part-of: chenu-platform
+  app.kubernetes.io/managed-by: kustomize

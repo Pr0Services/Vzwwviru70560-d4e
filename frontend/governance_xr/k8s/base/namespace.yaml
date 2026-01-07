@@ -1,0 +1,13 @@
+# ============================================================================
+# CHE·NU Kubernetes Namespace
+# ============================================================================
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: chenu
+  labels:
+    name: chenu
+    environment: base
+  annotations:
+    description: "CHE·NU Governed Intelligence Operating System"

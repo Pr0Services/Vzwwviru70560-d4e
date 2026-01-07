@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHE·NU™ — Orbital Minimap</title>
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════════════
+       RESET & BASE
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #0D0D0D 0%, #1A1A1A 50%, #0F1419 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #E9E4D6;
+      overflow: hidden;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       COLORS CHE·NU
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    :root {
+      --sacred-gold: #D8B26A;
+      --sacred-gold-faint: rgba(216, 178, 106, 0.08);
+      --sacred-gold-light: rgba(216, 178, 106, 0.45);
+      --sacred-gold-medium: rgba(216, 178, 106, 0.7);
+      --sacred-gold-full: rgba(216, 178, 106, 1);
+      --glow-soft: rgba(216, 178, 106, 0.4);
+      --glow-strong: rgba(216, 178, 106, 0.7);
+      --ui-slate: #1E1F22;
+      --soft-sand: #E9E4D6;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       LOGO (top left)
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .logo {
+      position: fixed;
+      top: 24px;
+      left: 24px;
+      font-size: 18px;
+      font-weight: 300;
+      letter-spacing: 0.3em;
+      color: var(--sacred-gold);
+      opacity: 0.8;
+    }
+
+    .logo::after {
+      content: '™';
+      font-size: 10px;
+      vertical-align: super;
+      margin-left: 2px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       MINIMAP CONTAINER
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .minimap-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .minimap-container {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       BACKGROUND IMAGE (Ring)
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .minimap-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      opacity: 0.9;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       SPHERES LAYER
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .spheres-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       SPHERE
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .sphere {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+      cursor: pointer;
+    }
+
+    .sphere:hover,
+    .sphere.active {
+      z-index: 10;
+    }
+
+    .sphere-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--sacred-gold-faint);
+      box-shadow: none;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* STATE: Minimap hovered → spheres visible */
+    .minimap-container:hover .sphere-dot {
+      background: var(--sacred-gold-light);
+      box-shadow: 0 0 8px var(--glow-soft);
+    }
+
+    /* STATE: Sphere hovered */
+    .sphere:hover .sphere-dot {
+      width: 18px;
+      height: 18px;
+      background: var(--sacred-gold-medium);
+      box-shadow: 0 0 16px var(--glow-soft), 0 0 32px var(--sacred-gold-faint);
+    }
+
+    /* STATE: Sphere active */
+    .sphere.active .sphere-dot {
+      width: 20px;
+      height: 20px;
+      background: var(--sacred-gold-full);
+      box-shadow: 0 0 20px var(--glow-strong), 0 0 40px var(--glow-soft);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       LABEL
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .sphere-label {
+      position: absolute;
+      white-space: nowrap;
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--sacred-gold-medium);
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+
+    /* Show label on sphere hover */
+    .sphere:hover .sphere-label {
+      opacity: 1;
+      color: var(--sacred-gold);
+    }
+
+    /* Show label when active */
+    .sphere.active .sphere-label {
+      opacity: 1;
+      color: var(--sacred-gold);
+    }
+
+    /* Label positions by quadrant */
+    .sphere-label.pos-top {
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .sphere-label.pos-right {
+      top: 50%;
+      left: 100%;
+      transform: translateY(-50%);
+      margin-left: 12px;
+      text-align: left;
+    }
+
+    .sphere-label.pos-bottom {
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 12px;
+      text-align: center;
+    }
+
+    .sphere-label.pos-left {
+      top: 50%;
+      right: 100%;
+      transform: translateY(-50%);
+      margin-right: 12px;
+      text-align: right;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       STATUS DISPLAY
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .status {
+      text-align: center;
+      color: var(--sacred-gold-light);
+      font-size: 13px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .status-label {
+      color: var(--sacred-gold);
+      font-weight: 500;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       INSTRUCTIONS
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    .instructions {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: rgba(233, 228, 214, 0.3);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Logo -->
+  <div class="logo">CHE·NU</div>
+
+  <!-- Minimap -->
+  <div class="minimap-wrapper">
+    <div class="minimap-container" id="minimap">
+      <!-- Background Image -->
+      <img 
+        class="minimap-bg" 
+        src="orbital-ring-bg.png" 
+        alt=""
+        draggable="false"
+      >
+      
+      <!-- Spheres Layer -->
+      <div class="spheres-layer" id="spheres-layer">
+        <!-- Spheres will be injected by JS -->
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="status">
+      Sphère active: <span class="status-label" id="active-sphere">Aucune</span>
+    </div>
+  </div>
+
+  <!-- Instructions -->
+  <div class="instructions">
+    Survolez pour révéler les sphères • Cliquez pour activer
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════════════════════
+    // CONFIGURATION DES 9 SPHÈRES
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    const SPHERES = [
+      { id: 'personal',      label: 'Personnel',    angle: 0 },     // 12h
+      { id: 'business',      label: 'Business',     angle: 40 },    // ~1h30
+      { id: 'government',    label: 'Institutions', angle: 80 },    // ~3h
+      { id: 'studio',        label: 'Studio',       angle: 120 },   // ~4h
+      { id: 'community',     label: 'Communauté',   angle: 160 },   // ~5h30
+      { id: 'social',        label: 'Social',       angle: 200 },   // ~7h
+      { id: 'entertainment', label: 'Loisirs',      angle: 240 },   // ~8h
+      { id: 'team',          label: 'Équipe',       angle: 280 },   // ~9h30
+      { id: 'scholar',       label: 'Savoir',       angle: 320 },   // ~11h
+    ];
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // HELPERS
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    function getSpherePosition(angle, radius, center) {
+      const radians = ((angle - 90) * Math.PI) / 180;
+      return {
+        x: center + radius * Math.cos(radians),
+        y: center + radius * Math.sin(radians),
+      };
+    }
+
+    function getLabelPosition(angle) {
+      const normalized = ((angle % 360) + 360) % 360;
+      if (normalized >= 315 || normalized < 45) return 'pos-top';
+      if (normalized >= 45 && normalized < 135) return 'pos-right';
+      if (normalized >= 135 && normalized < 225) return 'pos-bottom';
+      return 'pos-left';
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // STATE
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    let activeSphereId = null;
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // CREATE SPHERES
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    function createSpheres() {
+      const container = document.getElementById('spheres-layer');
+      const size = 400;
+      const center = size / 2;
+      const radius = size * 0.35; // 35% from center to match the ring
+
+      SPHERES.forEach(sphere => {
+        const pos = getSpherePosition(sphere.angle, radius, center);
+        const labelPos = getLabelPosition(sphere.angle);
+
+        const el = document.createElement('div');
+        el.className = 'sphere';
+        el.dataset.id = sphere.id;
+        el.style.left = `${pos.x}px`;
+        el.style.top = `${pos.y}px`;
+
+        el.innerHTML = `
+          <div class="sphere-dot"></div>
+          <span class="sphere-label ${labelPos}">${sphere.label}</span>
+        `;
+
+        el.addEventListener('click', () => {
+          setActiveSphere(sphere.id);
+        });
+
+        container.appendChild(el);
+      });
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // SET ACTIVE SPHERE
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    function setActiveSphere(sphereId) {
+      // Remove active class from all
+      document.querySelectorAll('.sphere').forEach(el => {
+        el.classList.remove('active');
+      });
+
+      // Set new active
+      if (sphereId && sphereId !== activeSphereId) {
+        activeSphereId = sphereId;
+        const activeEl = document.querySelector(`.sphere[data-id="${sphereId}"]`);
+        if (activeEl) {
+          activeEl.classList.add('active');
+        }
+      } else {
+        activeSphereId = null;
+      }
+
+      // Update status
+      const statusEl = document.getElementById('active-sphere');
+      const sphere = SPHERES.find(s => s.id === activeSphereId);
+      statusEl.textContent = sphere ? sphere.label : 'Aucune';
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // INIT
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    createSpheres();
+  </script>
+
+</body>
+</html>

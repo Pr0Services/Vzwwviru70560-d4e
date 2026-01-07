@@ -1,0 +1,87 @@
+{
+  "$schema": "chenu://sphere/v2",
+  "id": "projects",
+  "version": "1.0.0",
+  
+  "name": "Projets",
+  "displayName": "Projets",
+  "emoji": "📋",
+  "icon": "clipboard-list",
+  
+  "description": {
+    "fr": "Espace de gestion de projets personnels et professionnels",
+    "en": "Personal and professional project management space"
+  },
+  
+  "colors": {
+    "primary": "#3EB4A2",
+    "secondary": "#2F4C39",
+    "accent": "#D8B26A",
+    "background": "#1E1F22",
+    "surface": "#2A2B2F"
+  },
+  
+  "scope": {
+    "included": [
+      "project-planning",
+      "task-management",
+      "milestones",
+      "timelines",
+      "kanban-boards",
+      "gantt-charts",
+      "collaboration",
+      "resource-allocation",
+      "budget-tracking",
+      "deliverables"
+    ],
+    "excluded": [
+      "personal-notes",
+      "private-communications",
+      "health-data"
+    ]
+  },
+  
+  "features": {
+    "kanban": true,
+    "gantt": true,
+    "calendar": true,
+    "milestones": true,
+    "budgets": true,
+    "teams": true,
+    "documents": true,
+    "timeTracking": true
+  },
+  
+  "agents": {
+    "enabled": true,
+    "types": [
+      "project-manager",
+      "task-scheduler",
+      "resource-optimizer",
+      "deadline-tracker"
+    ],
+    "notes": "Project management agents assist with planning and tracking"
+  },
+  
+  "integrations": [
+    "business",
+    "associations",
+    "construction"
+  ],
+  
+  "interSphereInteraction": true,
+  
+  "permissions": {
+    "canShareWithBusiness": true,
+    "canShareWithAssociations": true,
+    "requiresAuth": true
+  },
+  
+  "metadata": {
+    "safe": true,
+    "nonAutonomous": true,
+    "representational": true,
+    "createdAt": "2025-12-13",
+    "updatedAt": "2025-12-13"
+  }
+}

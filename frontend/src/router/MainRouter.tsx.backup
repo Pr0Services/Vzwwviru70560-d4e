@@ -1,0 +1,212 @@
+/**
+ * CHE·NU™ - MAIN ROUTER
+ * Handles routing for all 8 Spheres and their Bureau sections
+ */
+
+import React, { Suspense, lazy } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { SphereProvider } from '../contexts/SphereContext';
+import { AppShell } from '../layouts/AppShell';
+
+// ═══════════════════════════════════════════════════════════════
+// LAZY LOADED PAGES
+// ═══════════════════════════════════════════════════════════════
+
+// Auth Pages
+const LoginPage = lazy(() => import('../pages/auth/LoginPage'));
+const RegisterPage = lazy(() => import('../pages/auth/RegisterPage'));
+const ForgotPasswordPage = lazy(() => import('../pages/auth/ForgotPasswordPage'));
+
+// Sphere Pages (main app)
+const SpherePage = lazy(() => import('../pages/spheres/SpherePage').then(m => ({ default: m.SpherePage })));
+
+// Error Pages
+const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
+
+// ═══════════════════════════════════════════════════════════════
+// LOADING FALLBACK
+// ═══════════════════════════════════════════════════════════════
+
+const LoadingScreen: React.FC = () => (
+  <div style={{
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100vh',
+    backgroundColor: '#0a0a0a',
+    color: '#fff'
+  }}>
+    <div style={{
+      width: '60px',
+      height: '60px',
+      borderRadius: '16px',
+      background: 'linear-gradient(135deg, #D8B26A, #3EB4A2)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: '24px',
+      animation: 'pulse 2s ease-in-out infinite'
+    }}>
+      <span style={{ fontSize: '24px', fontWeight: 700 }}>C·N</span>
+    </div>
+    <p style={{ color: '#666', fontSize: '14px' }}>Loading CHE·NU...</p>
+    <style>{`
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.05); opacity: 0.8; }
+      }
+    `}</style>
+  </div>
+);
+
+// ═══════════════════════════════════════════════════════════════
+// PROTECTED ROUTE WRAPPER
+// ═══════════════════════════════════════════════════════════════
+
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
+
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+  // TODO: Implement actual auth check
+  const isAuthenticated = true; // Replace with actual auth state
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+// ═══════════════════════════════════════════════════════════════
+// MAIN ROUTER
+// ═══════════════════════════════════════════════════════════════
+
+export const MainRouter: React.FC = () => {
+  return (
+    <BrowserRouter>
+      <Suspense fallback={<LoadingScreen />}>
+        <Routes>
+          {/* ═══════════════════════════════════════════════════════
+              PUBLIC ROUTES (Auth)
+              ═══════════════════════════════════════════════════════ */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+
+          {/* ═══════════════════════════════════════════════════════
+              PROTECTED ROUTES (App)
+              ═══════════════════════════════════════════════════════ */}
+          <Route
+            path="/*"
+            element={
+              <ProtectedRoute>
+                <SphereProvider>
+                  <SphereRoutes />
+                </SphereProvider>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ═══════════════════════════════════════════════════════
+              404 FALLBACK
+              ═══════════════════════════════════════════════════════ */}
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════
+// SPHERE ROUTES (Nested)
+// ═══════════════════════════════════════════════════════════════
+
+const SphereRoutes: React.FC = () => {
+  return (
+    <Routes>
+      {/* Root redirect to personal/dashboard */}
+      <Route path="/" element={<Navigate to="/personal/dashboard" replace />} />
+
+      {/* ═══════════════════════════════════════════════════════
+          PERSONAL SPHERE
+          ═══════════════════════════════════════════════════════ */}
+      <Route path="/personal" element={<Navigate to="/personal/dashboard" replace />} />
+      <Route path="/personal/:section" element={<SpherePage sphereId="personal" />} />
+
+      {/* ═══════════════════════════════════════════════════════
+          BUSINESS SPHERE
+          ═══════════════════════════════════════════════════════ */}
+      <Route path="/business" element={<Navigate to="/business/dashboard" replace />} />
+      <Route path="/business/:section" element={<SpherePage sphereId="business" />} />
+
+      {/* ═══════════════════════════════════════════════════════
+          GOVERNMENT SPHERE
+          ═══════════════════════════════════════════════════════ */}
+      <Route path="/government" element={<Navigate to="/government/dashboard" replace />} />
+      <Route path="/government/:section" element={<SpherePage sphereId="government" />} />
+
+      {/* ═══════════════════════════════════════════════════════
+          STUDIO SPHERE
+          ═══════════════════════════════════════════════════════ */}
+      <Route path="/studio" element={<Navigate to="/studio/dashboard" replace />} />
+      <Route path="/studio/:section" element={<SpherePage sphereId="studio" />} />
+
+      {/* ═══════════════════════════════════════════════════════
+          COMMUNITY SPHERE
+          ═══════════════════════════════════════════════════════ */}
+      <Route path="/community" element={<Navigate to="/community/dashboard" replace />} />
+      <Route path="/community/:section" element={<SpherePage sphereId="community" />} />
+
+      {/* ═══════════════════════════════════════════════════════
+          SOCIAL SPHERE
+          ═══════════════════════════════════════════════════════ */}
+      <Route path="/social" element={<Navigate to="/social/dashboard" replace />} />
+      <Route path="/social/:section" element={<SpherePage sphereId="social" />} />
+
+      {/* ═══════════════════════════════════════════════════════
+          ENTERTAINMENT SPHERE
+          ═══════════════════════════════════════════════════════ */}
+      <Route path="/entertainment" element={<Navigate to="/entertainment/dashboard" replace />} />
+      <Route path="/entertainment/:section" element={<SpherePage sphereId="entertainment" />} />
+
+      {/* ═══════════════════════════════════════════════════════
+          TEAM SPHERE (includes IA Labs, Skills & Tools)
+          ═══════════════════════════════════════════════════════ */}
+      <Route path="/team" element={<Navigate to="/team/dashboard" replace />} />
+      <Route path="/team/:section" element={<SpherePage sphereId="team" />} />
+
+      {/* ═══════════════════════════════════════════════════════
+          SETTINGS
+          ═══════════════════════════════════════════════════════ */}
+      <Route path="/settings" element={<SettingsPage />} />
+      <Route path="/settings/:tab" element={<SettingsPage />} />
+
+      {/* Catch-all for unmatched routes */}
+      <Route path="*" element={<Navigate to="/personal/dashboard" replace />} />
+    </Routes>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════
+// SETTINGS PAGE (Placeholder)
+// ═══════════════════════════════════════════════════════════════
+
+const SettingsPage: React.FC = () => (
+  <div style={{
+    padding: '40px',
+    color: '#fff',
+    backgroundColor: '#0a0a0a',
+    minHeight: '100vh'
+  }}>
+    <h1 style={{ marginBottom: '24px' }}>⚙️ Settings</h1>
+    <p style={{ color: '#666' }}>Settings page content coming soon...</p>
+  </div>
+);
+
+// ═══════════════════════════════════════════════════════════════
+// EXPORTS
+// ═══════════════════════════════════════════════════════════════
+
+export default MainRouter;

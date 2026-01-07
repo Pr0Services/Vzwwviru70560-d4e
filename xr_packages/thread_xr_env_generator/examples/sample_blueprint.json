@@ -1,0 +1,97 @@
+{
+  "thread_id": "thread_123",
+  "template": "cause_room",
+  "generated_at": "2026-01-06T12:00:00Z",
+  "version": "1.0",
+  "zones": [
+    {
+      "id": "intent_wall",
+      "type": "wall",
+      "title": "Intent",
+      "items": [
+        {
+          "id": "intent_1",
+          "kind": "intent",
+          "label": "Founding Intent\u2026",
+          "redaction_level": "public"
+        }
+      ]
+    },
+    {
+      "id": "decision_wall",
+      "type": "wall",
+      "title": "Decisions",
+      "items": [
+        {
+          "id": "dec_1",
+          "kind": "decision",
+          "label": "Decision: \u2026",
+          "source_event_id": "evt_1",
+          "redaction_level": "semi_private"
+        }
+      ]
+    },
+    {
+      "id": "action_table",
+      "type": "table",
+      "title": "Actions",
+      "items": [
+        {
+          "id": "act_1",
+          "kind": "action",
+          "label": "Action: \u2026",
+          "source_event_id": "evt_2",
+          "redaction_level": "private",
+          "actions": [
+            "mark_done",
+            "open_details"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "memory_kiosk",
+      "type": "kiosk",
+      "title": "Memory",
+      "items": [
+        {
+          "id": "mem_1",
+          "kind": "memory",
+          "label": "Latest summary\u2026",
+          "source_snapshot_id": "snap_1",
+          "redaction_level": "semi_private"
+        }
+      ]
+    },
+    {
+      "id": "timeline_strip",
+      "type": "timeline",
+      "title": "Timeline",
+      "items": [
+        {
+          "id": "tl_1",
+          "kind": "timeline_event",
+          "label": "Live started",
+          "source_event_id": "evt_3",
+          "redaction_level": "public"
+        }
+      ]
+    }
+  ],
+  "portals": [
+    {
+      "label": "Linked thread",
+      "thread_id": "thread_456"
+    }
+  ],
+  "references": {
+    "events": [
+      "evt_1",
+      "evt_2",
+      "evt_3"
+    ],
+    "snapshots": [
+      "snap_1"
+    ]
+  }
+}

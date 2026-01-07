@@ -1,0 +1,135 @@
+# =====================================================
+# CHE·NU — UNIVERSE VIEW (GLOBAL)
+# Status: CANONICAL
+# Authority: FOUNDATION
+# Purpose: Représentation unifiée de l'ensemble des sphères
+#
+# Le Universe View permet l'orientation sans manipulation.
+# Clarté, présence et respect de l'autonomie humaine.
+#
+# ❤️ Avec amour, pour l'humanité.
+# =====================================================
+
+universe_view:
+  name: "Universe View"
+  id: "universe_view"
+  emoji: "🌐"
+  description: >
+    Représentation unifiée et navigable de l'ensemble des sphères
+    CHE·NU. Le Universe View permet à l'utilisateur de comprendre
+    sa position, ses projets et ses espaces sans surcharge cognitive,
+    sans hiérarchie implicite et sans manipulation visuelle.
+  version: "1.0.0"
+
+# ===========================================
+# PRINCIPES FONDAMENTAUX
+# ===========================================
+principles:
+  - orientation_over_control
+  - clarity_over_density
+  - presence_without_pressure
+  - scale_represents_content_not_power
+  - silence_is_a_valid_state
+
+# ===========================================
+# MODÈLE STRUCTUREL
+# ===========================================
+model:
+  type: "tree-universe"
+
+  trunk:
+    represents: "Foundation Laws"
+    immutable: true
+
+  spheres:
+    represent:
+      - domains_of_activity
+      - contexts_of_meaning
+    properties:
+      size: "based_on_content_volume"
+      distance: "based_on_user_usage"
+      brightness: "based_on_activity_recentness"
+
+  branches:
+    represent: "sub-contexts"
+    elastic: true
+    collapsible: true
+
+# ===========================================
+# NAVIGATION
+# ===========================================
+navigation:
+  modes:
+    - overview     # macro
+    - sphere_focus # meso
+    - context_focus # micro
+
+  transitions:
+    smooth: true
+    user_initiated_only: true
+    no_auto_navigation: true
+
+  exit:
+    available_at_all_times: true
+
+# ===========================================
+# MOTEUR DE DIMENSION
+# ===========================================
+dimension_engine:
+  input:
+    - content_volume
+    - depth_of_structure
+    - temporal_density
+
+  output:
+    - sphere_scale
+    - spatial_position
+    - visual_weight
+
+  forbidden_inputs:
+    - popularity
+    - productivity
+    - engagement
+    - emotional_metrics
+
+# ===========================================
+# LANGAGE VISUEL
+# ===========================================
+visual_language:
+  abstraction_levels:
+    - symbolic
+    - minimal_3d
+    - spatial_xr
+
+  no_visual_hierarchy:
+    - no_taller_spheres
+    - no_center_of_power
+    - no_dominant_colors
+
+# ===========================================
+# RÈGLES D'INTERACTION
+# ===========================================
+interaction:
+  hover: "informational_only"
+  click: "enter_context"
+  long_press: "inspect_structure"
+  no_dark_patterns: true
+
+# ===========================================
+# COMPATIBILITÉ XR
+# ===========================================
+xr:
+  supported: true
+  motion_constraints:
+    - no_auto_camera_movement
+    - no_forced_focus
+  comfort_first: true
+
+# ===========================================
+# VALIDATION
+# ===========================================
+validation:
+  respects_all_global_laws: true
+  no_manipulation: true
+  orientation_first: true
+  approved_by_human: true

@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHE·NU™ — Dashboard vs Bureau</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════════════
+       CHE·NU™ — DASHBOARD vs BUREAU (WORKSPACE)
+       
+       🎯 OBJECTIF: En 1 seconde, sans lire:
+       - Je sais si je suis en mode DÉCISION (Dashboard)
+       - Ou en mode TRAVAIL (Bureau)
+       
+       🧮 RÈGLE: Surface Bureau = Surface Dashboard + 1 cran
+       ═══════════════════════════════════════════════════════════════════════════ */
+    
+    :root {
+      /* === GLOBAL === */
+      --bg-root: #1B1F23;
+      --bg-root-deeper: #181C20;
+      --text-primary: #E6E8EA;
+      --text-secondary: #B8BDC3;
+      --text-muted: #8B9096;
+      --gold: #BFAE7A;
+      --cyan: #6EAFC4;
+      --green: #6FAF9A;
+      --error: #C47070;
+      
+      /* === DASHBOARD — "CENTRE DE COMMANDE" === */
+      /* Intention: densité contrôlée, structuré, POSÉ */
+      --dashboard-bg: #242A30;
+      --dashboard-surface: #2A3138;
+      --dashboard-surface-focus: #303841;
+      --dashboard-radius: 10px;
+      --dashboard-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+      --dashboard-border: rgba(255, 255, 255, 0.04);
+      --dashboard-gap: 12px;
+      --dashboard-padding: 16px;
+      
+      /* === BUREAU (WORKSPACE) — "ESPACE DE TRAVAIL" === */
+      /* Intention: lisibilité longue, ouvert, FLOTTE */
+      --workspace-bg: #1F2429;
+      --workspace-surface: #323A42;      /* +1 cran vs dashboard */
+      --workspace-surface-focus: #39424A;
+      --workspace-radius: 14px;
+      --workspace-shadow: 0 12px 32px rgba(0, 0, 0, 0.32);
+      --workspace-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      --workspace-border: rgba(255, 255, 255, 0.05);
+      --workspace-gap: 20px;
+      --workspace-padding: 24px;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: linear-gradient(180deg, var(--bg-root-deeper), var(--bg-root));
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    
+    .container { max-width: 1400px; margin: 0 auto; padding: 40px 24px; }
+    
+    /* Header */
+    .header { text-align: center; margin-bottom: 48px; }
+    .header h1 { font-size: 32px; font-weight: 700; color: var(--gold); margin-bottom: 8px; }
+    .header .subtitle { font-size: 16px; color: var(--text-secondary); margin-bottom: 20px; }
+    .header .objective {
+      display: inline-block;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, var(--dashboard-bg), var(--workspace-bg));
+      border-radius: 12px;
+      font-size: 14px;
+      color: var(--text-primary);
+      border: 1px solid var(--dashboard-border);
+    }
+    
+    /* Comparison Grid */
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-bottom: 48px;
+    }
+    
+    @media (max-width: 900px) {
+      .comparison { grid-template-columns: 1fr; }
+    }
+    
+    /* Zone Headers */
+    .zone-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--dashboard-border);
+    }
+    .zone-header .icon { font-size: 24px; }
+    .zone-header h2 { font-size: 18px; font-weight: 600; }
+    .zone-header .tag {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       DASHBOARD ZONE
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .dashboard-zone {
+      background-color: var(--dashboard-bg);
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid var(--dashboard-border);
+    }
+    
+    .dashboard-zone .zone-header h2 { color: var(--cyan); }
+    .dashboard-zone .zone-header .tag {
+      background-color: var(--cyan);
+      color: var(--bg-root);
+    }
+    
+    .dashboard-zone .surface {
+      background-color: var(--dashboard-surface);
+      border-radius: var(--dashboard-radius);
+      border: 1px solid var(--dashboard-border);
+      box-shadow: var(--dashboard-shadow);
+      padding: var(--dashboard-padding);
+      margin-bottom: var(--dashboard-gap);
+      transition: all 0.2s ease;
+    }
+    
+    .dashboard-zone .surface:hover {
+      background-color: var(--dashboard-surface-focus);
+    }
+    
+    .dashboard-zone .surface:last-child {
+      margin-bottom: 0;
+    }
+    
+    /* Dashboard Grid (compact) */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--dashboard-gap);
+    }
+    
+    .dashboard-stat {
+      background-color: var(--dashboard-surface);
+      border-radius: var(--dashboard-radius);
+      border: 1px solid var(--dashboard-border);
+      box-shadow: var(--dashboard-shadow);
+      padding: 14px;
+      text-align: center;
+    }
+    
+    .dashboard-stat .value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+    
+    .dashboard-stat .label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Dashboard List (dense) */
+    .dashboard-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .dashboard-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background-color: var(--dashboard-surface);
+      border-radius: 8px;
+      border: 1px solid var(--dashboard-border);
+      font-size: 13px;
+    }
+    
+    .dashboard-item .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    
+    .dashboard-item .dot.green { background-color: var(--green); }
+    .dashboard-item .dot.gold { background-color: var(--gold); }
+    .dashboard-item .dot.red { background-color: var(--error); }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       WORKSPACE ZONE
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .workspace-zone {
+      background-color: var(--workspace-bg);
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid var(--workspace-border);
+    }
+    
+    .workspace-zone .zone-header h2 { color: var(--gold); }
+    .workspace-zone .zone-header .tag {
+      background-color: var(--gold);
+      color: var(--bg-root);
+    }
+    
+    .workspace-zone .surface {
+      background-color: var(--workspace-surface);
+      border-radius: var(--workspace-radius);
+      border: 1px solid var(--workspace-border);
+      box-shadow: var(--workspace-shadow-inset), var(--workspace-shadow);
+      padding: var(--workspace-padding);
+      margin-bottom: var(--workspace-gap);
+      transition: all 0.2s ease;
+    }
+    
+    .workspace-zone .surface:hover {
+      background-color: var(--workspace-surface-focus);
+      transform: translateY(-2px);
+    }
+    
+    .workspace-zone .surface:last-child {
+      margin-bottom: 0;
+    }
+    
+    /* Workspace Editor (airy) */
+    .workspace-editor {
+      min-height: 120px;
+    }
+    
+    .workspace-editor .title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--workspace-border);
+    }
+    
+    .workspace-editor .content {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+    
+    /* Workspace Cards (spacious) */
+    .workspace-cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--workspace-gap);
+    }
+    
+    .workspace-card {
+      background-color: var(--workspace-surface);
+      border-radius: var(--workspace-radius);
+      border: 1px solid var(--workspace-border);
+      box-shadow: var(--workspace-shadow-inset), var(--workspace-shadow);
+      padding: 20px;
+      transition: all 0.2s ease;
+    }
+    
+    .workspace-card:hover {
+      background-color: var(--workspace-surface-focus);
+      transform: translateY(-2px);
+    }
+    
+    .workspace-card .icon {
+      font-size: 28px;
+      margin-bottom: 12px;
+    }
+    
+    .workspace-card .name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    
+    .workspace-card .desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    
+    /* ═══════════════════════════════════════════════════════════════════════════
+       INFO SECTIONS
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .info-section {
+      margin-bottom: 48px;
+    }
+    
+    .info-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--dashboard-border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .info-title .number {
+      width: 32px;
+      height: 32px;
+      background-color: var(--gold);
+      color: var(--bg-root);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    
+    /* Rules Comparison */
+    .rules-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    
+    @media (max-width: 768px) {
+      .rules-comparison { grid-template-columns: 1fr; }
+    }
+    
+    .rule-card {
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid var(--dashboard-border);
+    }
+    
+    .rule-card.dashboard {
+      background-color: var(--dashboard-bg);
+    }
+    
+    .rule-card.workspace {
+      background-color: var(--workspace-bg);
+    }
+    
+    .rule-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .rule-card.dashboard h3 { color: var(--cyan); }
+    .rule-card.workspace h3 { color: var(--gold); }
+    
+    .rule-card ul {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .rule-card li {
+      font-size: 13px;
+      color: var(--text-secondary);
+      padding: 8px 0;
+      border-bottom: 1px solid var(--dashboard-border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .rule-card li:last-child {
+      border-bottom: none;
+    }
+    
+    .rule-card li .check {
+      color: var(--green);
+    }
+    
+    /* Tokens Table */
+    .tokens-table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: var(--dashboard-surface);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .tokens-table th,
+    .tokens-table td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--dashboard-border);
+    }
+    
+    .tokens-table th {
+      background-color: var(--dashboard-surface-focus);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .tokens-table td {
+      font-size: 13px;
+    }
+    
+    .tokens-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .color-swatch {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      vertical-align: middle;
+      margin-right: 8px;
+      border: 1px solid var(--dashboard-border);
+    }
+    
+    .code {
+      font-family: 'SF Mono', monospace;
+      font-size: 12px;
+      color: var(--cyan);
+      background-color: var(--bg-root);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    
+    /* Formula */
+    .formula {
+      background-color: var(--dashboard-surface);
+      border-radius: 12px;
+      padding: 32px;
+      text-align: center;
+      border: 1px solid var(--dashboard-border);
+      margin-bottom: 24px;
+    }
+    
+    .formula h3 {
+      font-size: 14px;
+      color: var(--gold);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .formula .equation {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-family: 'SF Mono', monospace;
+    }
+    
+    .formula .note {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 12px;
+    }
+    
+    /* Test Section */
+    .test-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    
+    @media (max-width: 768px) {
+      .test-grid { grid-template-columns: 1fr; }
+    }
+    
+    .test-card {
+      background-color: var(--dashboard-surface);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      border: 1px solid var(--dashboard-border);
+    }
+    
+    .test-card .emoji { font-size: 36px; margin-bottom: 12px; }
+    .test-card .title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+    .test-card .desc { font-size: 12px; color: var(--text-muted); }
+    .test-card.success { border-color: var(--green); }
+    .test-card.success .title { color: var(--green); }
+    
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 40px 0;
+      border-top: 1px solid var(--dashboard-border);
+      margin-top: 48px;
+    }
+    .footer p { color: var(--text-muted); font-size: 14px; }
+    .footer .brand { color: var(--gold); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>✧ CHE·NU™ Dashboard vs Bureau</h1>
+      <p class="subtitle">Différenciation visuelle des espaces cognitifs</p>
+      <div class="objective">
+        🎯 En 1 seconde, sans lire: mode DÉCISION ou mode TRAVAIL ?
+      </div>
+    </header>
+
+    <!-- Live Comparison -->
+    <div class="comparison">
+      <!-- DASHBOARD -->
+      <div class="dashboard-zone">
+        <div class="zone-header">
+          <span class="icon">🎛️</span>
+          <h2>Dashboard</h2>
+          <span class="tag">Décider</span>
+        </div>
+        
+        <!-- Stats Grid (compact) -->
+        <div class="dashboard-grid" style="margin-bottom: 16px;">
+          <div class="dashboard-stat">
+            <div class="value">24</div>
+            <div class="label">Threads</div>
+          </div>
+          <div class="dashboard-stat">
+            <div class="value">8</div>
+            <div class="label">Urgents</div>
+          </div>
+          <div class="dashboard-stat">
+            <div class="value">3</div>
+            <div class="label">Réunions</div>
+          </div>
+        </div>
+        
+        <!-- Quick Actions (dense) -->
+        <div class="surface">
+          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Actions rapides</div>
+          <div class="dashboard-list">
+            <div class="dashboard-item">
+              <span class="dot green"></span>
+              <span>Approuver le budget Q1</span>
+            </div>
+            <div class="dashboard-item">
+              <span class="dot gold"></span>
+              <span>Réviser le contrat Dupont</span>
+            </div>
+            <div class="dashboard-item">
+              <span class="dot red"></span>
+              <span>Répondre à l'urgence #2847</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- WORKSPACE -->
+      <div class="workspace-zone">
+        <div class="zone-header">
+          <span class="icon">📋</span>
+          <h2>Bureau</h2>
+          <span class="tag">Travailler</span>
+        </div>
+        
+        <!-- Editor (airy) -->
+        <div class="surface workspace-editor">
+          <div class="title">Thread: Architecture V50</div>
+          <div class="content">
+            Analyse des nouveaux composants et définition de la stratégie de migration. 
+            Focus sur la séparation Dashboard/Bureau pour améliorer l'expérience cognitive...
+          </div>
+        </div>
+        
+        <!-- Cards (spacious) -->
+        <div class="workspace-cards">
+          <div class="workspace-card">
+            <div class="icon">📄</div>
+            <div class="name">Notes</div>
+            <div class="desc">12 fichiers</div>
+          </div>
+          <div class="workspace-card">
+            <div class="icon">📁</div>
+            <div class="name">Documents</div>
+            <div class="desc">8 fichiers</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rules Section -->
+    <section class="info-section">
+      <h2 class="info-title">
+        <span class="number">1</span>
+        Règles visuelles par zone
+      </h2>
+      
+      <div class="rules-comparison">
+        <div class="rule-card dashboard">
+          <h3>🎛️ Dashboard — Centre de Commande</h3>
+          <ul>
+            <li><span class="check">✓</span> Surfaces plus sombres</li>
+            <li><span class="check">✓</span> Contrastes nets</li>
+            <li><span class="check">✓</span> Coins stricts (10px)</li>
+            <li><span class="check">✓</span> Très peu de glow</li>
+            <li><span class="check">✓</span> Marges serrées</li>
+            <li><span class="check">✓</span> Le Dashboard est POSÉ</li>
+          </ul>
+        </div>
+        
+        <div class="rule-card workspace">
+          <h3>📋 Bureau — Espace de Travail</h3>
+          <ul>
+            <li><span class="check">✓</span> Surfaces plus claires (+1 cran)</li>
+            <li><span class="check">✓</span> Plus d'air</li>
+            <li><span class="check">✓</span> Coins doux (14px)</li>
+            <li><span class="check">✓</span> Profondeur légère</li>
+            <li><span class="check">✓</span> Marges larges</li>
+            <li><span class="check">✓</span> Le Bureau FLOTTE</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tokens Section -->
+    <section class="info-section">
+      <h2 class="info-title">
+        <span class="number">2</span>
+        Tokens CSS
+      </h2>
+      
+      <div class="formula">
+        <h3>🧮 Règle mathématique</h3>
+        <div class="equation">Surface Bureau = Surface Dashboard + 1 cran</div>
+        <div class="note">Si le Bureau est plus sombre que le Dashboard → l'utilisateur se fatigue très vite</div>
+      </div>
+      
+      <table class="tokens-table">
+        <thead>
+          <tr>
+            <th>Token</th>
+            <th>Dashboard</th>
+            <th>Bureau</th>
+            <th>Delta</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Background</td>
+            <td><span class="color-swatch" style="background: #242A30;"></span><span class="code">#242A30</span></td>
+            <td><span class="color-swatch" style="background: #1F2429;"></span><span class="code">#1F2429</span></td>
+            <td style="color: var(--text-muted);">Bureau plus foncé (recule)</td>
+          </tr>
+          <tr>
+            <td>Surface</td>
+            <td><span class="color-swatch" style="background: #2A3138;"></span><span class="code">#2A3138</span></td>
+            <td><span class="color-swatch" style="background: #323A42;"></span><span class="code">#323A42</span></td>
+            <td style="color: var(--green);">+1 cran luminosité</td>
+          </tr>
+          <tr>
+            <td>Surface Focus</td>
+            <td><span class="color-swatch" style="background: #303841;"></span><span class="code">#303841</span></td>
+            <td><span class="color-swatch" style="background: #39424A;"></span><span class="code">#39424A</span></td>
+            <td style="color: var(--green);">+1 cran luminosité</td>
+          </tr>
+          <tr>
+            <td>Border Radius</td>
+            <td><span class="code">10px</span></td>
+            <td><span class="code">14px</span></td>
+            <td style="color: var(--text-muted);">Bureau plus doux</td>
+          </tr>
+          <tr>
+            <td>Shadow</td>
+            <td><span class="code">0 6px 18px</span></td>
+            <td><span class="code">0 12px 32px + inset</span></td>
+            <td style="color: var(--text-muted);">Bureau flotte</td>
+          </tr>
+          <tr>
+            <td>Gap/Padding</td>
+            <td><span class="code">12px / 16px</span></td>
+            <td><span class="code">20px / 24px</span></td>
+            <td style="color: var(--text-muted);">Bureau respire</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Test Section -->
+    <section class="info-section">
+      <h2 class="info-title">
+        <span class="number">✓</span>
+        Test en 30 secondes
+      </h2>
+      
+      <div class="test-grid">
+        <div class="test-card success">
+          <div class="emoji">🔄</div>
+          <div class="title">Passe du Dashboard au Bureau</div>
+          <div class="desc">Épaules qui se relâchent ? → OK</div>
+        </div>
+        <div class="test-card success">
+          <div class="emoji">✍️</div>
+          <div class="title">Dans le Bureau</div>
+          <div class="desc">Envie de rester et écrire ? → OK</div>
+        </div>
+        <div class="test-card success">
+          <div class="emoji">🎯</div>
+          <div class="title">Retour Dashboard</div>
+          <div class="desc">Sensation de contrôle ? → OK</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Concept Section -->
+    <section class="info-section">
+      <h2 class="info-title">
+        <span class="number">💡</span>
+        Différence conceptuelle
+      </h2>
+      
+      <div class="rules-comparison">
+        <div class="rule-card dashboard">
+          <h3>🎛️ Dashboard CONTIENT</h3>
+          <ul>
+            <li><span class="check">→</span> Observer / décider</li>
+            <li><span class="check">→</span> Compact, structuré</li>
+            <li><span class="check">→</span> Scroll fréquent mais court</li>
+            <li><span class="check">→</span> Grilles visibles</li>
+            <li><span class="check">→</span> Alignement strict</li>
+          </ul>
+        </div>
+        
+        <div class="rule-card workspace">
+          <h3>📋 Bureau RESPIRE</h3>
+          <ul>
+            <li><span class="check">→</span> Produire / réfléchir</li>
+            <li><span class="check">→</span> Ouvert, lisible, calme</li>
+            <li><span class="check">→</span> Scroll long et fluide</li>
+            <li><span class="check">→</span> Sections aérées</li>
+            <li><span class="check">→</span> Moins de lignes visibles</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p><span class="brand">CHE·NU™ V50</span> — Dashboard vs Bureau</p>
+      <p style="margin-top: 8px; font-size: 12px;">Sans jamais lire un label: Dashboard = "je décide" • Bureau = "je travaille"</p>
+    </footer>
+  </div>
+</body>
+</html>

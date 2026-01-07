@@ -1,0 +1,43 @@
+# ============================================================================
+# CHE·NU Kubernetes ConfigMap
+# Non-sensitive configuration values
+# ============================================================================
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chenu-config
+  namespace: chenu
+data:
+  # Server Configuration
+  CHENU_HOST: "0.0.0.0"
+  CHENU_PORT: "8000"
+  CHENU_LOG_LEVEL: "INFO"
+  CHENU_DEBUG: "false"
+  
+  # JWT Configuration
+  JWT_ALGORITHM: "HS256"
+  JWT_ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+  
+  # Database Configuration
+  POSTGRES_DB: "chenu"
+  POSTGRES_HOST: "postgres"
+  POSTGRES_PORT: "5432"
+  
+  # Redis Configuration
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"
+  REDIS_DB: "0"
+  
+  # CORS Configuration
+  CORS_ORIGINS: '["https://che-nu.com","https://app.che-nu.com"]'
+  
+  # Feature Flags
+  CHENU_ENABLE_XR: "true"
+  CHENU_ENABLE_LIVE: "true"
+  CHENU_ENABLE_GOVERNANCE_DASHBOARD: "true"
+  
+  # R&D Compliance
+  CHENU_ENFORCE_HUMAN_GATES: "true"
+  CHENU_AUDIT_ALL_ACTIONS: "true"
+  CHENU_DISABLE_RANKING_ALGORITHMS: "true"
