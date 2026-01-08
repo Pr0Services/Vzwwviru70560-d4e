@@ -13,8 +13,8 @@ Authentication endpoints:
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.core.database import get_db
-from backend.core.exceptions import (
+from app.core.database import get_db
+from app.core.exceptions import (
     AuthenticationError,
     InvalidCredentialsError,
     TokenExpiredError,
@@ -22,9 +22,9 @@ from backend.core.exceptions import (
     DuplicateResourceError,
     NotFoundError,
 )
-from backend.api.dependencies import get_current_user, CurrentUser
-from backend.services.auth.auth_service import AuthService, get_auth_service
-from backend.schemas.auth_schemas import (
+from app.api.dependencies import get_current_user, CurrentUser
+from app.services.auth.auth_service import AuthService, get_auth_service
+from app.schemas.auth_schemas import (
     RegisterRequest,
     LoginRequest,
     RefreshTokenRequest,
@@ -239,7 +239,7 @@ async def update_profile(
     """Update current user profile."""
     service = get_auth_service(db)
     
-    from backend.schemas.auth_schemas import UserUpdate
+    from app.schemas.auth_schemas import UserUpdate
     update_data = UserUpdate(
         name=request.name,
         avatar_url=request.avatar_url,

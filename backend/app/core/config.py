@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     
     # Security
     SECRET_KEY: str = "change-me-in-production-use-long-random-string"
+    ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     

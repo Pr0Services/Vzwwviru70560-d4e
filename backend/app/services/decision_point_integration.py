@@ -14,14 +14,14 @@ from datetime import datetime
 from typing import Optional, Dict, Any
 from uuid import uuid4
 
-from backend.schemas.governance_schemas import (
+from app.schemas.governance_schemas import (
     DecisionPoint,
     DecisionPointCreate,
     DecisionPointType,
     AgingLevel,
     AISuggestion,
 )
-from backend.services.governance.decision_point_service import DecisionPointService
+from app.services.governance.decision_point_service import DecisionPointService
 
 logger = logging.getLogger(__name__)
 
@@ -361,7 +361,7 @@ async def checkpoint_exception_handler(request: Request, exc: Exception) -> JSON
     Automatically creates decision points for 423 responses.
     
     Usage in main.py:
-        from backend.services.governance.decision_point_integration import (
+        from app.services.governance.decision_point_integration import (
             CheckpointException,
             checkpoint_exception_handler,
         )

@@ -1,0 +1,96 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": "decision-001",
+      "title": "Choix de la palette de couleurs cuisine",
+      "context": "La rénovation de la cuisine nécessite de choisir une palette de couleurs harmonieuse",
+      "thread_id": "thread-001",
+      "thread_title": "Rénovation Cuisine",
+      "status": "pending",
+      "priority": "medium",
+      "deadline": "2026-01-15T18:00:00Z",
+      "created_at": "2026-01-05T10:00:00Z",
+      "options": [
+        {
+          "id": "opt-1",
+          "label": "Palette Moderne",
+          "description": "Blanc, gris anthracite, touches de cuivre",
+          "pros": ["Intemporel", "Lumineux", "Facile à entretenir"],
+          "cons": ["Peut paraître froid", "Salissant"]
+        },
+        {
+          "id": "opt-2",
+          "label": "Palette Naturelle",
+          "description": "Beige, bois naturel, vert olive",
+          "pros": ["Chaleureux", "Tendance", "Apaisant"],
+          "cons": ["Plus difficile à coordonner", "Moins lumineux"]
+        },
+        {
+          "id": "opt-3",
+          "label": "Palette Audacieuse",
+          "description": "Bleu marine, or, blanc",
+          "pros": ["Original", "Élégant", "Personnalité forte"],
+          "cons": ["Peut se démoder", "Plus coûteux"]
+        }
+      ]
+    },
+    {
+      "id": "decision-002",
+      "title": "Choix du framework frontend",
+      "context": "Le projet client Alpha nécessite un choix technologique pour le frontend",
+      "thread_id": "thread-002",
+      "thread_title": "Projet Client Alpha",
+      "status": "pending",
+      "priority": "high",
+      "deadline": "2026-01-10T12:00:00Z",
+      "created_at": "2026-01-03T09:00:00Z",
+      "options": [
+        {
+          "id": "opt-1",
+          "label": "React + TypeScript",
+          "description": "Stack éprouvée avec large écosystème",
+          "pros": ["Équipe compétente", "Nombreuses libs", "Grande communauté"],
+          "cons": ["Bundle size", "Boilerplate"]
+        },
+        {
+          "id": "opt-2",
+          "label": "Vue 3 + TypeScript",
+          "description": "Framework progressif et performant",
+          "pros": ["Légèreté", "Documentation claire", "Composition API"],
+          "cons": ["Moins de ressources", "Courbe apprentissage équipe"]
+        }
+      ]
+    },
+    {
+      "id": "decision-003",
+      "title": "Choisir le fournisseur principal",
+      "context": "Sélectionner le fournisseur pour les équipements de bureau",
+      "thread_id": "thread-002",
+      "thread_title": "Projet Client Alpha",
+      "status": "pending",
+      "priority": "high",
+      "deadline": "2026-01-12T17:00:00Z",
+      "created_at": "2026-01-06T14:00:00Z",
+      "options": [
+        {
+          "id": "opt-1",
+          "label": "Fournisseur A",
+          "description": "Grand groupe avec prix compétitifs",
+          "pros": ["Prix bas", "Large stock", "Livraison rapide"],
+          "cons": ["Service client moyen", "Qualité variable"]
+        },
+        {
+          "id": "opt-2",
+          "label": "Fournisseur B",
+          "description": "PME locale avec service personnalisé",
+          "pros": ["Qualité premium", "Service excellent", "Relation de confiance"],
+          "cons": ["Prix plus élevé", "Délais plus longs"]
+        }
+      ]
+    }
+  ],
+  "total": 15,
+  "pending": 15,
+  "resolved_this_week": 8
+}

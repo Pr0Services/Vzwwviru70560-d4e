@@ -4,7 +4,7 @@ CHE·NU™ API Routes
 All API route modules.
 """
 
-from backend.api.routes import (
+from app.api.routes import (
     auth_routes,
     sphere_routes,
     thread_routes,

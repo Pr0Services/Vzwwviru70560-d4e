@@ -17,12 +17,9 @@
     "paths": { "@/*": ["src/*"] }
   },
   "include": [
-    "src/types/modules.d.ts",
-    "src/constants/CANON.ts",
-    "src/constants/colors.ts",
-    "src/constants/routes.ts",
-    "src/components/bureau-canonical/**/*.tsx",
-    "src/components/nova-canonical/**/*.tsx"
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.d.ts"
   ],
-  "exclude": ["node_modules", "**/_archive*/**", "**/__tests__/**"]
+  "exclude": ["node_modules", "**/_archive*/**", "**/__tests__/**", "**/dist/**"]
 }

@@ -83,13 +83,13 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
-from backend.core.exceptions import (
+from app.core.exceptions import (
     NotFoundError,
     ValidationError,
     ForbiddenError,
     CheckpointRequiredError,
 )
-from backend.models.agent import SphereType
+from app.models.agent import SphereType
 
 logger = logging.getLogger(__name__)
 

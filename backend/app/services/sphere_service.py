@@ -18,13 +18,13 @@ from sqlalchemy import select, update, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from backend.core.exceptions import (
+from app.core.exceptions import (
     NotFoundError,
     SphereNotFoundError,
     IdentityBoundaryError,
     ValidationError,
 )
-from backend.models.sphere import (
+from app.models.sphere import (
     Sphere,
     BureauSection,
     QuickCapture,
@@ -35,7 +35,7 @@ from backend.models.sphere import (
     SPHERE_METADATA,
     BUREAU_SECTION_METADATA,
 )
-from backend.schemas.sphere_schemas import (
+from app.schemas.sphere_schemas import (
     SphereSummary,
     SphereDetail,
     SphereUpdate,

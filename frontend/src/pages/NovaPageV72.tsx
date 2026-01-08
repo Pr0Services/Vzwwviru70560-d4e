@@ -16,6 +16,9 @@ import { AgentSuggestionEngine } from '../components/agents/AgentSuggestionEngin
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import type { AgentDefinition } from '../data/agents-catalog';
 
+// API Hooks
+import { useNovaStatus, useNovaQuery, useNovaHistory, NOVA_LANES } from '../hooks/api';
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -307,6 +310,10 @@ export const NovaPageV72: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  // API Data
+  const { data: novaStatus } = useNovaStatus();
+  const novaQueryMutation = useNovaQuery();
+
   // State
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
   const [inputValue, setInputValue] = useState('');
@@ -339,33 +346,57 @@ export const NovaPageV72: React.FC = () => {
     setInputValue('');
     setIsTyping(true);
 
-    // Simulate Nova response
-    setTimeout(() => {
-      const shouldShowCheckpoint = inputValue.toLowerCase().includes('envoyer') ||
-                                   inputValue.toLowerCase().includes('supprimer') ||
-                                   inputValue.toLowerCase().includes('payer');
+    // Try API first, fallback to simulation
+    novaQueryMutation.mutate(
+      { query: inputValue.trim() },
+      {
+        onSuccess: (response) => {
+          const novaMessage: Message = {
+            id: `msg-${Date.now() + 1}`,
+            role: 'nova',
+            content: response.response,
+            timestamp: new Date().toISOString(),
+            checkpoint: response.checkpoint_required ? {
+              id: `checkpoint-${Date.now()}`,
+              action_type: 'external_action',
+              action_description: `Exécuter l'action demandée`,
+              risk_level: 'medium',
+              status: 'pending',
+              proposed_action: { original_request: inputValue.trim() },
+            } : undefined,
+          };
+          setMessages(prev => [...prev, novaMessage]);
+          setIsTyping(false);
+        },
+        onError: () => {
+          // Fallback to simulation on API error
+          const shouldShowCheckpoint = inputValue.toLowerCase().includes('envoyer') ||
+                                       inputValue.toLowerCase().includes('supprimer') ||
+                                       inputValue.toLowerCase().includes('payer');
 
-      const novaMessage: Message = {
-        id: `msg-${Date.now() + 1}`,
-        role: 'nova',
-        content: shouldShowCheckpoint
-          ? `Je comprends votre demande. Avant de procéder, je dois vous demander une approbation car cette action pourrait avoir un impact significatif.`
-          : getNovaResponse(inputValue),
-        timestamp: new Date().toISOString(),
-        checkpoint: shouldShowCheckpoint ? {
-          id: `checkpoint-${Date.now()}`,
-          action_type: 'external_action',
-          action_description: `Exécuter l'action: "${inputValue.trim()}"`,
-          risk_level: inputValue.toLowerCase().includes('supprimer') ? 'high' : 'medium',
-          status: 'pending',
-          proposed_action: { original_request: inputValue.trim() },
-        } : undefined,
-      };
+          const novaMessage: Message = {
+            id: `msg-${Date.now() + 1}`,
+            role: 'nova',
+            content: shouldShowCheckpoint
+              ? `Je comprends votre demande. Avant de procéder, je dois vous demander une approbation car cette action pourrait avoir un impact significatif.`
+              : getNovaResponse(inputValue),
+            timestamp: new Date().toISOString(),
+            checkpoint: shouldShowCheckpoint ? {
+              id: `checkpoint-${Date.now()}`,
+              action_type: 'external_action',
+              action_description: `Exécuter l'action: "${inputValue.trim()}"`,
+              risk_level: inputValue.toLowerCase().includes('supprimer') ? 'high' : 'medium',
+              status: 'pending',
+              proposed_action: { original_request: inputValue.trim() },
+            } : undefined,
+          };
 
-      setMessages(prev => [...prev, novaMessage]);
-      setIsTyping(false);
-    }, 1500);
-  }, [inputValue]);
+          setMessages(prev => [...prev, novaMessage]);
+          setIsTyping(false);
+        },
+      }
+    );
+  }, [inputValue, novaQueryMutation]);
 
   // Handle checkpoint actions
   const handleCheckpointAction = useCallback((messageId: string, action: 'approve' | 'reject') => {

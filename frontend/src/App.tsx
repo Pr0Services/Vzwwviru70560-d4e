@@ -24,10 +24,15 @@
 
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Providers
 import { AuthProvider, ProtectedRoute, PublicRoute } from './providers/AuthProvider';
 import { SphereProvider } from './providers/SphereProvider';
+import { ToastProvider } from './components/toast/ToastProvider';
+
+// Error Handling
+import { ErrorBoundary } from './components/errors/ErrorBoundary';
 
 // Shell (Layout canonique)
 import { AppShell } from './components/shell';
@@ -35,6 +40,23 @@ import { AppShell } from './components/shell';
 // Pages
 import { LoginPage } from './pages/LoginPage';
 import { SpherePage } from './pages/SpherePage';
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// QUERY CLIENT CONFIG
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30 * 1000, // 30 seconds
+      retry: 2,
+      refetchOnWindowFocus: false,
+    },
+    mutations: {
+      retry: 1,
+    },
+  },
+});
 
 // Constants
 import { SPHERES_LIST } from './constants/CANON';
@@ -45,9 +67,12 @@ import { SPHERES_LIST } from './constants/CANON';
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <Routes>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ToastProvider maxToasts={5}>
+          <BrowserRouter>
+            <AuthProvider>
+              <Routes>
           {/* ═══════════════════════════════════════════════════════════════════ */}
           {/* PUBLIC ROUTES */}
           {/* ═══════════════════════════════════════════════════════════════════ */}
@@ -108,8 +133,11 @@ function App() {
             element={<Navigate to="/" replace />} 
           />
         </Routes>
-      </AuthProvider>
-    </BrowserRouter>
+            </AuthProvider>
+          </BrowserRouter>
+        </ToastProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 

@@ -1,126 +1,37 @@
 """
-CHE·NU™ Pydantic Schemas
+CHE·NU™ V75 Backend - Schemas Package
 
-All request/response schemas.
+Pydantic schemas for API validation.
+
+@version 75.0.0
 """
 
-from backend.schemas.auth_schemas import (
-    RegisterRequest,
-    LoginRequest,
-    RefreshTokenRequest,
-    ChangePasswordRequest,
-    UpdateProfileRequest,
-    UserResponse,
-    TokenResponse,
-    AuthResponse,
-    MessageResponse,
-    UserCreate,
-    UserUpdate,
-)
-
-from backend.schemas.sphere_schemas import (
-    SphereTypeEnum,
-    BureauSectionTypeEnum,
-    QuickCaptureTypeEnum,
-    SphereSummary,
-    SphereDetail,
-    SphereUpdate,
-    SphereStats,
-    BureauSectionResponse,
-    BureauSectionContent,
-    QuickCaptureRequest,
-    QuickCaptureResponse,
-    ThreadSummaryResponse,
-    PaginationResponse,
-    SphereListResponse,
-    BureauSectionListResponse,
-)
-
-from backend.schemas.thread_schemas import (
-    ThreadStatusEnum,
-    ThreadTypeEnum,
-    ThreadVisibilityEnum,
-    ThreadEventTypeEnum,
-    ActionStatusEnum,
-    ActionPriorityEnum,
-    ThreadCreate,
-    ThreadSummary,
-    ThreadResponse,
-    ThreadUpdate,
-    EventCreate,
-    EventResponse,
-    EventListResponse,
-    DecisionCreate,
-    DecisionResponse,
-    DecisionListResponse,
-    ActionCreate,
-    ActionResponse,
-    ActionUpdate,
-    ActionListResponse,
-    SnapshotCreate,
-    SnapshotResponse,
-    IntentRefinement,
-    CheckpointRequired,
-    ThreadListResponse,
-    PaginationParams,
-)
+from schemas.base import *
+from schemas.auth import *
 
 __all__ = [
+    # Base
+    "Meta",
+    "ErrorDetail",
+    "BaseResponse",
+    "ErrorResponse",
+    "PaginatedResponse",
+    "PaginationMeta",
+    # Enums
+    "SphereId",
+    "BureauId",
+    "AgentLevel",
+    "AgentStatus",
+    "ThreadStatus",
+    "CheckpointType",
+    "CheckpointStatus",
+    "DecisionType",
+    "DecisionStatus",
+    "XREnvironmentType",
     # Auth
-    "RegisterRequest",
     "LoginRequest",
-    "RefreshTokenRequest",
-    "ChangePasswordRequest",
-    "UpdateProfileRequest",
-    "UserResponse",
-    "TokenResponse",
+    "RegisterRequest",
+    "User",
+    "AuthTokens",
     "AuthResponse",
-    "MessageResponse",
-    "UserCreate",
-    "UserUpdate",
-    
-    # Sphere
-    "SphereTypeEnum",
-    "BureauSectionTypeEnum",
-    "QuickCaptureTypeEnum",
-    "SphereSummary",
-    "SphereDetail",
-    "SphereUpdate",
-    "SphereStats",
-    "BureauSectionResponse",
-    "BureauSectionContent",
-    "QuickCaptureRequest",
-    "QuickCaptureResponse",
-    "ThreadSummaryResponse",
-    "PaginationResponse",
-    "SphereListResponse",
-    "BureauSectionListResponse",
-    
-    # Thread
-    "ThreadStatusEnum",
-    "ThreadTypeEnum",
-    "ThreadVisibilityEnum",
-    "ThreadEventTypeEnum",
-    "ActionStatusEnum",
-    "ActionPriorityEnum",
-    "ThreadCreate",
-    "ThreadSummary",
-    "ThreadResponse",
-    "ThreadUpdate",
-    "EventCreate",
-    "EventResponse",
-    "EventListResponse",
-    "DecisionCreate",
-    "DecisionResponse",
-    "DecisionListResponse",
-    "ActionCreate",
-    "ActionResponse",
-    "ActionUpdate",
-    "ActionListResponse",
-    "SnapshotCreate",
-    "SnapshotResponse",
-    "IntentRefinement",
-    "CheckpointRequired",
-    "ThreadListResponse",
-    "PaginationParams",
 ]

@@ -17,11 +17,13 @@ import time
 from typing import Any
 
 from app.api.v1 import router as api_v1_router
+from app.api.v1.files import router as files_router
+from app.api.v1.search import router as search_router
 from app.core.config import settings
-from app.core.database import engine, Base
-from app.core.redis import redis_client
-from app.middleware.rate_limit import RateLimitMiddleware
-from app.middleware.auth import AuthMiddleware
+from app.core.database import get_engine, Base, init_db, close_db
+from app.core.redis import get_redis, close_redis
+# from app.middleware.rate_limit import RateLimitMiddleware  # TODO: Create
+# from app.middleware.auth import AuthMiddleware  # TODO: Create
 
 # Configure logging
 logging.basicConfig(
@@ -41,16 +43,19 @@ async def lifespan(app: FastAPI):
     logger.info("🚀 Starting CHE·NU V72 API...")
     
     # Create database tables
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    logger.info("✅ Database tables created")
+    try:
+        await init_db()
+        logger.info("✅ Database initialized")
+    except Exception as e:
+        logger.warning(f"⚠️ Database initialization: {e}")
     
     # Test Redis connection
     try:
-        await redis_client.ping()
+        redis = await get_redis()
+        await redis.ping()
         logger.info("✅ Redis connected")
     except Exception as e:
-        logger.warning(f"⚠️ Redis connection failed: {e}")
+        logger.warning(f"⚠️ Redis connection (using mock): {e}")
     
     logger.info("✅ CHE·NU V72 API ready!")
     
@@ -58,8 +63,8 @@ async def lifespan(app: FastAPI):
     
     # Shutdown
     logger.info("👋 Shutting down CHE·NU V72 API...")
-    await redis_client.close()
-    await engine.dispose()
+    await close_redis()
+    await close_db()
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # APP INITIALIZATION
@@ -97,8 +102,8 @@ app.add_middleware(
 # GZip compression
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
-# Rate limiting
-app.add_middleware(RateLimitMiddleware)
+# Rate limiting (TODO: Enable when middleware is created)
+# app.add_middleware(RateLimitMiddleware)
 
 # Request timing
 @app.middleware("http")
@@ -154,6 +159,8 @@ async def general_exception_handler(request: Request, exc: Exception):
 
 # API v1 routes
 app.include_router(api_v1_router, prefix="/api/v1")
+app.include_router(files_router, prefix="/api/v1")
+app.include_router(search_router, prefix="/api/v1")
 
 # Health check
 @app.get("/health", tags=["Health"])

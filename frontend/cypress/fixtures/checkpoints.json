@@ -1,0 +1,95 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": "checkpoint-001",
+      "type": "governance",
+      "status": "pending",
+      "reason": "Thread archival requires approval",
+      "action": "archive_thread",
+      "resource_id": "thread-002",
+      "resource_type": "thread",
+      "created_at": "2026-01-08T10:00:00Z",
+      "initiated_by": "user",
+      "options": ["approve", "reject"],
+      "context": {
+        "thread_title": "Projet Client Alpha",
+        "events_count": 234
+      }
+    },
+    {
+      "id": "checkpoint-002",
+      "type": "cost",
+      "status": "pending",
+      "reason": "Token budget exceeded for agent hire",
+      "action": "hire_agent",
+      "resource_id": "agent-003",
+      "resource_type": "agent",
+      "created_at": "2026-01-08T11:30:00Z",
+      "initiated_by": "user",
+      "options": ["approve", "reject"],
+      "context": {
+        "agent_name": "Content Creator",
+        "token_cost": 600,
+        "current_budget": 500000,
+        "used_budget": 498000
+      }
+    },
+    {
+      "id": "checkpoint-003",
+      "type": "sensitive",
+      "status": "pending",
+      "reason": "External communication requires validation",
+      "action": "send_email",
+      "resource_id": "email-draft-001",
+      "resource_type": "communication",
+      "created_at": "2026-01-08T12:00:00Z",
+      "initiated_by": "agent-006",
+      "options": ["approve", "edit", "reject"],
+      "context": {
+        "recipient": "client@alpha.com",
+        "subject": "Project Update",
+        "preview": "Dear Client, here is the weekly update..."
+      }
+    },
+    {
+      "id": "checkpoint-004",
+      "type": "cross_sphere",
+      "status": "pending",
+      "reason": "Data transfer between spheres requires approval",
+      "action": "transfer_data",
+      "resource_id": "transfer-001",
+      "resource_type": "data_transfer",
+      "created_at": "2026-01-08T13:00:00Z",
+      "initiated_by": "user",
+      "options": ["approve", "reject"],
+      "context": {
+        "source_sphere": "personal",
+        "target_sphere": "business",
+        "data_type": "notes",
+        "items_count": 5
+      }
+    },
+    {
+      "id": "checkpoint-005",
+      "type": "governance",
+      "status": "pending",
+      "reason": "High-impact decision requires additional approval",
+      "action": "make_decision",
+      "resource_id": "decision-003",
+      "resource_type": "decision",
+      "created_at": "2026-01-08T14:00:00Z",
+      "initiated_by": "user",
+      "options": ["approve", "reject"],
+      "context": {
+        "decision_title": "Choisir le fournisseur principal",
+        "impact": "high",
+        "affected_threads": 3
+      }
+    }
+  ],
+  "total": 5,
+  "pending": 5,
+  "approved_today": 12,
+  "rejected_today": 2
+}

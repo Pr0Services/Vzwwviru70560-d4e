@@ -26,7 +26,7 @@ from sqlalchemy import select, update, func, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from backend.core.exceptions import (
+from app.core.exceptions import (
     NotFoundError,
     ThreadNotFoundError,
     IdentityBoundaryError,
@@ -34,7 +34,7 @@ from backend.core.exceptions import (
     ValidationError,
     CheckpointRequiredError,
 )
-from backend.models.thread import (
+from app.models.thread import (
     Thread,
     ThreadEvent,
     ThreadDecision,
@@ -47,8 +47,8 @@ from backend.models.thread import (
     ActionStatus,
     ActionPriority,
 )
-from backend.models.sphere import Sphere
-from backend.schemas.thread_schemas import (
+from app.models.sphere import Sphere
+from app.schemas.thread_schemas import (
     ThreadCreate,
     ThreadResponse,
     ThreadSummary,

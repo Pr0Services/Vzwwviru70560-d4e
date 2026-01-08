@@ -19,8 +19,8 @@ from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 
-from backend.core.config import settings
-from backend.core.security import (
+from app.core.config import settings
+from app.core.security import (
     hash_password,
     verify_password,
     create_token_pair,
@@ -29,7 +29,7 @@ from backend.core.security import (
     TokenPayload,
     TokenPair,
 )
-from backend.core.exceptions import (
+from app.core.exceptions import (
     AuthenticationError,
     InvalidCredentialsError,
     TokenExpiredError,
@@ -38,8 +38,8 @@ from backend.core.exceptions import (
     DuplicateResourceError,
     ValidationError,
 )
-from backend.models.user import User, RefreshToken
-from backend.schemas.auth_schemas import (
+from app.models.user import User, RefreshToken
+from app.schemas.auth_schemas import (
     RegisterRequest,
     LoginRequest,
     UserCreate,

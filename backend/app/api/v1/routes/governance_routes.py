@@ -23,7 +23,7 @@ from datetime import datetime
 import logging
 
 # Import schemas
-from backend.schemas.governance_schemas import (
+from app.schemas.governance_schemas import (
     GovernanceSignal,
     GovernanceSignalLevel,
     GovernanceCriterion,
@@ -44,9 +44,9 @@ from backend.schemas.governance_schemas import (
 )
 
 # Import services
-from backend.services.governance.orchestrator_service import OrchestratorService
-from backend.services.governance.cea_service import CEARegistry
-from backend.services.governance.backlog_service import BacklogService
+from app.services.governance.orchestrator_service import OrchestratorService
+from app.services.governance.cea_service import CEARegistry
+from app.services.governance.backlog_service import BacklogService
 
 logger = logging.getLogger(__name__)
 
@@ -546,14 +546,14 @@ async def compute_qct(
 # ============================================================================
 
 # Import decision point schemas and service
-from backend.schemas.governance_schemas import (
+from app.schemas.governance_schemas import (
     DecisionPoint,
     DecisionPointCreate,
     DecisionPointType,
     AgingLevel,
     UserResponseType,
 )
-from backend.services.governance.decision_point_service import DecisionPointService
+from app.services.governance.decision_point_service import DecisionPointService
 
 def get_decision_point_service() -> DecisionPointService:
     """Get decision point service instance."""

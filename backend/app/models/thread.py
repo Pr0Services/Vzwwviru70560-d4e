@@ -26,7 +26,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.core.database import Base
+from app.core.database import Base
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -234,7 +234,7 @@ class Thread(Base):
         default=list,
     )
     
-    metadata: Mapped[dict] = mapped_column(
+    event_metadata: Mapped[dict] = mapped_column(
         JSONB,
         nullable=False,
         default=dict,
@@ -713,7 +713,7 @@ class ThreadAction(Base):
     )
     
     # Metadata
-    metadata: Mapped[dict] = mapped_column(
+    event_metadata: Mapped[dict] = mapped_column(
         JSONB,
         nullable=False,
         default=dict,

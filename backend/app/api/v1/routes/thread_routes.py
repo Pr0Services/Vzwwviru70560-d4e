@@ -24,17 +24,17 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.core.database import get_db
-from backend.core.exceptions import (
+from app.core.database import get_db
+from app.core.exceptions import (
     ThreadNotFoundError,
     IdentityBoundaryError,
     ValidationError,
     CheckpointRequiredError,
 )
-from backend.api.dependencies import get_current_user, CurrentUser
-from backend.services.thread.thread_service import ThreadService, get_thread_service
-from backend.models.thread import ThreadStatus, ActionStatus
-from backend.schemas.thread_schemas import (
+from app.api.dependencies import get_current_user, CurrentUser
+from app.services.thread.thread_service import ThreadService, get_thread_service
+from app.models.thread import ThreadStatus, ActionStatus
+from app.schemas.thread_schemas import (
     ThreadStatusEnum,
     ActionStatusEnum,
     ThreadCreate,

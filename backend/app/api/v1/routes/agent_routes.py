@@ -34,23 +34,23 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.core.database import get_db
-from backend.core.exceptions import (
+from app.core.database import get_db
+from app.core.exceptions import (
     NotFoundError,
     ValidationError,
     ForbiddenError,
     CheckpointRequiredError,
 )
-from backend.api.dependencies import get_current_user, get_current_identity_id
-from backend.models.user import User
-from backend.models.agent import SphereType, AgentStatus, ExecutionStatus, AgentCapabilityType
-from backend.services.agent import (
+from app.api.dependencies import get_current_user, get_current_identity_id
+from app.models.user import User
+from app.models.agent import SphereType, AgentStatus, ExecutionStatus, AgentCapabilityType
+from app.services.agent import (
     AgentRegistryService,
     AgentExecutionService,
     TOTAL_AGENTS,
     AGENT_DISTRIBUTION,
 )
-from backend.schemas.agent_schemas import (
+from app.schemas.agent_schemas import (
     AgentResponse,
     AgentSummary,
     AgentListResponse,

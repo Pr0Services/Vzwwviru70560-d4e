@@ -17,6 +17,9 @@ import { NotificationBell } from '../components/notifications/NotificationCenter
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import { useSpheres, SPHERES } from '../hooks/useSpheres';
 
+// API Hooks
+import { useThreads, type Thread as APIThread } from '../hooks/api';
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -57,113 +60,7 @@ const STATUS_CONFIG: Record<ThreadStatus, { color: string; label: string }> = {
   archived: { color: '#6B7B6B', label: 'Archivé' },
 };
 
-// Mock threads data
-const MOCK_THREADS: Thread[] = [
-  {
-    id: 'thread-1',
-    title: 'Rénovation cuisine',
-    founding_intent: 'Planifier et exécuter la rénovation complète de la cuisine principale',
-    sphere_id: 'personal',
-    status: 'active',
-    maturity_level: 'GROWING',
-    maturity_score: 65,
-    event_count: 47,
-    decision_count: 8,
-    last_activity: '2025-01-07T10:30:00Z',
-    created_at: '2024-12-15T09:00:00Z',
-  },
-  {
-    id: 'thread-2',
-    title: 'Lancement produit Q1',
-    founding_intent: 'Coordonner le lancement du nouveau produit pour Q1 2025',
-    sphere_id: 'business',
-    status: 'active',
-    maturity_level: 'MATURE',
-    maturity_score: 82,
-    event_count: 124,
-    decision_count: 23,
-    last_activity: '2025-01-07T09:45:00Z',
-    created_at: '2024-11-01T08:00:00Z',
-  },
-  {
-    id: 'thread-3',
-    title: 'Formation équipe dev',
-    founding_intent: 'Organiser et suivre la formation continue de l\'équipe développement',
-    sphere_id: 'team',
-    status: 'active',
-    maturity_level: 'SPROUTING',
-    maturity_score: 35,
-    event_count: 18,
-    decision_count: 3,
-    last_activity: '2025-01-06T16:20:00Z',
-    created_at: '2025-01-02T10:00:00Z',
-  },
-  {
-    id: 'thread-4',
-    title: 'Projet immobilier Laval',
-    founding_intent: 'Analyser et acquérir un immeuble à revenus dans la région de Laval',
-    sphere_id: 'business',
-    status: 'active',
-    maturity_level: 'GROWING',
-    maturity_score: 58,
-    event_count: 67,
-    decision_count: 12,
-    last_activity: '2025-01-07T08:15:00Z',
-    created_at: '2024-12-01T14:00:00Z',
-  },
-  {
-    id: 'thread-5',
-    title: 'Permis RBQ',
-    founding_intent: 'Obtenir la licence RBQ pour entrepreneur général',
-    sphere_id: 'government',
-    status: 'paused',
-    maturity_level: 'SEED',
-    maturity_score: 12,
-    event_count: 8,
-    decision_count: 2,
-    last_activity: '2025-01-03T11:00:00Z',
-    created_at: '2024-12-20T09:00:00Z',
-  },
-  {
-    id: 'thread-6',
-    title: 'Création logo entreprise',
-    founding_intent: 'Concevoir le nouveau logo et l\'identité visuelle de l\'entreprise',
-    sphere_id: 'studio',
-    status: 'completed',
-    maturity_level: 'RIPE',
-    maturity_score: 100,
-    event_count: 34,
-    decision_count: 7,
-    last_activity: '2025-01-05T17:30:00Z',
-    created_at: '2024-11-15T10:00:00Z',
-  },
-  {
-    id: 'thread-7',
-    title: 'Recherche doctorale IA',
-    founding_intent: 'Suivre et documenter la recherche sur les systèmes d\'IA gouvernés',
-    sphere_id: 'scholar',
-    status: 'active',
-    maturity_level: 'GROWING',
-    maturity_score: 45,
-    event_count: 56,
-    decision_count: 5,
-    last_activity: '2025-01-07T07:00:00Z',
-    created_at: '2024-10-01T08:00:00Z',
-  },
-  {
-    id: 'thread-8',
-    title: 'Organisation événement communautaire',
-    founding_intent: 'Planifier l\'événement annuel de la communauté locale',
-    sphere_id: 'community',
-    status: 'active',
-    maturity_level: 'SPROUTING',
-    maturity_score: 28,
-    event_count: 15,
-    decision_count: 4,
-    last_activity: '2025-01-06T14:00:00Z',
-    created_at: '2025-01-01T09:00:00Z',
-  },
-];
+// NOTE: Threads data now comes from useThreads() API hook
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // THREAD CARD COMPONENT
@@ -499,6 +396,25 @@ const NewThreadModal: React.FC<{
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// HELPER FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function calculateMaturityScore(eventCount: number, decisionCount: number): number {
+  // Simple formula: events + (decisions * 5), max 100
+  const score = Math.min(100, eventCount + decisionCount * 5);
+  return score;
+}
+
+function calculateMaturityLevel(eventCount: number, decisionCount: number): MaturityLevel {
+  const score = calculateMaturityScore(eventCount, decisionCount);
+  if (score >= 90) return 'RIPE';
+  if (score >= 70) return 'MATURE';
+  if (score >= 45) return 'GROWING';
+  if (score >= 20) return 'SPROUTING';
+  return 'SEED';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // MAIN PAGE
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -506,8 +422,28 @@ export const ThreadsPageV72: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
+  // API Data
+  const { data: apiThreads, isLoading, isError, refetch } = useThreads();
+  
+  // Transform API threads to local format with maturity
+  const threads: Thread[] = useMemo(() => {
+    if (!apiThreads) return [];
+    return apiThreads.map((t) => ({
+      id: t.id,
+      title: t.title,
+      founding_intent: t.founding_intent,
+      sphere_id: t.sphere_id,
+      status: t.status as ThreadStatus,
+      maturity_level: calculateMaturityLevel(t.event_count, t.decision_count),
+      maturity_score: calculateMaturityScore(t.event_count, t.decision_count),
+      event_count: t.event_count,
+      decision_count: t.decision_count,
+      last_activity: t.last_activity_at,
+      created_at: t.created_at,
+    }));
+  }, [apiThreads]);
+
   // State
-  const [threads, setThreads] = useState<Thread[]>(MOCK_THREADS);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterSphere, setFilterSphere] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<ThreadStatus | null>(null);
@@ -748,7 +684,64 @@ export const ThreadsPageV72: React.FC = () => {
         </div>
 
         {/* Threads Grid */}
-        {filteredThreads.length > 0 ? (
+        {isLoading ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: 16 }}>
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div
+                key={i}
+                style={{
+                  padding: 20,
+                  background: 'rgba(255, 255, 255, 0.02)',
+                  border: '1px solid rgba(255, 255, 255, 0.06)',
+                  borderRadius: 16,
+                  height: 180,
+                }}
+              >
+                <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(255,255,255,0.05)', animation: 'pulse 1.5s infinite' }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ height: 16, width: '60%', background: 'rgba(255,255,255,0.05)', borderRadius: 4, marginBottom: 8, animation: 'pulse 1.5s infinite' }} />
+                    <div style={{ height: 12, width: '40%', background: 'rgba(255,255,255,0.03)', borderRadius: 4, animation: 'pulse 1.5s infinite' }} />
+                  </div>
+                </div>
+                <div style={{ height: 12, width: '100%', background: 'rgba(255,255,255,0.03)', borderRadius: 4, marginBottom: 8, animation: 'pulse 1.5s infinite' }} />
+                <div style={{ height: 12, width: '80%', background: 'rgba(255,255,255,0.03)', borderRadius: 4, animation: 'pulse 1.5s infinite' }} />
+              </div>
+            ))}
+          </div>
+        ) : isError ? (
+          <div
+            style={{
+              padding: 40,
+              textAlign: 'center',
+              background: 'rgba(239, 68, 68, 0.1)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: 16,
+            }}
+          >
+            <div style={{ fontSize: 32, marginBottom: 12 }}>⚠️</div>
+            <h3 style={{ color: '#EF4444', fontSize: 16, margin: '0 0 8px' }}>
+              Erreur de chargement
+            </h3>
+            <p style={{ color: '#9BA89B', fontSize: 13, margin: '0 0 16px' }}>
+              Impossible de charger les threads
+            </p>
+            <button
+              onClick={() => refetch()}
+              style={{
+                padding: '10px 20px',
+                background: 'rgba(239, 68, 68, 0.2)',
+                border: '1px solid rgba(239, 68, 68, 0.4)',
+                borderRadius: 8,
+                color: '#EF4444',
+                cursor: 'pointer',
+                fontSize: 13,
+              }}
+            >
+              Réessayer
+            </button>
+          </div>
+        ) : filteredThreads.length > 0 ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: 16 }}>
             {filteredThreads.map((thread) => (
               <ThreadCard

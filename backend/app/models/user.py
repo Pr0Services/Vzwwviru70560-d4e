@@ -13,7 +13,7 @@ from sqlalchemy import String, Boolean, DateTime, Text, JSON
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.core.database import Base
+from app.core.database import Base
 
 
 class User(Base):

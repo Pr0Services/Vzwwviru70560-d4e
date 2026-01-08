@@ -40,15 +40,15 @@ from uuid import UUID, uuid4
 from sqlalchemy import select, func, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.core.exceptions import NotFoundError, ValidationError, ConflictError
-from backend.models.agent import (
+from app.core.exceptions import NotFoundError, ValidationError, ConflictError
+from app.models.agent import (
     Agent,
     AgentStatus,
     AgentCapabilityType,
     SphereType,
     UserAgentConfig,
 )
-from backend.schemas.agent_schemas import (
+from app.schemas.agent_schemas import (
     AgentCreate,
     AgentUpdate,
     AgentResponse,

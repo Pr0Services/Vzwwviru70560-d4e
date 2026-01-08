@@ -29,7 +29,7 @@ from __future__ import annotations
 from typing import List, Dict, Any
 from uuid import uuid4
 
-from backend.models.agent import AgentStatus, SphereType
+from app.models.agent import AgentStatus, SphereType
 
 
 # =============================================================================

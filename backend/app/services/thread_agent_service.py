@@ -51,8 +51,8 @@ from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel, Field
 
-from backend.core.exceptions import NotFoundError, ValidationError, ForbiddenError
-from backend.models.agent import SphereType, AgentStatus, AgentCapabilityType
+from app.core.exceptions import NotFoundError, ValidationError, ForbiddenError
+from app.models.agent import SphereType, AgentStatus, AgentCapabilityType
 
 logger = logging.getLogger(__name__)
 

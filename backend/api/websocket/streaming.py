@@ -40,11 +40,39 @@ class WSMessageType(str, Enum):
     PONG = "pong"
     ERROR = "error"
     
-    # Events
+    # Events - Simulations
     SIMULATION_UPDATE = "simulation_update"
+    
+    # Events - Agents
     AGENT_EVENT = "agent_event"
+    AGENT_HIRED = "agent_hired"
+    AGENT_DISMISSED = "agent_dismissed"
+    
+    # Events - Checkpoints/Governance
     CHECKPOINT_CREATED = "checkpoint_created"
     CHECKPOINT_RESOLVED = "checkpoint_resolved"
+    GOVERNANCE_ALERT = "governance_alert"
+    
+    # Events - Threads
+    THREAD_CREATED = "thread_created"
+    THREAD_UPDATED = "thread_updated"
+    THREAD_ARCHIVED = "thread_archived"
+    THREAD_EVENT = "thread_event"
+    
+    # Events - Decisions
+    DECISION_CREATED = "decision_created"
+    DECISION_RESOLVED = "decision_resolved"
+    DECISION_DEFERRED = "decision_deferred"
+    
+    # Events - Notifications
+    NOTIFICATION = "notification"
+    NOTIFICATION_COUNT = "notification_count"
+    
+    # Events - Nova
+    NOVA_RESPONSE = "nova_response"
+    NOVA_TYPING = "nova_typing"
+    
+    # Events - XR
     XR_PACK_READY = "xr_pack_ready"
 
 
@@ -427,6 +455,249 @@ async def emit_xr_pack_ready(
     sent += await manager.broadcast_to_channel(f"simulation:{simulation_id}", message)
     
     return sent
+
+
+# ============================================================================
+# THREAD EVENT EMITTERS
+# ============================================================================
+
+async def emit_thread_created(
+    thread_id: str,
+    title: str,
+    sphere_id: str,
+    owner_id: str,
+) -> int:
+    """Emit thread created event"""
+    message = WSMessage(
+        type=WSMessageType.THREAD_CREATED,
+        payload={
+            "thread_id": thread_id,
+            "title": title,
+            "sphere_id": sphere_id,
+            "owner_id": owner_id,
+        },
+    )
+    
+    sent = await manager.broadcast_to_channel(f"user:{owner_id}", message)
+    sent += await manager.broadcast_to_channel(f"sphere:{sphere_id}", message)
+    return sent
+
+
+async def emit_thread_updated(
+    thread_id: str,
+    changes: Dict[str, Any],
+    owner_id: str,
+) -> int:
+    """Emit thread updated event"""
+    message = WSMessage(
+        type=WSMessageType.THREAD_UPDATED,
+        payload={
+            "thread_id": thread_id,
+            "changes": changes,
+        },
+    )
+    
+    sent = await manager.broadcast_to_channel(f"thread:{thread_id}", message)
+    sent += await manager.broadcast_to_channel(f"user:{owner_id}", message)
+    return sent
+
+
+async def emit_thread_event(
+    thread_id: str,
+    event_type: str,
+    payload: Dict[str, Any],
+) -> int:
+    """Emit thread event"""
+    message = WSMessage(
+        type=WSMessageType.THREAD_EVENT,
+        payload={
+            "thread_id": thread_id,
+            "event_type": event_type,
+            **payload,
+        },
+    )
+    
+    return await manager.broadcast_to_channel(f"thread:{thread_id}", message)
+
+
+# ============================================================================
+# DECISION EVENT EMITTERS
+# ============================================================================
+
+async def emit_decision_created(
+    decision_id: str,
+    title: str,
+    thread_id: str,
+    owner_id: str,
+    priority: str,
+) -> int:
+    """Emit decision created event"""
+    message = WSMessage(
+        type=WSMessageType.DECISION_CREATED,
+        payload={
+            "decision_id": decision_id,
+            "title": title,
+            "thread_id": thread_id,
+            "priority": priority,
+        },
+    )
+    
+    sent = await manager.broadcast_to_channel(f"user:{owner_id}", message)
+    sent += await manager.broadcast_to_channel("decisions", message)
+    return sent
+
+
+async def emit_decision_resolved(
+    decision_id: str,
+    selected_option: Dict[str, Any],
+    owner_id: str,
+) -> int:
+    """Emit decision resolved event"""
+    message = WSMessage(
+        type=WSMessageType.DECISION_RESOLVED,
+        payload={
+            "decision_id": decision_id,
+            "selected_option": selected_option,
+        },
+    )
+    
+    sent = await manager.broadcast_to_channel(f"user:{owner_id}", message)
+    sent += await manager.broadcast_to_channel("decisions", message)
+    return sent
+
+
+# ============================================================================
+# NOTIFICATION EVENT EMITTERS
+# ============================================================================
+
+async def emit_notification(
+    user_id: str,
+    notification_id: str,
+    title: str,
+    message_text: str,
+    notification_type: str,
+    action_url: str = None,
+) -> int:
+    """Emit notification event"""
+    message = WSMessage(
+        type=WSMessageType.NOTIFICATION,
+        payload={
+            "notification_id": notification_id,
+            "title": title,
+            "message": message_text,
+            "type": notification_type,
+            "action_url": action_url,
+        },
+    )
+    
+    return await manager.broadcast_to_channel(f"user:{user_id}", message)
+
+
+async def emit_notification_count(
+    user_id: str,
+    unread_count: int,
+) -> int:
+    """Emit notification count update"""
+    message = WSMessage(
+        type=WSMessageType.NOTIFICATION_COUNT,
+        payload={
+            "unread_count": unread_count,
+        },
+    )
+    
+    return await manager.broadcast_to_channel(f"user:{user_id}", message)
+
+
+# ============================================================================
+# AGENT EVENT EMITTERS
+# ============================================================================
+
+async def emit_agent_hired(
+    agent_id: str,
+    agent_name: str,
+    user_id: str,
+) -> int:
+    """Emit agent hired event"""
+    message = WSMessage(
+        type=WSMessageType.AGENT_HIRED,
+        payload={
+            "agent_id": agent_id,
+            "agent_name": agent_name,
+        },
+    )
+    
+    return await manager.broadcast_to_channel(f"user:{user_id}", message)
+
+
+async def emit_agent_dismissed(
+    agent_id: str,
+    agent_name: str,
+    user_id: str,
+) -> int:
+    """Emit agent dismissed event"""
+    message = WSMessage(
+        type=WSMessageType.AGENT_DISMISSED,
+        payload={
+            "agent_id": agent_id,
+            "agent_name": agent_name,
+        },
+    )
+    
+    return await manager.broadcast_to_channel(f"user:{user_id}", message)
+
+
+# ============================================================================
+# NOVA EVENT EMITTERS
+# ============================================================================
+
+async def emit_nova_typing(user_id: str) -> int:
+    """Emit Nova typing indicator"""
+    message = WSMessage(
+        type=WSMessageType.NOVA_TYPING,
+        payload={"typing": True},
+    )
+    
+    return await manager.broadcast_to_channel(f"user:{user_id}", message)
+
+
+async def emit_nova_response(
+    user_id: str,
+    response: str,
+    pipeline_status: Dict[str, str] = None,
+) -> int:
+    """Emit Nova response"""
+    message = WSMessage(
+        type=WSMessageType.NOVA_RESPONSE,
+        payload={
+            "response": response,
+            "pipeline_status": pipeline_status,
+        },
+    )
+    
+    return await manager.broadcast_to_channel(f"user:{user_id}", message)
+
+
+# ============================================================================
+# GOVERNANCE EVENT EMITTERS
+# ============================================================================
+
+async def emit_governance_alert(
+    user_id: str,
+    alert_type: str,
+    message_text: str,
+    severity: str = "warning",
+) -> int:
+    """Emit governance alert"""
+    message = WSMessage(
+        type=WSMessageType.GOVERNANCE_ALERT,
+        payload={
+            "alert_type": alert_type,
+            "message": message_text,
+            "severity": severity,
+        },
+    )
+    
+    return await manager.broadcast_to_channel(f"user:{user_id}", message)
 
 
 # ============================================================================

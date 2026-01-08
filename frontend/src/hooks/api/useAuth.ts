@@ -1,162 +1,209 @@
 /**
- * ╔══════════════════════════════════════════════════════════════════════════════╗
- * ║                    CHE·NU™ — AUTH & USER HOOKS                               ║
- * ║                    Sprint B3.2: TanStack Query                               ║
- * ╚══════════════════════════════════════════════════════════════════════════════╝
+ * ═══════════════════════════════════════════════════════════════════════════
+ * CHE·NU™ V75 — AUTH HOOKS
+ * ═══════════════════════════════════════════════════════════════════════════
  */
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { apiGet, apiPost, apiPatch, queryKeys, parseAPIError } from './client'
-import type {
-  User,
-  LoginRequest,
-  LoginResponse,
-  RegisterRequest,
-  UpdateUserRequest,
-  TokenBalance,
-} from '@/types/api.generated'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { apiClient, tokenManager } from '../../services/apiClient';
+import { API_CONFIG, QUERY_KEYS, STALE_TIMES } from '../../config/api.config';
 
-// ============================================================================
-// AUTH HOOKS
-// ============================================================================
+// ═══════════════════════════════════════════════════════════════════════════
+// TYPES
+// ═══════════════════════════════════════════════════════════════════════════
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  avatar?: string;
+  role: 'user' | 'admin';
+  created_at: string;
+  last_login_at?: string;
+  preferences?: UserPreferences;
+}
+
+export interface UserPreferences {
+  theme: 'light' | 'dark' | 'system';
+  language: 'en' | 'fr';
+  notifications_enabled: boolean;
+  default_sphere?: string;
+}
+
+export interface LoginInput {
+  email: string;
+  password: string;
+  remember_me?: boolean;
+}
+
+export interface RegisterInput {
+  email: string;
+  password: string;
+  name: string;
+  language?: 'en' | 'fr';
+}
+
+export interface AuthResponse {
+  user: User;
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
+}
+
+export interface ChangePasswordInput {
+  current_password: string;
+  new_password: string;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// QUERY HOOKS
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Fetch current user
+ */
+export function useCurrentUser() {
+  return useQuery<User>({
+    queryKey: QUERY_KEYS.USER_ME,
+    queryFn: () => apiClient.get<User>(API_CONFIG.ENDPOINTS.AUTH.ME),
+    staleTime: STALE_TIMES.STATIC,
+    enabled: tokenManager.isAuthenticated(),
+    retry: false,
+  });
+}
+
+/**
+ * Check if user is authenticated
+ */
+export function useIsAuthenticated() {
+  const { data: user, isLoading, isError } = useCurrentUser();
+  
+  return {
+    isAuthenticated: !!user && !isError,
+    isLoading,
+    user,
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MUTATION HOOKS
+// ═══════════════════════════════════════════════════════════════════════════
 
 /**
  * Login mutation
  */
 export function useLogin() {
-  const queryClient = useQueryClient()
-  
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: async (data: LoginRequest) => {
-      const response = await apiPost<LoginResponse>('/auth/login', data)
+    mutationFn: async (input: LoginInput) => {
+      const response = await apiClient.post<AuthResponse>(
+        API_CONFIG.ENDPOINTS.AUTH.LOGIN,
+        input,
+        { skipAuth: true }
+      );
       
       // Store tokens
-      localStorage.setItem('access_token', response.access_token)
-      localStorage.setItem('refresh_token', response.refresh_token)
+      tokenManager.setTokens(response.access_token, response.refresh_token);
       
-      return response
+      return response;
     },
     onSuccess: (data) => {
       // Update user cache
-      queryClient.setQueryData(queryKeys.user.me(), data.user)
+      queryClient.setQueryData(QUERY_KEYS.USER_ME, data.user);
+      // Invalidate all queries to refetch with new auth
+      queryClient.invalidateQueries();
     },
-    onError: (error) => {
-      const parsed = parseAPIError(error)
-      logger.error('Login failed:', parsed.message)
-    },
-  })
+  });
 }
 
 /**
  * Register mutation
  */
 export function useRegister() {
-  const queryClient = useQueryClient()
-  
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: async (data: RegisterRequest) => {
-      const response = await apiPost<LoginResponse>('/auth/register', data)
+    mutationFn: async (input: RegisterInput) => {
+      const response = await apiClient.post<AuthResponse>(
+        API_CONFIG.ENDPOINTS.AUTH.REGISTER,
+        input,
+        { skipAuth: true }
+      );
       
       // Store tokens
-      localStorage.setItem('access_token', response.access_token)
-      localStorage.setItem('refresh_token', response.refresh_token)
+      tokenManager.setTokens(response.access_token, response.refresh_token);
       
-      return response
+      return response;
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(queryKeys.user.me(), data.user)
+      // Update user cache
+      queryClient.setQueryData(QUERY_KEYS.USER_ME, data.user);
     },
-  })
+  });
 }
 
 /**
  * Logout mutation
  */
 export function useLogout() {
-  const queryClient = useQueryClient()
-  
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async () => {
       try {
-        await apiPost('/auth/logout')
+        await apiClient.post(API_CONFIG.ENDPOINTS.AUTH.LOGOUT);
       } finally {
-        // Always clear local storage
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('refresh_token')
+        // Always clear tokens, even if API call fails
+        tokenManager.clearTokens();
       }
     },
     onSuccess: () => {
-      // Clear all queries
-      queryClient.clear()
+      // Clear all cached data
+      queryClient.clear();
     },
-  })
-}
-
-// ============================================================================
-// USER HOOKS
-// ============================================================================
-
-/**
- * Get current user
- */
-export function useCurrentUser() {
-  return useQuery({
-    queryKey: queryKeys.user.me(),
-    queryFn: () => apiGet<User>('/users/me'),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: false, // Don't retry on 401
-  })
+  });
 }
 
 /**
- * Update current user
+ * Change password mutation
  */
-export function useUpdateUser() {
-  const queryClient = useQueryClient()
-  
+export function useChangePassword() {
   return useMutation({
-    mutationFn: (data: UpdateUserRequest) => 
-      apiPatch<User>('/users/me', data),
+    mutationFn: (input: ChangePasswordInput) =>
+      apiClient.post(API_CONFIG.ENDPOINTS.AUTH.CHANGE_PASSWORD, input),
+  });
+}
+
+/**
+ * Update user preferences
+ */
+export function useUpdatePreferences() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (preferences: Partial<UserPreferences>) =>
+      apiClient.patch<User>(`${API_CONFIG.ENDPOINTS.AUTH.ME}/preferences`, preferences),
     onSuccess: (updatedUser) => {
-      queryClient.setQueryData(queryKeys.user.me(), updatedUser)
+      queryClient.setQueryData(QUERY_KEYS.USER_ME, updatedUser);
     },
-  })
+  });
 }
 
-/**
- * Get user token balance
- */
-export function useTokenBalance() {
-  return useQuery({
-    queryKey: queryKeys.user.tokens(),
-    queryFn: () => apiGet<TokenBalance>('/users/me/tokens'),
-    staleTime: 30 * 1000, // 30 seconds
-    refetchInterval: 60 * 1000, // Refetch every minute
-  })
-}
-
-// ============================================================================
-// AUTH STATE HELPERS
-// ============================================================================
+// ═══════════════════════════════════════════════════════════════════════════
+// UTILITY HOOKS
+// ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Check if user is authenticated
+ * Get auth state for routing
  */
-export function useIsAuthenticated() {
-  const { data: user, isLoading } = useCurrentUser()
+export function useAuthState() {
+  const { isAuthenticated, isLoading, user } = useIsAuthenticated();
+  
   return {
-    isAuthenticated: !!user,
+    isAuthenticated,
     isLoading,
     user,
-  }
-}
-
-/**
- * Prefetch user data (for SSR or preloading)
- */
-export async function prefetchUser(queryClient: ReturnType<typeof useQueryClient>) {
-  await queryClient.prefetchQuery({
-    queryKey: queryKeys.user.me(),
-    queryFn: () => apiGet<User>('/users/me'),
-  })
+    hasToken: tokenManager.isAuthenticated(),
+  };
 }

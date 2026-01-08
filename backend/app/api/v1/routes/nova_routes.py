@@ -28,14 +28,14 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, Depends, Query, status
 from pydantic import BaseModel, Field
 
-from backend.core.exceptions import (
+from app.core.exceptions import (
     NotFoundError,
     ValidationError,
     ForbiddenError,
     CheckpointRequiredError,
 )
-from backend.models.agent import SphereType
-from backend.services.nova import (
+from app.models.agent import SphereType
+from app.services.nova import (
     NovaPipelineService,
     NovaRequest,
     NovaPipelineResult,
@@ -335,7 +335,7 @@ async def analyze_intent(
     Useful for previewing what actions will require checkpoints
     without executing the full pipeline.
     """
-    from backend.services.nova import IntentAnalyzer, NovaRequest
+    from app.services.nova import IntentAnalyzer, NovaRequest
     
     analyzer = IntentAnalyzer()
     

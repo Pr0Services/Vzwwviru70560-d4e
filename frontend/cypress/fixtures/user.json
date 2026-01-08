@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "data": {
+    "id": "user-001",
+    "email": "test@chenu.io",
+    "name": "Jo",
+    "avatar": null,
+    "preferences": {
+      "theme": "dark",
+      "language": "fr",
+      "notifications": true,
+      "xr_enabled": true
+    },
+    "spheres": [
+      { "id": "personal", "name": "Personal", "access": "owner" },
+      { "id": "business", "name": "Business", "access": "owner" },
+      { "id": "scholar", "name": "Scholar", "access": "owner" },
+      { "id": "creative_studio", "name": "Creative Studio", "access": "owner" },
+      { "id": "community", "name": "Community", "access": "member" },
+      { "id": "social", "name": "Social & Media", "access": "owner" },
+      { "id": "entertainment", "name": "Entertainment", "access": "owner" },
+      { "id": "my_team", "name": "My Team", "access": "owner" },
+      { "id": "government", "name": "Government", "access": "member" }
+    ],
+    "token_budget": 500000,
+    "tokens_used": 125000,
+    "agents_hired": 8,
+    "created_at": "2025-01-01T00:00:00Z"
+  }
+}

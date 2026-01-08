@@ -26,14 +26,14 @@ from uuid import UUID, uuid4
 from sqlalchemy import select, func, and_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.core.exceptions import (
+from app.core.exceptions import (
     NotFoundError,
     ValidationError,
     ConflictError,
     ForbiddenError,
     CheckpointRequiredError,
 )
-from backend.models.agent import (
+from app.models.agent import (
     Agent,
     AgentStatus,
     AgentCapabilityType,
@@ -44,8 +44,8 @@ from backend.models.agent import (
     ExecutionStatus,
     ExecutionTrigger,
 )
-from backend.models.governance import GovernanceCheckpoint, CheckpointStatus, CheckpointType
-from backend.schemas.agent_schemas import (
+from app.models.governance import GovernanceCheckpoint, CheckpointStatus, CheckpointType
+from app.schemas.agent_schemas import (
     ExecutionRequest,
     ExecutionApproval,
     ExecutionResponse,
@@ -53,7 +53,7 @@ from backend.schemas.agent_schemas import (
     ExecutionListResponse,
     ExecutionCheckpointResponse,
 )
-from backend.services.agent.agent_registry import AgentRegistryService
+from app.services.agent_registry import AgentRegistryService
 
 logger = logging.getLogger(__name__)
 

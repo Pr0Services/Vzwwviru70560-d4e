@@ -12,7 +12,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
 
-from backend.core.config import settings
+from app.core.config import settings
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

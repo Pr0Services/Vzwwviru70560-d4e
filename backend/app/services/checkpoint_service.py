@@ -23,7 +23,7 @@ import logging
 from sqlalchemy import select, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.models.governance import (
+from app.models.governance import (
     GovernanceCheckpoint,
     AuditLog,
     CheckpointType,
@@ -31,7 +31,7 @@ from backend.models.governance import (
     AuditAction,
     AuditResourceType,
 )
-from backend.core.exceptions import (
+from app.core.exceptions import (
     NotFoundError,
     ForbiddenError,
     CheckpointRequiredError,

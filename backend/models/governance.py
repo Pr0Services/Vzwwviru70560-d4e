@@ -1,326 +1,181 @@
 """
-CHE·NU™ Governance Models
-=========================
+CHE·NU™ V75 Backend - Governance Models
 
-Database models for governance features:
-- GovernanceCheckpoint: HTTP 423 human gates
-- AuditLog: Complete audit trail
+RÈGLE ABSOLUE: GOUVERNANCE > EXÉCUTION
+- Tout action sensible nécessite approbation
+- Checkpoints avec aging visuel (GREEN → YELLOW → RED → BLINK)
+- Audit log complet
 
-R&D COMPLIANCE:
-✅ Rule #1: Human sovereignty via checkpoints
-✅ Rule #6: Full traceability via audit logs
+@version 75.0.0
 """
 
-from datetime import datetime
-from typing import Optional, List, Dict, Any
-from uuid import UUID, uuid4
-
-from sqlalchemy import (
-    Column, String, Text, Boolean, Integer, DateTime,
-    ForeignKey, Enum as SQLEnum
-)
-from sqlalchemy.dialects.postgresql import UUID as PGUUID, JSONB, ARRAY
+from sqlalchemy import Column, String, Boolean, DateTime, Text, ForeignKey, Integer
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
+from datetime import datetime, timedelta
+import uuid
 
-from backend.core.database import Base
-
-
-# =============================================================================
-# ENUMS
-# =============================================================================
-
-class CheckpointType:
-    """Types of governance checkpoints."""
-    GOVERNANCE = "governance"      # Rule-based checkpoint
-    COST = "cost"                  # Budget threshold
-    IDENTITY = "identity"          # Cross-identity action
-    SENSITIVE = "sensitive"        # Sensitive data/action
-    EXTERNAL = "external"          # External communication
-    FINANCIAL = "financial"        # Financial transaction
-    DELETION = "deletion"          # Data deletion
+from config.database import Base
 
 
-class CheckpointStatus:
-    """Checkpoint resolution status."""
-    PENDING = "pending"
-    APPROVED = "approved"
-    REJECTED = "rejected"
-    EXPIRED = "expired"
-    CANCELLED = "cancelled"
-
-
-# =============================================================================
-# GOVERNANCE CHECKPOINT MODEL
-# =============================================================================
-
-class GovernanceCheckpoint(Base):
+class Checkpoint(Base):
     """
-    Governance checkpoint for human approval gates.
+    Governance checkpoint.
     
-    When a sensitive action is detected, a checkpoint is created
-    and the system returns HTTP 423 LOCKED until human resolution.
+    Types:
+    - governance: Policy-related decisions
+    - cost: Financial approvals
+    - identity: Identity verification
+    - sensitive: Sensitive data access
+    - agent: Agent operations
+    - external: External API calls
     
-    R&D COMPLIANCE:
-    - Rule #1: Human Sovereignty - humans approve all sensitive actions
-    - Rule #6: Traceability - full audit of checkpoint lifecycle
+    Aging Status:
+    - green: < 25% time elapsed
+    - yellow: 25-50% elapsed
+    - red: 50-75% elapsed
+    - blink: > 75% elapsed (urgent)
     """
-    __tablename__ = "governance_checkpoints"
     
-    # Primary key
-    id: UUID = Column(PGUUID(as_uuid=True), primary_key=True, default=uuid4)
+    __tablename__ = "checkpoints"
     
-    # Ownership (for identity boundary)
-    identity_id: UUID = Column(
-        PGUUID(as_uuid=True),
-        ForeignKey("users.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True
-    )
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     
-    # Context
-    thread_id: Optional[UUID] = Column(
-        PGUUID(as_uuid=True),
-        ForeignKey("threads.id", ondelete="SET NULL"),
-        nullable=True,
-        index=True
-    )
+    type = Column(String(50), nullable=False)  # governance, cost, identity, sensitive, agent, external
+    title = Column(String(255), nullable=False)
+    description = Column(Text, nullable=True)
     
-    # Checkpoint details
-    checkpoint_type: str = Column(String(50), nullable=False)
-    reason: str = Column(Text, nullable=False)
+    status = Column(String(20), default="pending")  # pending, approved, rejected, expired
     
-    # The pending action data
-    action_data: Dict[str, Any] = Column(JSONB, nullable=False, default={})
+    requester_id = Column(String(255), nullable=False)
+    requester_type = Column(String(20), nullable=False)  # user, agent, system
     
-    # Available options for resolution
-    options: List[str] = Column(JSONB, nullable=False, default=["approve", "reject"])
+    resource_type = Column(String(50), nullable=False)
+    resource_id = Column(String(255), nullable=False)
     
-    # Resolution status
-    status: str = Column(String(50), nullable=False, default=CheckpointStatus.PENDING)
-    resolution: Optional[str] = Column(String(50), nullable=True)
-    resolution_reason: Optional[str] = Column(Text, nullable=True)
-    resolved_at: Optional[datetime] = Column(DateTime(timezone=True), nullable=True)
-    resolved_by: Optional[UUID] = Column(PGUUID(as_uuid=True), nullable=True)
+    context = Column(JSONB, default={})
     
-    # Expiration
-    expires_at: Optional[datetime] = Column(DateTime(timezone=True), nullable=True)
-    
-    # Metadata
-    metadata: Dict[str, Any] = Column(JSONB, nullable=False, default={})
-    
-    # Timestamps
-    created_at: datetime = Column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        nullable=False
-    )
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+    expires_at = Column(DateTime(timezone=True), nullable=True)
+    resolved_at = Column(DateTime(timezone=True), nullable=True)
+    resolved_by = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
+    resolution_comment = Column(Text, nullable=True)
     
     # Relationships
-    identity = relationship("User", back_populates="checkpoints")
-    thread = relationship("Thread", back_populates="checkpoints")
+    resolver = relationship("User", foreign_keys=[resolved_by])
     
-    def __repr__(self) -> str:
-        return f"<GovernanceCheckpoint(id={self.id}, type={self.checkpoint_type}, status={self.status})>"
+    def __repr__(self):
+        return f"<Checkpoint {self.type}: {self.title}>"
     
     @property
-    def is_pending(self) -> bool:
-        """Check if checkpoint is still pending."""
-        return self.status == CheckpointStatus.PENDING
+    def aging_status(self) -> str:
+        """
+        Calculate checkpoint aging status.
+        
+        GREEN: < 25% of time elapsed
+        YELLOW: 25-50% elapsed
+        RED: 50-75% elapsed
+        BLINK: > 75% elapsed (urgent)
+        """
+        if self.status != "pending":
+            return "resolved"
+        
+        now = datetime.utcnow()
+        expires = self.expires_at or (self.created_at + timedelta(hours=24))
+        
+        if now >= expires:
+            return "expired"
+        
+        total_time = (expires - self.created_at).total_seconds()
+        elapsed_time = (now - self.created_at).total_seconds()
+        
+        if elapsed_time < 0:
+            return "green"
+        
+        percentage = elapsed_time / total_time
+        
+        if percentage < 0.25:
+            return "green"
+        elif percentage < 0.50:
+            return "yellow"
+        elif percentage < 0.75:
+            return "red"
+        else:
+            return "blink"
     
     @property
     def is_expired(self) -> bool:
         """Check if checkpoint has expired."""
-        if self.expires_at and self.status == CheckpointStatus.PENDING:
-            return datetime.utcnow() > self.expires_at
-        return False
-    
-    def approve(self, resolved_by: UUID, reason: Optional[str] = None) -> None:
-        """Approve the checkpoint."""
-        self.status = CheckpointStatus.APPROVED
-        self.resolution = "approve"
-        self.resolution_reason = reason
-        self.resolved_at = datetime.utcnow()
-        self.resolved_by = resolved_by
-    
-    def reject(self, resolved_by: UUID, reason: Optional[str] = None) -> None:
-        """Reject the checkpoint."""
-        self.status = CheckpointStatus.REJECTED
-        self.resolution = "reject"
-        self.resolution_reason = reason
-        self.resolved_at = datetime.utcnow()
-        self.resolved_by = resolved_by
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary for API response."""
-        return {
-            "id": str(self.id),
-            "identity_id": str(self.identity_id),
-            "thread_id": str(self.thread_id) if self.thread_id else None,
-            "checkpoint_type": self.checkpoint_type,
-            "reason": self.reason,
-            "action_data": self.action_data,
-            "options": self.options,
-            "status": self.status,
-            "resolution": self.resolution,
-            "resolution_reason": self.resolution_reason,
-            "resolved_at": self.resolved_at.isoformat() if self.resolved_at else None,
-            "resolved_by": str(self.resolved_by) if self.resolved_by else None,
-            "expires_at": self.expires_at.isoformat() if self.expires_at else None,
-            "metadata": self.metadata,
-            "created_at": self.created_at.isoformat(),
-        }
+        if not self.expires_at:
+            return False
+        return datetime.utcnow() >= self.expires_at
 
 
-# =============================================================================
-# AUDIT LOG MODEL
-# =============================================================================
+class Policy(Base):
+    """
+    Governance policy definition.
+    
+    Policies are loaded into OPA for enforcement.
+    """
+    
+    __tablename__ = "policies"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    
+    name = Column(String(100), nullable=False, unique=True)
+    description = Column(Text, nullable=True)
+    
+    type = Column(String(50), nullable=False)  # cost, external, agent, identity, data
+    rules = Column(JSONB, nullable=False, default={})
+    
+    is_active = Column(Boolean, default=True)
+    priority = Column(Integer, default=100)  # Lower = higher priority
+    
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+    updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def __repr__(self):
+        return f"<Policy {self.name}>"
+
 
 class AuditLog(Base):
     """
-    Audit log for complete system traceability.
+    Governance audit log.
     
-    Every significant action in CHE·NU is logged here for:
-    - Security auditing
-    - Compliance requirements
-    - Debugging and support
-    - User activity history
-    
-    R&D COMPLIANCE:
-    - Rule #6: Module Traceability - all actions logged
-    - Rule #7: R&D Continuity - historical record maintained
+    Every governance decision is logged for compliance and transparency.
     """
-    __tablename__ = "audit_logs"
     
-    # Primary key
-    id: UUID = Column(PGUUID(as_uuid=True), primary_key=True, default=uuid4)
+    __tablename__ = "audit_log"
     
-    # Who performed the action (can be null for system actions)
-    identity_id: Optional[UUID] = Column(
-        PGUUID(as_uuid=True),
-        ForeignKey("users.id", ondelete="SET NULL"),
-        nullable=True,
-        index=True
-    )
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     
-    # What action was performed
-    action: str = Column(String(100), nullable=False, index=True)
+    action = Column(String(100), nullable=False)  # e.g., checkpoint.approve, agent.hire
+    resource_type = Column(String(50), nullable=False)
+    resource_id = Column(String(255), nullable=False)
     
-    # What resource was affected
-    resource_type: str = Column(String(100), nullable=False)
-    resource_id: Optional[UUID] = Column(PGUUID(as_uuid=True), nullable=True)
+    actor_id = Column(String(255), nullable=False)
+    actor_type = Column(String(20), nullable=False)  # user, agent, system
     
-    # Action details
-    details: Dict[str, Any] = Column(JSONB, nullable=False, default={})
+    details = Column(JSONB, default={})
     
-    # Request context
-    ip_address: Optional[str] = Column(String(45), nullable=True)
-    user_agent: Optional[str] = Column(String(500), nullable=True)
+    # OPA decision info
+    opa_decision = Column(Boolean, nullable=True)
+    opa_policy = Column(String(100), nullable=True)
     
-    # Timestamp
-    created_at: datetime = Column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        nullable=False,
-        index=True
-    )
+    timestamp = Column(DateTime(timezone=True), default=datetime.utcnow, index=True)
     
-    # Relationships
-    identity = relationship("User", back_populates="audit_logs")
+    def __repr__(self):
+        return f"<AuditLog {self.action} on {self.resource_type}/{self.resource_id}>"
     
-    def __repr__(self) -> str:
-        return f"<AuditLog(id={self.id}, action={self.action}, resource={self.resource_type})>"
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary for API response."""
-        return {
-            "id": str(self.id),
-            "identity_id": str(self.identity_id) if self.identity_id else None,
-            "action": self.action,
-            "resource_type": self.resource_type,
-            "resource_id": str(self.resource_id) if self.resource_id else None,
-            "details": self.details,
-            "ip_address": self.ip_address,
-            "user_agent": self.user_agent,
-            "created_at": self.created_at.isoformat(),
-        }
-
-
-# =============================================================================
-# AUDIT ACTION TYPES
-# =============================================================================
-
-class AuditAction:
-    """Standard audit action types."""
-    # Authentication
-    LOGIN = "auth.login"
-    LOGOUT = "auth.logout"
-    LOGIN_FAILED = "auth.login_failed"
-    PASSWORD_CHANGED = "auth.password_changed"
-    PASSWORD_RESET_REQUESTED = "auth.password_reset_requested"
-    TOKEN_REFRESHED = "auth.token_refreshed"
-    
-    # User
-    USER_CREATED = "user.created"
-    USER_UPDATED = "user.updated"
-    USER_DELETED = "user.deleted"
-    
-    # Sphere
-    SPHERE_CREATED = "sphere.created"
-    SPHERE_UPDATED = "sphere.updated"
-    SPHERE_ACCESSED = "sphere.accessed"
-    
-    # Thread
-    THREAD_CREATED = "thread.created"
-    THREAD_UPDATED = "thread.updated"
-    THREAD_ARCHIVED = "thread.archived"
-    EVENT_APPENDED = "thread.event_appended"
-    
-    # Decision
-    DECISION_RECORDED = "decision.recorded"
-    DECISION_SUPERSEDED = "decision.superseded"
-    
-    # Action
-    ACTION_CREATED = "action.created"
-    ACTION_COMPLETED = "action.completed"
-    ACTION_CANCELLED = "action.cancelled"
-    
-    # Checkpoint
-    CHECKPOINT_CREATED = "checkpoint.created"
-    CHECKPOINT_APPROVED = "checkpoint.approved"
-    CHECKPOINT_REJECTED = "checkpoint.rejected"
-    CHECKPOINT_EXPIRED = "checkpoint.expired"
-    
-    # Agent
-    AGENT_INVOKED = "agent.invoked"
-    AGENT_COMPLETED = "agent.completed"
-    AGENT_FAILED = "agent.failed"
-    
-    # Data
-    DATA_EXPORTED = "data.exported"
-    DATA_IMPORTED = "data.imported"
-    
-    # System
-    SYSTEM_ERROR = "system.error"
-    RATE_LIMIT_EXCEEDED = "system.rate_limit"
-
-
-# =============================================================================
-# AUDIT RESOURCE TYPES
-# =============================================================================
-
-class AuditResourceType:
-    """Standard resource types for audit logs."""
-    USER = "user"
-    SESSION = "session"
-    SPHERE = "sphere"
-    BUREAU_SECTION = "bureau_section"
-    QUICK_CAPTURE = "quick_capture"
-    THREAD = "thread"
-    EVENT = "event"
-    DECISION = "decision"
-    ACTION = "action"
-    SNAPSHOT = "snapshot"
-    CHECKPOINT = "checkpoint"
-    AGENT = "agent"
-    SYSTEM = "system"
+    @classmethod
+    def log(cls, action: str, resource_type: str, resource_id: str, 
+            actor_id: str, actor_type: str = "user", **details):
+        """Create an audit log entry."""
+        return cls(
+            action=action,
+            resource_type=resource_type,
+            resource_id=resource_id,
+            actor_id=actor_id,
+            actor_type=actor_type,
+            details=details,
+        )

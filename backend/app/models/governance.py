@@ -23,7 +23,7 @@ from sqlalchemy.dialects.postgresql import UUID as PGUUID, JSONB, ARRAY
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-from backend.core.database import Base
+from app.core.database import Base
 
 
 # =============================================================================
@@ -106,8 +106,8 @@ class GovernanceCheckpoint(Base):
     # Expiration
     expires_at: Optional[datetime] = Column(DateTime(timezone=True), nullable=True)
     
-    # Metadata
-    metadata: Dict[str, Any] = Column(JSONB, nullable=False, default={})
+    # Checkpoint metadata
+    checkpoint_metadata: Dict[str, Any] = Column(JSONB, nullable=False, default={})
     
     # Timestamps
     created_at: datetime = Column(
@@ -167,7 +167,7 @@ class GovernanceCheckpoint(Base):
             "resolved_at": self.resolved_at.isoformat() if self.resolved_at else None,
             "resolved_by": str(self.resolved_by) if self.resolved_by else None,
             "expires_at": self.expires_at.isoformat() if self.expires_at else None,
-            "metadata": self.metadata,
+            "metadata": self.checkpoint_metadata,
             "created_at": self.created_at.isoformat(),
         }
 

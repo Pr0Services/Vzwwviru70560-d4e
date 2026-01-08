@@ -4,8 +4,8 @@ CHE·NU™ Core Module
 Central configuration, security, database, and utilities.
 """
 
-from backend.core.config import settings, get_settings
-from backend.core.database import (
+from app.core.config import settings, get_settings
+from app.core.database import (
     Base,
     get_db,
     get_db_context,
@@ -15,7 +15,7 @@ from backend.core.database import (
     engine,
     async_session_factory,
 )
-from backend.core.security import (
+from app.core.security import (
     hash_password,
     verify_password,
     create_access_token,
@@ -32,7 +32,7 @@ from backend.core.security import (
     TokenVerificationError,
     IdentityBoundaryViolation,
 )
-from backend.core.redis import (
+from app.core.redis import (
     get_redis,
     close_redis,
     check_redis_health,
@@ -45,7 +45,7 @@ from backend.core.redis import (
     rate_limit_cache,
     pubsub,
 )
-from backend.core.exceptions import (
+from app.core.exceptions import (
     CHENUBaseException,
     AuthenticationError,
     AuthorizationError,

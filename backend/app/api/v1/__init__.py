@@ -314,6 +314,15 @@ async def list_decisions(
     ]
     return ApiResponse(success=True, data=decisions)
 
+@router.get("/decisions/stats", response_model=ApiResponse[DecisionStats], tags=["Decisions"])
+async def get_decision_stats(current_user: User = Depends(get_current_user)):
+    """Get decision statistics."""
+    return ApiResponse(success=True, data=DecisionStats(
+        total=15,
+        by_aging={"GREEN": 5, "YELLOW": 6, "RED": 3, "BLINK": 1},
+        by_priority={"low": 4, "medium": 7, "high": 3, "critical": 1}
+    ))
+
 @router.get("/decisions/{decision_id}", response_model=ApiResponse[Decision], tags=["Decisions"])
 async def get_decision(decision_id: str, current_user: User = Depends(get_current_user)):
     """Get decision by ID."""
@@ -343,15 +352,6 @@ async def defer_decision(
 ):
     """Defer a decision."""
     return ApiResponse(success=True, data=None, message="Decision deferred")
-
-@router.get("/decisions/stats", response_model=ApiResponse[DecisionStats], tags=["Decisions"])
-async def get_decision_stats(current_user: User = Depends(get_current_user)):
-    """Get decision statistics."""
-    return ApiResponse(success=True, data=DecisionStats(
-        total=15,
-        by_aging={"GREEN": 5, "YELLOW": 6, "RED": 3, "BLINK": 1},
-        by_priority={"low": 4, "medium": 7, "high": 3, "critical": 1}
-    ))
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # AGENTS ENDPOINTS
@@ -387,6 +387,34 @@ async def list_agents(
         ),
     ]
     return ApiResponse(success=True, data=agents)
+
+@router.get("/agents/stats", response_model=ApiResponse[dict], tags=["Agents"])
+async def get_agents_stats(current_user: User = Depends(get_current_user)):
+    """Get agent statistics."""
+    stats = {
+        "total_agents": 226,
+        "hired_agents": 8,
+        "available_agents": 218,
+        "by_domain": {
+            "construction": 34,
+            "business": 43,
+            "creative": 42,
+            "personal": 28,
+            "scholar": 25,
+            "government": 18,
+            "social": 15,
+            "community": 12,
+            "entertainment": 8,
+            "my_team": 35,
+        },
+        "by_level": {
+            "1": 45,
+            "2": 89,
+            "3": 67,
+            "4": 25,
+        }
+    }
+    return ApiResponse(success=True, data=stats)
 
 @router.get("/agents/{agent_id}", response_model=ApiResponse[Agent], tags=["Agents"])
 async def get_agent(agent_id: str, current_user: User = Depends(get_current_user)):
@@ -428,16 +456,6 @@ async def get_agent_suggestions(
         ),
     ]
     return ApiResponse(success=True, data=suggestions)
-
-@router.get("/agents/stats", response_model=ApiResponse[AgentStats], tags=["Agents"])
-async def get_agent_stats(current_user: User = Depends(get_current_user)):
-    """Get agent statistics."""
-    return ApiResponse(success=True, data=AgentStats(
-        total=226,
-        hired=8,
-        by_level={0: 1, 1: 89, 2: 98, 3: 38},
-        by_domain={"construction": 45, "finance": 32, "legal": 28}
-    ))
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # CHECKPOINTS ENDPOINTS (GOVERNANCE)

@@ -15,16 +15,16 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.core.database import get_db
-from backend.core.exceptions import (
+from app.core.database import get_db
+from app.core.exceptions import (
     SphereNotFoundError,
     IdentityBoundaryError,
     ValidationError,
 )
-from backend.api.dependencies import get_current_user, CurrentUser
-from backend.services.sphere.sphere_service import SphereService, get_sphere_service
-from backend.models.sphere import BureauSectionType
-from backend.schemas.sphere_schemas import (
+from app.api.dependencies import get_current_user, CurrentUser
+from app.services.sphere.sphere_service import SphereService, get_sphere_service
+from app.models.sphere import BureauSectionType
+from app.schemas.sphere_schemas import (
     SphereTypeEnum,
     BureauSectionTypeEnum,
     SphereSummary,
@@ -119,7 +119,7 @@ async def get_sphere_by_type(
     db: AsyncSession = Depends(get_db),
 ) -> SphereDetail:
     """Get sphere by type."""
-    from backend.models.sphere import SphereType
+    from app.models.sphere import SphereType
     
     service = get_sphere_service(db, current_user.identity_id)
     

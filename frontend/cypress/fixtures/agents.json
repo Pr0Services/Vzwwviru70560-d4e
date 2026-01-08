@@ -1,0 +1,74 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": "agent-001",
+      "name": "Project Coordinator",
+      "domain": "business",
+      "level": 2,
+      "capabilities": ["project_planning", "resource_allocation", "timeline_management"],
+      "token_cost": 500,
+      "is_hired": true,
+      "description": "Coordonne les projets et gère les ressources",
+      "sphere_restrictions": ["business", "my_team"]
+    },
+    {
+      "id": "agent-002",
+      "name": "Research Analyst",
+      "domain": "scholar",
+      "level": 3,
+      "capabilities": ["literature_review", "data_analysis", "citation_management"],
+      "token_cost": 750,
+      "is_hired": true,
+      "description": "Analyse la recherche et synthétise les informations",
+      "sphere_restrictions": ["scholar", "personal"]
+    },
+    {
+      "id": "agent-003",
+      "name": "Content Creator",
+      "domain": "creative",
+      "level": 2,
+      "capabilities": ["content_writing", "image_generation", "video_editing"],
+      "token_cost": 600,
+      "is_hired": false,
+      "description": "Crée du contenu multimédia",
+      "sphere_restrictions": ["creative_studio", "social"]
+    },
+    {
+      "id": "agent-004",
+      "name": "Financial Advisor",
+      "domain": "finance",
+      "level": 3,
+      "capabilities": ["budget_planning", "expense_tracking", "financial_analysis"],
+      "token_cost": 800,
+      "is_hired": true,
+      "description": "Conseille sur les questions financières",
+      "sphere_restrictions": ["business", "personal"]
+    },
+    {
+      "id": "agent-005",
+      "name": "Task Automator",
+      "domain": "productivity",
+      "level": 1,
+      "capabilities": ["task_scheduling", "reminder_setting", "workflow_automation"],
+      "token_cost": 300,
+      "is_hired": false,
+      "description": "Automatise les tâches répétitives",
+      "sphere_restrictions": ["personal", "business"]
+    },
+    {
+      "id": "agent-006",
+      "name": "Communication Manager",
+      "domain": "communication",
+      "level": 2,
+      "capabilities": ["email_drafting", "meeting_scheduling", "notification_management"],
+      "token_cost": 450,
+      "is_hired": true,
+      "description": "Gère les communications",
+      "sphere_restrictions": ["business", "community", "my_team"]
+    }
+  ],
+  "total": 226,
+  "hired": 8,
+  "available": 218
+}

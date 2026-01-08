@@ -23,7 +23,7 @@ from datetime import datetime
 import logging
 
 # Import schemas
-from backend.schemas.xr_schemas import (
+from app.schemas.xr_schemas import (
     XRBlueprint,
     BlueprintZone,
     BlueprintItem,
@@ -43,8 +43,8 @@ from backend.schemas.xr_schemas import (
 )
 
 # Import services
-from backend.services.xr.maturity_service import MaturityService
-from backend.services.xr.xr_renderer_service import XRRendererService
+from app.services.xr.maturity_service import MaturityService
+from app.services.xr.xr_renderer_service import XRRendererService
 
 logger = logging.getLogger(__name__)
 

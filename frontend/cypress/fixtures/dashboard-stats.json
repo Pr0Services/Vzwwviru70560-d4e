@@ -1,0 +1,12 @@
+{
+  "success": true,
+  "data": {
+    "decisions_pending": 15,
+    "threads_active": 23,
+    "agents_hired": 8,
+    "checkpoints_pending": 5,
+    "governance_score": 87.5,
+    "tokens_used": 125000,
+    "tokens_budget": 500000
+  }
+}

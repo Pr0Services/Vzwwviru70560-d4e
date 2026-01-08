@@ -21,23 +21,23 @@ R&D COMPLIANCE:
 - Rule #6: Full traceability
 """
 
-from backend.services.agent.agent_registry import (
+from app.services.agent_registry import (
     AgentRegistryService,
     get_all_predefined_agents,
 )
-from backend.services.agent.agent_execution import (
+from app.services.agent_execution import (
     AgentExecutionService,
     requires_human_gate,
     SENSITIVE_CAPABILITIES,
     CONDITIONAL_APPROVAL_CAPABILITIES,
 )
-from backend.services.agent.extended_agents import (
+from app.services.extended_agents import (
     get_all_extended_agents,
     EXTENDED_AGENT_COUNTS,
     TOTAL_EXTENDED_AGENTS,
     GRAND_TOTAL_SPHERE_AGENTS,
 )
-from backend.services.agent.thread_agent_service import (
+from app.services.thread_agent_service import (
     ThreadAgentService,
     ThreadAgent,
     ThreadAgentStatus,

@@ -2,56 +2,125 @@
 CHE·NU™ Redis Configuration
 
 Redis client for caching, sessions, and real-time features.
+Falls back to in-memory cache if Redis is not available.
 """
 
-from typing import Optional, Any
+from typing import Optional, Any, Dict
 import json
 from contextlib import asynccontextmanager
+import os
 
-import redis.asyncio as redis
-from redis.asyncio.connection import ConnectionPool
+from app.core.config import settings
 
-from backend.core.config import settings
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# IN-MEMORY FALLBACK (for development without Redis)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class InMemoryCache:
+    """Simple in-memory cache for development."""
+    
+    def __init__(self):
+        self._data: Dict[str, Any] = {}
+    
+    async def get(self, key: str) -> Optional[str]:
+        return self._data.get(key)
+    
+    async def set(self, key: str, value: str, ex: int = None) -> bool:
+        self._data[key] = value
+        return True
+    
+    async def setex(self, key: str, ttl: int, value: str) -> bool:
+        self._data[key] = value
+        return True
+    
+    async def delete(self, key: str) -> int:
+        if key in self._data:
+            del self._data[key]
+            return 1
+        return 0
+    
+    async def exists(self, key: str) -> int:
+        return 1 if key in self._data else 0
+    
+    async def incrby(self, key: str, amount: int) -> int:
+        val = int(self._data.get(key, 0)) + amount
+        self._data[key] = str(val)
+        return val
+    
+    async def expire(self, key: str, ttl: int) -> bool:
+        return key in self._data
+    
+    async def ttl(self, key: str) -> int:
+        return -1 if key in self._data else -2
+    
+    async def ping(self) -> bool:
+        return True
+    
+    async def publish(self, channel: str, message: str) -> int:
+        return 0
+    
+    def pubsub(self):
+        return InMemoryPubSub()
+    
+    async def close(self):
+        pass
+
+
+class InMemoryPubSub:
+    """Mock PubSub for development."""
+    
+    async def subscribe(self, *channels):
+        pass
+    
+    async def unsubscribe(self, *channels):
+        pass
+    
+    async def listen(self):
+        # Never yields, just returns empty
+        return
+        yield  # Make it a generator
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # REDIS CLIENT
 # ═══════════════════════════════════════════════════════════════════════════════
 
-_redis_pool: Optional[ConnectionPool] = None
-_redis_client: Optional[redis.Redis] = None
+_redis_client: Optional[Any] = None
+_use_mock = os.environ.get("USE_MOCK_REDIS", "true").lower() == "true"
 
 
-async def get_redis_pool() -> ConnectionPool:
-    """Get or create Redis connection pool."""
-    global _redis_pool
-    if _redis_pool is None:
-        _redis_pool = ConnectionPool.from_url(
-            settings.REDIS_URL,
-            max_connections=50,
-            decode_responses=True,
-        )
-    return _redis_pool
-
-
-async def get_redis() -> redis.Redis:
-    """Get Redis client instance."""
+async def get_redis() -> Any:
+    """Get Redis client instance (or mock for development)."""
     global _redis_client
+    
     if _redis_client is None:
-        pool = await get_redis_pool()
-        _redis_client = redis.Redis(connection_pool=pool)
+        if _use_mock:
+            _redis_client = InMemoryCache()
+        else:
+            try:
+                import redis.asyncio as redis
+                from redis.asyncio.connection import ConnectionPool
+                
+                pool = ConnectionPool.from_url(
+                    settings.REDIS_URL,
+                    max_connections=50,
+                    decode_responses=True,
+                )
+                _redis_client = redis.Redis(connection_pool=pool)
+            except Exception:
+                # Fall back to mock
+                _redis_client = InMemoryCache()
+    
     return _redis_client
 
 
 async def close_redis() -> None:
     """Close Redis connections."""
-    global _redis_client, _redis_pool
+    global _redis_client
     if _redis_client:
         await _redis_client.close()
         _redis_client = None
-    if _redis_pool:
-        await _redis_pool.disconnect()
-        _redis_pool = None
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

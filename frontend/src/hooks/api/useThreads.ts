@@ -1,335 +1,222 @@
 /**
- * ╔══════════════════════════════════════════════════════════════════════════════╗
- * ║                    CHE·NU™ — THREAD & MESSAGE HOOKS                          ║
- * ║                    Sprint B3.2: TanStack Query                               ║
- * ╚══════════════════════════════════════════════════════════════════════════════╝
+ * ═══════════════════════════════════════════════════════════════════════════
+ * CHE·NU™ V75 — THREADS HOOKS
+ * ═══════════════════════════════════════════════════════════════════════════
  */
 
-import { 
-  useQuery, 
-  useMutation, 
-  useQueryClient,
-  useInfiniteQuery,
-} from '@tanstack/react-query'
-import { apiGet, apiPost, apiPatch, apiDelete, queryKeys } from './client'
-import type {
-  Thread,
-  ThreadDetail,
-  ThreadFilters,
-  CreateThreadRequest,
-  UpdateThreadRequest,
-  Message,
-  SendMessageRequest,
-  SendMessageResponse,
-  PaginatedResponse,
-  UUID,
-} from '@/types/api.generated'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '../../services/apiClient';
+import { API_CONFIG, QUERY_KEYS, STALE_TIMES } from '../../config/api.config';
 
-// ============================================================================
-// THREAD HOOKS
-// ============================================================================
+// ═══════════════════════════════════════════════════════════════════════════
+// TYPES
+// ═══════════════════════════════════════════════════════════════════════════
+
+export type ThreadStatus = 'active' | 'paused' | 'archived' | 'completed';
+export type ThreadType = 'personal' | 'collective' | 'institutional';
+export type ThreadVisibility = 'private' | 'semi_private' | 'public';
+
+export interface Thread {
+  id: string;
+  title: string;
+  founding_intent: string;
+  thread_type: ThreadType;
+  sphere_id: string;
+  sphere_name?: string;
+  parent_thread_id?: string;
+  status: ThreadStatus;
+  visibility: ThreadVisibility;
+  event_count: number;
+  decision_count: number;
+  last_activity_at: string;
+  created_at: string;
+  updated_at: string;
+  tags?: string[];
+  color?: string;
+}
+
+export interface ThreadEvent {
+  id: string;
+  thread_id: string;
+  type: string;
+  payload: Record<string, unknown>;
+  created_by: string;
+  created_at: string;
+  parent_event_id?: string;
+}
+
+export interface CreateThreadInput {
+  title: string;
+  founding_intent: string;
+  sphere_id: string;
+  thread_type?: ThreadType;
+  visibility?: ThreadVisibility;
+  parent_thread_id?: string;
+  tags?: string[];
+  color?: string;
+}
+
+export interface UpdateThreadInput {
+  title?: string;
+  status?: ThreadStatus;
+  visibility?: ThreadVisibility;
+  tags?: string[];
+  color?: string;
+}
+
+export interface ThreadFilters {
+  sphere_id?: string;
+  status?: ThreadStatus;
+  thread_type?: ThreadType;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// QUERY HOOKS
+// ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Get paginated threads with filters
+ * Fetch all threads with optional filters
  */
 export function useThreads(filters?: ThreadFilters) {
-  return useQuery({
-    queryKey: queryKeys.threads.list(filters),
-    queryFn: () => apiGet<PaginatedResponse<Thread>>('/threads', { params: filters }),
-    staleTime: 30 * 1000, // 30 seconds
-  })
+  return useQuery<Thread[]>({
+    queryKey: [...QUERY_KEYS.THREADS, filters],
+    queryFn: () => apiClient.get<Thread[]>(API_CONFIG.ENDPOINTS.THREADS.LIST, { 
+      params: filters as Record<string, string | number | boolean | undefined> 
+    }),
+    staleTime: STALE_TIMES.STANDARD,
+  });
 }
 
 /**
- * Get infinite scrolling threads
+ * Fetch single thread by ID
  */
-export function useInfiniteThreads(filters?: Omit<ThreadFilters, 'page'>) {
-  return useInfiniteQuery({
-    queryKey: [...queryKeys.threads.list(filters), 'infinite'],
-    queryFn: ({ pageParam = 1 }) => 
-      apiGet<PaginatedResponse<Thread>>('/threads', { 
-        params: { ...filters, page: pageParam } 
-      }),
-    getNextPageParam: (lastPage) => 
-      lastPage.has_next ? lastPage.page + 1 : undefined,
-    initialPageParam: 1,
-    staleTime: 30 * 1000,
-  })
-}
-
-/**
- * Get single thread with details
- */
-export function useThread(threadId: UUID | undefined) {
-  return useQuery({
-    queryKey: queryKeys.threads.detail(threadId || ''),
-    queryFn: () => apiGet<ThreadDetail>(`/threads/${threadId}`),
+export function useThread(threadId: string | undefined) {
+  return useQuery<Thread>({
+    queryKey: QUERY_KEYS.THREAD(threadId || ''),
+    queryFn: () => apiClient.get<Thread>(API_CONFIG.ENDPOINTS.THREADS.DETAIL(threadId!)),
     enabled: !!threadId,
-    staleTime: 10 * 1000, // 10 seconds - threads update frequently
-  })
+    staleTime: STALE_TIMES.STANDARD,
+  });
 }
 
 /**
- * Create new thread
+ * Fetch thread events
  */
-export function useCreateThread() {
-  const queryClient = useQueryClient()
-  
-  return useMutation({
-    mutationFn: (data: CreateThreadRequest) => 
-      apiPost<Thread>('/threads', data),
-    onSuccess: (newThread) => {
-      // Invalidate thread lists
-      queryClient.invalidateQueries({ queryKey: queryKeys.threads.list() })
-      
-      // Add to cache
-      queryClient.setQueryData(
-        queryKeys.threads.detail(newThread.id),
-        newThread
-      )
-    },
-  })
-}
-
-/**
- * Update thread
- */
-export function useUpdateThread(threadId: UUID) {
-  const queryClient = useQueryClient()
-  
-  return useMutation({
-    mutationFn: (data: UpdateThreadRequest) => 
-      apiPatch<Thread>(`/threads/${threadId}`, data),
-    // Optimistic update
-    onMutate: async (data) => {
-      await queryClient.cancelQueries({ queryKey: queryKeys.threads.detail(threadId) })
-      
-      const previousThread = queryClient.getQueryData<ThreadDetail>(
-        queryKeys.threads.detail(threadId)
-      )
-      
-      if (previousThread) {
-        queryClient.setQueryData(
-          queryKeys.threads.detail(threadId),
-          { ...previousThread, ...data }
-        )
-      }
-      
-      return { previousThread }
-    },
-    onError: (_err, _data, context) => {
-      // Rollback on error
-      if (context?.previousThread) {
-        queryClient.setQueryData(
-          queryKeys.threads.detail(threadId),
-          context.previousThread
-        )
-      }
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.threads.detail(threadId) })
-      queryClient.invalidateQueries({ queryKey: queryKeys.threads.list() })
-    },
-  })
-}
-
-/**
- * Delete thread
- */
-export function useDeleteThread() {
-  const queryClient = useQueryClient()
-  
-  return useMutation({
-    mutationFn: (threadId: UUID) => 
-      apiDelete<{ success: boolean }>(`/threads/${threadId}`),
-    onSuccess: (_data, threadId) => {
-      // Remove from cache
-      queryClient.removeQueries({ queryKey: queryKeys.threads.detail(threadId) })
-      queryClient.invalidateQueries({ queryKey: queryKeys.threads.list() })
-    },
-  })
-}
-
-/**
- * Archive thread
- */
-export function useArchiveThread() {
-  const queryClient = useQueryClient()
-  
-  return useMutation({
-    mutationFn: (threadId: UUID) => 
-      apiPost<Thread>(`/threads/${threadId}/archive`),
-    onSuccess: (updatedThread) => {
-      queryClient.setQueryData(
-        queryKeys.threads.detail(updatedThread.id),
-        (old: ThreadDetail | undefined) => old ? { ...old, ...updatedThread } : undefined
-      )
-      queryClient.invalidateQueries({ queryKey: queryKeys.threads.list() })
-    },
-  })
-}
-
-// ============================================================================
-// MESSAGE HOOKS
-// ============================================================================
-
-/**
- * Get messages for a thread (paginated)
- */
-export function useMessages(threadId: UUID | undefined, page = 1, limit = 50) {
-  return useQuery({
-    queryKey: queryKeys.threads.messages(threadId || '', page),
-    queryFn: () => apiGet<PaginatedResponse<Message>>(
-      `/threads/${threadId}/messages`,
-      { params: { page, limit } }
+export function useThreadEvents(threadId: string | undefined, limit: number = 50) {
+  return useQuery<ThreadEvent[]>({
+    queryKey: [...QUERY_KEYS.THREAD_EVENTS(threadId || ''), { limit }],
+    queryFn: () => apiClient.get<ThreadEvent[]>(
+      API_CONFIG.ENDPOINTS.THREADS.EVENTS(threadId!),
+      { params: { limit } }
     ),
     enabled: !!threadId,
-    staleTime: 10 * 1000,
-  })
+    staleTime: STALE_TIMES.FREQUENT,
+  });
 }
 
 /**
- * Get infinite scrolling messages
+ * Fetch threads by sphere
  */
-export function useInfiniteMessages(threadId: UUID | undefined) {
-  return useInfiniteQuery({
-    queryKey: [...queryKeys.threads.messages(threadId || ''), 'infinite'],
-    queryFn: ({ pageParam = 1 }) => 
-      apiGet<PaginatedResponse<Message>>(
-        `/threads/${threadId}/messages`,
-        { params: { page: pageParam, limit: 50 } }
-      ),
-    getNextPageParam: (lastPage) => 
-      lastPage.has_next ? lastPage.page + 1 : undefined,
-    initialPageParam: 1,
-    enabled: !!threadId,
-    staleTime: 10 * 1000,
-  })
+export function useThreadsBySphere(sphereId: string | undefined) {
+  return useThreads(sphereId ? { sphere_id: sphereId } : undefined);
 }
 
 /**
- * Send message to thread
+ * Fetch active threads only
  */
-export function useSendMessage(threadId: UUID) {
-  const queryClient = useQueryClient()
-  
+export function useActiveThreads() {
+  return useThreads({ status: 'active' });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MUTATION HOOKS
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Create a new thread
+ */
+export function useCreateThread() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (data: SendMessageRequest) => 
-      apiPost<SendMessageResponse>(`/threads/${threadId}/messages`, data),
-    // Optimistic update
-    onMutate: async (data) => {
-      await queryClient.cancelQueries({ 
-        queryKey: queryKeys.threads.messages(threadId) 
-      })
-      
-      // Create optimistic message
-      const optimisticMessage: Message = {
-        id: `optimistic-${Date.now()}`,
-        thread_id: threadId,
-        role: 'user',
-        content: data.content,
-        status: 'sending',
-        created_by: 'current-user',
-        created_at: new Date().toISOString(),
-        metadata: {},
-        attachments: [],
-      }
-      
-      // Add to messages cache
-      const previousMessages = queryClient.getQueryData<PaginatedResponse<Message>>(
-        queryKeys.threads.messages(threadId, 1)
-      )
-      
-      if (previousMessages) {
-        queryClient.setQueryData(
-          queryKeys.threads.messages(threadId, 1),
-          {
-            ...previousMessages,
-            items: [...previousMessages.items, optimisticMessage],
-            total: previousMessages.total + 1,
-          }
-        )
-      }
-      
-      return { previousMessages, optimisticMessage }
+    mutationFn: (data: CreateThreadInput) =>
+      apiClient.post<Thread>(API_CONFIG.ENDPOINTS.THREADS.CREATE, data),
+    onSuccess: (newThread) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.THREADS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SPHERE(newThread.sphere_id) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_STATS });
     },
-    onError: (_err, _data, context) => {
-      // Rollback
-      if (context?.previousMessages) {
-        queryClient.setQueryData(
-          queryKeys.threads.messages(threadId, 1),
-          context.previousMessages
-        )
-      }
-    },
-    onSuccess: (response, _data, context) => {
-      // Replace optimistic message with real one
-      queryClient.setQueryData<PaginatedResponse<Message>>(
-        queryKeys.threads.messages(threadId, 1),
-        (old) => {
-          if (!old) return old
-          
-          const items = old.items.map(msg => 
-            msg.id === context?.optimisticMessage.id 
-              ? response.user_message 
-              : msg
-          )
-          
-          // Add assistant response if present
-          if (response.assistant_message) {
-            items.push(response.assistant_message)
-          }
-          
-          return { ...old, items }
-        }
-      )
-      
-      // Update thread's last_message_at
-      queryClient.invalidateQueries({ queryKey: queryKeys.threads.detail(threadId) })
-    },
-  })
-}
-
-// ============================================================================
-// THREAD UTILITIES
-// ============================================================================
-
-/**
- * Prefetch thread data
- */
-export async function prefetchThread(
-  queryClient: ReturnType<typeof useQueryClient>,
-  threadId: UUID
-) {
-  await queryClient.prefetchQuery({
-    queryKey: queryKeys.threads.detail(threadId),
-    queryFn: () => apiGet<ThreadDetail>(`/threads/${threadId}`),
-  })
+  });
 }
 
 /**
- * Get thread from cache
+ * Update a thread
  */
-export function useThreadFromCache(threadId: UUID | undefined) {
-  const queryClient = useQueryClient()
-  return queryClient.getQueryData<ThreadDetail>(
-    queryKeys.threads.detail(threadId || '')
-  )
+export function useUpdateThread() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateThreadInput }) =>
+      apiClient.patch<Thread>(API_CONFIG.ENDPOINTS.THREADS.UPDATE(id), data),
+    onSuccess: (updatedThread, { id }) => {
+      queryClient.setQueryData(QUERY_KEYS.THREAD(id), updatedThread);
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.THREADS });
+    },
+  });
 }
 
 /**
- * Invalidate all thread queries (after WebSocket update)
+ * Archive a thread
  */
-export function useInvalidateThreads() {
-  const queryClient = useQueryClient()
-  
-  return {
-    invalidateThread: (threadId: UUID) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.threads.detail(threadId) })
-      queryClient.invalidateQueries({ queryKey: queryKeys.threads.messages(threadId) })
+export function useArchiveThread() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (threadId: string) =>
+      apiClient.post<Thread>(API_CONFIG.ENDPOINTS.THREADS.ARCHIVE(threadId)),
+    onSuccess: (_, threadId) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.THREAD(threadId) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.THREADS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_STATS });
     },
-    invalidateAll: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.threads.all })
+  });
+}
+
+/**
+ * Delete a thread
+ */
+export function useDeleteThread() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (threadId: string) =>
+      apiClient.delete(API_CONFIG.ENDPOINTS.THREADS.DELETE(threadId)),
+    onSuccess: (_, threadId) => {
+      queryClient.removeQueries({ queryKey: QUERY_KEYS.THREAD(threadId) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.THREADS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_STATS });
     },
-  }
+  });
+}
+
+/**
+ * Add event to thread
+ */
+export function useAddThreadEvent() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ threadId, event }: { 
+      threadId: string; 
+      event: Omit<ThreadEvent, 'id' | 'thread_id' | 'created_at'> 
+    }) =>
+      apiClient.post<ThreadEvent>(API_CONFIG.ENDPOINTS.THREADS.ADD_EVENT(threadId), event),
+    onSuccess: (_, { threadId }) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.THREAD_EVENTS(threadId) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.THREAD(threadId) });
+    },
+  });
 }

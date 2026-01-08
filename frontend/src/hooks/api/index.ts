@@ -1,105 +1,178 @@
 /**
- * CHE·NU™ — API Hooks Index
+ * ═══════════════════════════════════════════════════════════════════════════
+ * CHE·NU™ V75 — API HOOKS INDEX
+ * ═══════════════════════════════════════════════════════════════════════════
+ * Barrel export for all API hooks
+ * ═══════════════════════════════════════════════════════════════════════════
  */
 
-// Client & utilities
+// ═══════════════════════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════════════════════
 export {
-  apiClient,
-  queryClient,
-  queryKeys,
-  parseAPIError,
-  apiGet,
-  apiPost,
-  apiPatch,
-  apiDelete,
-  type ParsedAPIError,
-} from './client'
+  useDashboardStats,
+  useRecentActivity,
+  useQuickActions,
+  useDashboardData,
+  type DashboardStats,
+  type RecentActivity,
+  type QuickAction,
+} from './useDashboardStats';
 
-// Auth & User
-export {
-  useLogin,
-  useRegister,
-  useLogout,
-  useCurrentUser,
-  useUpdateUser,
-  useTokenBalance,
-  useIsAuthenticated,
-  prefetchUser,
-} from './useAuth'
-
-// Spheres
-export {
-  useSpheres,
-  useSphere,
-  useSphereStats,
-  useBureauSections,
-  useSphereFromCache,
-  useActiveSpheres,
-  useSphereColor,
-  useSphereIcon,
-  prefetchSphere,
-  prefetchSpheres,
-} from './useSpheres'
-
-// Threads & Messages
+// ═══════════════════════════════════════════════════════════════════════════
+// THREADS
+// ═══════════════════════════════════════════════════════════════════════════
 export {
   useThreads,
-  useInfiniteThreads,
   useThread,
+  useThreadEvents,
+  useThreadsBySphere,
+  useActiveThreads,
   useCreateThread,
   useUpdateThread,
-  useDeleteThread,
   useArchiveThread,
-  useMessages,
-  useInfiniteMessages,
-  useSendMessage,
-  useThreadFromCache,
-  useInvalidateThreads,
-  prefetchThread,
-} from './useThreads'
+  useDeleteThread,
+  useAddThreadEvent,
+  type Thread,
+  type ThreadEvent,
+  type ThreadStatus,
+  type ThreadType,
+  type ThreadVisibility,
+  type CreateThreadInput,
+  type UpdateThreadInput,
+  type ThreadFilters,
+} from './useThreads';
 
-// Agents
+// ═══════════════════════════════════════════════════════════════════════════
+// AGENTS
+// ═══════════════════════════════════════════════════════════════════════════
 export {
   useAgents,
   useAgent,
   useHiredAgents,
-  useAgentTasks,
-  useHireAgent,
-  usePauseAgent,
-  useResumeAgent,
-  useFireAgent,
+  useAvailableAgents,
+  useSuggestedAgents,
+  useAgentsBySphere,
   useAgentsByLevel,
-  useActiveHiredAgents,
-  useIsAgentHired,
-  useHiredAgentByAgentId,
-  useEstimatedCost,
-  prefetchAgents,
-} from './useAgents'
+  useHireAgent,
+  useFireAgent,
+  useAgentCounts,
+  type Agent,
+  type AgentLevel,
+  type AgentStatus,
+  type AgentSuggestion,
+  type AgentFilters,
+  type HireAgentInput,
+} from './useAgents';
 
-// Nova
-export {
-  useNovaStatus,
-  useIsNovaAvailable,
-  useNovaQuery,
-  useNovaStream,
-  useNovaWithContext,
-  useNovaSuggestions,
-  useNovaHistory,
-} from './useNova'
-
-// Governance
+// ═══════════════════════════════════════════════════════════════════════════
+// GOVERNANCE
+// ═══════════════════════════════════════════════════════════════════════════
 export {
   useCheckpoints,
   usePendingCheckpoints,
   useCheckpoint,
+  useAuditLog,
+  useGovernancePolicies,
   useApproveCheckpoint,
   useRejectCheckpoint,
-  useGovernanceStats,
-  useHasHighRiskPending,
-  useAuditLog,
-  useInfiniteAuditLog,
-  useCheckpointsByRisk,
-  useUrgentCheckpoints,
-  useCheckpointExpiration,
-  useInvalidateGovernance,
-} from './useGovernance'
+  useCheckpointCounts,
+  useHasCriticalCheckpoints,
+  type Checkpoint,
+  type CheckpointType,
+  type CheckpointStatus,
+  type CheckpointPriority,
+  type CheckpointOption,
+  type AuditLogEntry,
+  type GovernancePolicy,
+  type PolicyRule,
+  type CheckpointFilters,
+} from './useGovernance';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SPHERES
+// ═══════════════════════════════════════════════════════════════════════════
+export {
+  useSpheres,
+  useSphere,
+  useSphereStats,
+  useSphereThreads,
+  useActiveSpheres,
+  getSphereIcon,
+  getSphereColor,
+  getSphereGradient,
+  SPHERE_METADATA,
+  type Sphere,
+  type SphereId,
+  type SphereStats,
+  type SphereThread,
+} from './useSpheres';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// NOVA
+// ═══════════════════════════════════════════════════════════════════════════
+export {
+  useNovaStatus,
+  useNovaHistory,
+  useNovaSuggestions,
+  useNovaQuery,
+  useNovaAnalysis,
+  useNovaAvailable,
+  useNovaTokenUsage,
+  NOVA_LANES,
+  type NovaSystemStatus,
+  type NovaLane,
+  type NovaStatus,
+  type NovaLaneStatus,
+  type NovaQuery,
+  type NovaQueryResponse,
+  type NovaSuggestion,
+  type NovaHistoryEntry,
+  type NovaAnalysis,
+} from './useNova';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// XR
+// ═══════════════════════════════════════════════════════════════════════════
+export {
+  useXREnvironments,
+  useXRTemplates,
+  useXREnvironment,
+  useXRPreview,
+  useGenerateXR,
+  CANONICAL_ZONES,
+  XR_TEMPLATE_META,
+  type XREnvironment,
+  type XRZone,
+  type XRTemplate,
+  type XRTemplateId,
+  type CanonicalZone,
+  type GenerateXRInput,
+  type XRPreview,
+} from './useXR';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// AUTH (Keep existing)
+// ═══════════════════════════════════════════════════════════════════════════
+export * from './useAuth';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DECISIONS
+// ═══════════════════════════════════════════════════════════════════════════
+export {
+  useDecisions,
+  useDecision,
+  usePendingDecisions,
+  useBlinkDecisions,
+  useResolveDecision,
+  useDeferDecision,
+  useDecisionCounts,
+  AGING_CONFIG,
+  type DecisionPoint,
+  type DecisionOption,
+  type AISuggestion,
+  type AgingLevel,
+  type DecisionStatus,
+  type DecisionPriority,
+  type DecisionFilters,
+} from './useDecisions';

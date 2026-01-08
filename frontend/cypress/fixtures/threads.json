@@ -1,0 +1,73 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": "thread-001",
+      "title": "Rénovation Cuisine",
+      "founding_intent": "Planifier et exécuter la rénovation complète de la cuisine",
+      "sphere_id": "personal",
+      "sphere_name": "Personal",
+      "status": "active",
+      "maturity": "growing",
+      "created_at": "2025-12-15T10:00:00Z",
+      "updated_at": "2026-01-07T15:30:00Z",
+      "events_count": 45,
+      "decisions_pending": 2
+    },
+    {
+      "id": "thread-002",
+      "title": "Projet Client Alpha",
+      "founding_intent": "Développer la solution logicielle pour le client Alpha Corp",
+      "sphere_id": "business",
+      "sphere_name": "Business",
+      "status": "active",
+      "maturity": "mature",
+      "created_at": "2025-11-01T09:00:00Z",
+      "updated_at": "2026-01-08T11:00:00Z",
+      "events_count": 234,
+      "decisions_pending": 5
+    },
+    {
+      "id": "thread-003",
+      "title": "Campagne Marketing Q1",
+      "founding_intent": "Lancer la campagne marketing du premier trimestre",
+      "sphere_id": "business",
+      "sphere_name": "Business",
+      "status": "active",
+      "maturity": "seed",
+      "created_at": "2026-01-02T08:00:00Z",
+      "updated_at": "2026-01-08T09:00:00Z",
+      "events_count": 12,
+      "decisions_pending": 3
+    },
+    {
+      "id": "thread-004",
+      "title": "Formation Continue IA",
+      "founding_intent": "Suivre et documenter ma formation en intelligence artificielle",
+      "sphere_id": "scholar",
+      "sphere_name": "Scholar",
+      "status": "active",
+      "maturity": "growing",
+      "created_at": "2025-10-15T14:00:00Z",
+      "updated_at": "2026-01-06T16:00:00Z",
+      "events_count": 89,
+      "decisions_pending": 1
+    },
+    {
+      "id": "thread-005",
+      "title": "Organisation Événement Communautaire",
+      "founding_intent": "Organiser le meetup tech mensuel de janvier",
+      "sphere_id": "community",
+      "sphere_name": "Community",
+      "status": "active",
+      "maturity": "growing",
+      "created_at": "2025-12-20T11:00:00Z",
+      "updated_at": "2026-01-07T18:00:00Z",
+      "events_count": 28,
+      "decisions_pending": 4
+    }
+  ],
+  "total": 5,
+  "page": 1,
+  "per_page": 20
+}

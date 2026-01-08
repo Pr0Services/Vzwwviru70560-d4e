@@ -172,6 +172,12 @@ class DuplicateResourceError(CHENUBaseException):
     error_code = "DUPLICATE_RESOURCE"
 
 
+class ConflictError(CHENUBaseException):
+    """Conflict with current state of resource."""
+    status_code = 409
+    error_code = "CONFLICT"
+
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # GOVERNANCE EXCEPTIONS (423)
 # ═══════════════════════════════════════════════════════════════════════════════

@@ -18,6 +18,18 @@ import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import { SPHERES } from '../hooks/useSpheres';
 import type { AgentDefinition } from '../data/agents-catalog';
 
+// API Hooks
+import { 
+  useDecisions, 
+  useResolveDecision,
+  useDeferDecision,
+  AGING_CONFIG,
+  type DecisionPoint as APIDecisionPoint
+} from '../hooks/api';
+
+// Toast notifications
+import { useToast } from '../components/toast/ToastProvider';
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -763,12 +775,28 @@ const AgingTimeline: React.FC = () => {
 // MAIN PAGE
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// Fallback mock data for when API is not available
+const FALLBACK_DECISIONS: DecisionPoint[] = [];
+
 export const DecisionPointsPageV72: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
+  // API Data
+  const { data: apiDecisions, isLoading, isError, refetch } = useDecisions();
+  const resolveMutation = useResolveDecision();
+  const deferMutation = useDeferDecision();
+  
+  // Toast notifications
+  const toast = useToast();
+
+  // Transform API data to local format
+  const decisions: DecisionPoint[] = useMemo(() => {
+    if (!apiDecisions) return FALLBACK_DECISIONS;
+    return apiDecisions as unknown as DecisionPoint[];
+  }, [apiDecisions]);
+
   // State
-  const [decisions, setDecisions] = useState<DecisionPoint[]>(MOCK_DECISIONS);
   const [selectedDecision, setSelectedDecision] = useState<DecisionPoint | null>(null);
   const [filterAging, setFilterAging] = useState<AgingLevel | 'ALL'>('ALL');
   const [filterSphere, setFilterSphere] = useState<string | null>(null);
@@ -804,14 +832,19 @@ export const DecisionPointsPageV72: React.FC = () => {
 
   // Handlers
   const handleDecide = useCallback((decisionId: string, optionId: string) => {
-    setDecisions(prev => prev.map(d => {
-      if (d.id === decisionId) {
-        return { ...d, status: 'approved' as DecisionStatus, aging_level: 'ARCHIVE' as AgingLevel };
+    resolveMutation.mutate(
+      { decision_id: decisionId, chosen_option_id: optionId, rationale: 'User decision' },
+      {
+        onSuccess: () => {
+          toast.success('Décision prise', 'Enregistrée dans l\'historique');
+          setSelectedDecision(null);
+        },
+        onError: () => {
+          toast.error('Erreur', 'Impossible d\'enregistrer la décision');
+        },
       }
-      return d;
-    }));
-    setSelectedDecision(null);
-  }, []);
+    );
+  }, [resolveMutation, toast]);
 
   const handleQuickAction = useCallback((action: QuickAction) => {
     switch (action) {

@@ -21,41 +21,81 @@ import { AgentSuggestionEngine } from '../components/agents/AgentSuggestionEngin
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import type { AgentDefinition } from '../data/agents-catalog';
 
+// API Hooks
+import { useDashboardStats } from '../hooks/api';
+
 // ═══════════════════════════════════════════════════════════════════════════════
-// MOCK STATS
+// FALLBACK STATS (used while loading or on error)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const MOCK_STATS: DashboardStats = {
+const FALLBACK_STATS: DashboardStats = {
   decisions: {
-    total: 12,
-    byAging: { GREEN: 5, YELLOW: 4, RED: 2, BLINK: 1 },
+    total: 0,
+    byAging: { GREEN: 0, YELLOW: 0, RED: 0, BLINK: 0 },
   },
   threads: {
-    total: 47,
-    active: 23,
+    total: 0,
+    active: 0,
     bySphere: {
-      personal: 8,
-      business: 12,
-      studio: 6,
-      team: 5,
-      scholar: 4,
+      personal: 0,
+      business: 0,
+      studio: 0,
+      team: 0,
+      scholar: 0,
     },
   },
   agents: {
-    hired: 8,
-    active: 5,
-    available: 125,
+    hired: 0,
+    active: 0,
+    available: 0,
   },
   checkpoints: {
-    pending: 3,
-    approved_today: 7,
-    rejected_today: 1,
+    pending: 0,
+    approved_today: 0,
+    rejected_today: 0,
   },
   governance: {
-    signals: 2,
+    signals: 0,
     critical: 0,
   },
 };
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SKELETON LOADER
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const StatsSkeleton: React.FC = () => (
+  <div
+    style={{
+      background: 'rgba(255, 255, 255, 0.02)',
+      borderRadius: 16,
+      padding: 20,
+      border: '1px solid rgba(255, 255, 255, 0.06)',
+    }}
+  >
+    <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+      {[1, 2, 3, 4, 5].map((i) => (
+        <div
+          key={i}
+          style={{
+            flex: '1 1 150px',
+            height: 80,
+            background: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%)',
+            backgroundSize: '200% 100%',
+            animation: 'shimmer 1.5s infinite',
+            borderRadius: 12,
+          }}
+        />
+      ))}
+    </div>
+    <style>{`
+      @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+    `}</style>
+  </div>
+);
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // DASHBOARD PAGE
@@ -64,6 +104,10 @@ const MOCK_STATS: DashboardStats = {
 export const DashboardV72: React.FC = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
+
+  // API Data
+  const { data: statsData, isLoading: statsLoading, isError: statsError } = useDashboardStats();
+  const stats = statsData || FALLBACK_STATS;
 
   // State
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -342,10 +386,27 @@ export const DashboardV72: React.FC = () => {
         {/* ═══════════════════════════════════════════════════════════════════ */}
         
         <div style={{ marginBottom: 32 }}>
-          <DashboardStatsWidget
-            stats={MOCK_STATS}
-            onStatClick={handleStatClick}
-          />
+          {statsLoading ? (
+            <StatsSkeleton />
+          ) : statsError ? (
+            <div
+              style={{
+                background: 'rgba(239, 68, 68, 0.1)',
+                borderRadius: 12,
+                padding: 16,
+                border: '1px solid rgba(239, 68, 68, 0.2)',
+                color: '#FCA5A5',
+                fontSize: 13,
+              }}
+            >
+              ⚠️ Impossible de charger les statistiques. Veuillez réessayer.
+            </div>
+          ) : (
+            <DashboardStatsWidget
+              stats={stats}
+              onStatClick={handleStatClick}
+            />
+          )}
         </div>
 
         {/* ═══════════════════════════════════════════════════════════════════ */}

@@ -20,13 +20,13 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
-from backend.api.dependencies import get_current_user, get_db
-from backend.services.governance.checkpoint_service import (
+from app.api.dependencies import get_current_user, get_db
+from app.services.governance.checkpoint_service import (
     CheckpointService,
     AuditService,
 )
-from backend.models.user import User
-from backend.models.governance import CheckpointStatus
+from app.models.user import User
+from app.models.governance import CheckpointStatus
 
 router = APIRouter(prefix="/checkpoints", tags=["Governance"])
 

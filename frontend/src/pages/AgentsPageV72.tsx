@@ -7,7 +7,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 // V72 Components
@@ -17,7 +17,13 @@ import { GlobalSearchV72 } from '../components/search/GlobalSearchV72';
 import { QuickActionsFAB, type QuickAction } from '../components/actions/QuickActionsBar';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 
-// Data
+// API Hooks
+import { useHiredAgents, useHireAgent, useFireAgent } from '../hooks/api';
+
+// Toast notifications
+import { useToast } from '../components/toast/ToastProvider';
+
+// Data (Static catalog)
 import {
   ALL_AGENTS,
   AGENT_STATS,
@@ -367,10 +373,22 @@ export const AgentsPageV72: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
+  // API Data
+  const { data: hiredAgentsData, isLoading: hiredLoading } = useHiredAgents();
+  const hireAgentMutation = useHireAgent();
+  const fireAgentMutation = useFireAgent();
+  
+  // Toast notifications
+  const toast = useToast();
+  
+  // Derive hired agent IDs from API data
+  const hiredAgentIds = useMemo(() => {
+    return hiredAgentsData?.map(a => a.id) || [];
+  }, [hiredAgentsData]);
+
   // State
   const [selectedAgent, setSelectedAgent] = useState<AgentDefinition | null>(null);
   const [agentToHire, setAgentToHire] = useState<AgentDefinition | null>(null);
-  const [hiredAgentIds, setHiredAgentIds] = useState<string[]>([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // Check for hire param on load
@@ -391,11 +409,20 @@ export const AgentsPageV72: React.FC = () => {
 
   const handleConfirmHire = useCallback(() => {
     if (agentToHire) {
-      setHiredAgentIds(prev => [...prev, agentToHire.id]);
-      setAgentToHire(null);
-      // TODO: Call API to hire agent
+      hireAgentMutation.mutate(
+        { agent_id: agentToHire.id },
+        {
+          onSuccess: () => {
+            toast.success(`${agentToHire.name} engagé`, 'L\'agent est maintenant actif');
+            setAgentToHire(null);
+          },
+          onError: () => {
+            toast.error('Erreur', `Impossible d'engager ${agentToHire.name}`);
+          },
+        }
+      );
     }
-  }, [agentToHire]);
+  }, [agentToHire, hireAgentMutation, toast]);
 
   const handleSelect = useCallback((agent: AgentDefinition) => {
     setSelectedAgent(agent);

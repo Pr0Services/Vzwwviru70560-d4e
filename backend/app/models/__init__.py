@@ -9,9 +9,9 @@ CRITICAL:
 - All models must be imported for Alembic autogenerate
 """
 
-from backend.core.database import Base
-from backend.models.user import User, RefreshToken
-from backend.models.sphere import (
+from app.core.database import Base
+from app.models.user import User, RefreshToken
+from app.models.sphere import (
     Sphere,
     BureauSection,
     QuickCapture,
@@ -22,7 +22,7 @@ from backend.models.sphere import (
     SPHERE_METADATA,
     BUREAU_SECTION_METADATA,
 )
-from backend.models.thread import (
+from app.models.thread import (
     Thread,
     ThreadEvent,
     ThreadDecision,
@@ -35,7 +35,7 @@ from backend.models.thread import (
     ActionStatus,
     ActionPriority,
 )
-from backend.models.governance import (
+from app.models.governance import (
     GovernanceCheckpoint,
     AuditLog,
     CheckpointType,

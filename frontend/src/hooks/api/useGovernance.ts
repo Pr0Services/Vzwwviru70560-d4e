@@ -1,277 +1,227 @@
 /**
- * ╔══════════════════════════════════════════════════════════════════════════════╗
- * ║                    CHE·NU™ — GOVERNANCE HOOKS                                ║
- * ║                    Sprint B3.2: TanStack Query                               ║
- * ╚══════════════════════════════════════════════════════════════════════════════╝
+ * ═══════════════════════════════════════════════════════════════════════════
+ * CHE·NU™ V75 — GOVERNANCE HOOKS
+ * ═══════════════════════════════════════════════════════════════════════════
  */
 
-import { 
-  useQuery, 
-  useMutation, 
-  useQueryClient,
-  useInfiniteQuery,
-} from '@tanstack/react-query'
-import { apiGet, apiPost, queryKeys } from './client'
-import type {
-  GovernanceCheckpoint,
-  CheckpointStatus,
-  ApproveCheckpointRequest,
-  RejectCheckpointRequest,
-  GovernanceStats,
-  AuditLogEntry,
-  AuditLogFilters,
-  PaginatedResponse,
-  UUID,
-} from '@/types/api.generated'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '../../services/apiClient';
+import { API_CONFIG, QUERY_KEYS, STALE_TIMES } from '../../config/api.config';
 
-// ============================================================================
-// CHECKPOINT HOOKS
-// ============================================================================
+// ═══════════════════════════════════════════════════════════════════════════
+// TYPES
+// ═══════════════════════════════════════════════════════════════════════════
+
+export type CheckpointType = 'governance' | 'cost' | 'identity' | 'sensitive' | 'cross_sphere';
+export type CheckpointStatus = 'pending' | 'approved' | 'rejected' | 'expired';
+export type CheckpointPriority = 'low' | 'medium' | 'high' | 'critical';
+
+export interface Checkpoint {
+  id: string;
+  type: CheckpointType;
+  status: CheckpointStatus;
+  priority: CheckpointPriority;
+  title: string;
+  description: string;
+  context?: Record<string, unknown>;
+  thread_id?: string;
+  thread_title?: string;
+  agent_id?: string;
+  agent_name?: string;
+  requested_action: string;
+  options: CheckpointOption[];
+  created_at: string;
+  expires_at?: string;
+  resolved_at?: string;
+  resolved_by?: string;
+  resolution_note?: string;
+}
+
+export interface CheckpointOption {
+  id: string;
+  label: string;
+  action: 'approve' | 'reject' | 'defer' | 'modify';
+  description?: string;
+  is_default?: boolean;
+}
+
+export interface AuditLogEntry {
+  id: string;
+  action: string;
+  actor_id: string;
+  actor_name: string;
+  target_type: string;
+  target_id: string;
+  details: Record<string, unknown>;
+  timestamp: string;
+  ip_address?: string;
+}
+
+export interface GovernancePolicy {
+  id: string;
+  name: string;
+  description: string;
+  scope: 'global' | 'sphere' | 'thread';
+  rules: PolicyRule[];
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PolicyRule {
+  id: string;
+  condition: string;
+  action: 'block' | 'warn' | 'checkpoint' | 'log';
+  message: string;
+}
+
+export interface CheckpointFilters {
+  status?: CheckpointStatus;
+  type?: CheckpointType;
+  priority?: CheckpointPriority;
+  thread_id?: string;
+  limit?: number;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// QUERY HOOKS
+// ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Get governance checkpoints
+ * Fetch checkpoints with optional filters
  */
-export function useCheckpoints(status?: CheckpointStatus) {
-  return useQuery({
-    queryKey: queryKeys.governance.checkpoints(status),
-    queryFn: () => apiGet<GovernanceCheckpoint[]>('/governance/checkpoints', {
-      params: status ? { status } : undefined,
-    }),
-    staleTime: 10 * 1000, // 10 seconds - checkpoints change frequently
+export function useCheckpoints(filters?: CheckpointFilters) {
+  return useQuery<Checkpoint[]>({
+    queryKey: [...QUERY_KEYS.CHECKPOINTS, filters],
+    queryFn: () => apiClient.get<Checkpoint[]>(
+      API_CONFIG.ENDPOINTS.GOVERNANCE.CHECKPOINTS,
+      { params: filters as Record<string, string | number | boolean | undefined> }
+    ),
+    staleTime: STALE_TIMES.REALTIME,
     refetchInterval: 30 * 1000, // Refetch every 30 seconds
-  })
+  });
 }
 
 /**
- * Get pending checkpoints only
+ * Fetch pending checkpoints only
  */
 export function usePendingCheckpoints() {
-  return useCheckpoints('pending')
+  return useCheckpoints({ status: 'pending' });
 }
 
 /**
- * Get single checkpoint
+ * Fetch single checkpoint by ID
  */
-export function useCheckpoint(checkpointId: UUID | undefined) {
-  return useQuery({
-    queryKey: queryKeys.governance.checkpoint(checkpointId || ''),
-    queryFn: () => apiGet<GovernanceCheckpoint>(`/governance/checkpoints/${checkpointId}`),
+export function useCheckpoint(checkpointId: string | undefined) {
+  return useQuery<Checkpoint>({
+    queryKey: QUERY_KEYS.CHECKPOINT(checkpointId || ''),
+    queryFn: () => apiClient.get<Checkpoint>(
+      API_CONFIG.ENDPOINTS.GOVERNANCE.CHECKPOINT_DETAIL(checkpointId!)
+    ),
     enabled: !!checkpointId,
-    staleTime: 10 * 1000,
-  })
+    staleTime: STALE_TIMES.REALTIME,
+  });
 }
 
 /**
- * Approve checkpoint
+ * Fetch audit log
+ */
+export function useAuditLog(filters?: { limit?: number; actor_id?: string; target_type?: string }) {
+  return useQuery<AuditLogEntry[]>({
+    queryKey: [...QUERY_KEYS.AUDIT_LOG, filters],
+    queryFn: () => apiClient.get<AuditLogEntry[]>(
+      API_CONFIG.ENDPOINTS.GOVERNANCE.AUDIT_LOG,
+      { params: filters as Record<string, string | number | boolean | undefined> }
+    ),
+    staleTime: STALE_TIMES.FREQUENT,
+  });
+}
+
+/**
+ * Fetch governance policies
+ */
+export function useGovernancePolicies() {
+  return useQuery<GovernancePolicy[]>({
+    queryKey: ['governance', 'policies'],
+    queryFn: () => apiClient.get<GovernancePolicy[]>(API_CONFIG.ENDPOINTS.GOVERNANCE.POLICIES),
+    staleTime: STALE_TIMES.STATIC,
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MUTATION HOOKS
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Approve a checkpoint
  */
 export function useApproveCheckpoint() {
-  const queryClient = useQueryClient()
-  
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({ checkpointId, ...data }: ApproveCheckpointRequest & { checkpointId: UUID }) =>
-      apiPost<GovernanceCheckpoint>(`/governance/checkpoints/${checkpointId}/approve`, data),
-    // Optimistic update
-    onMutate: async ({ checkpointId }) => {
-      await queryClient.cancelQueries({ queryKey: queryKeys.governance.checkpoints() })
-      
-      const previousCheckpoints = queryClient.getQueryData<GovernanceCheckpoint[]>(
-        queryKeys.governance.checkpoints('pending')
-      )
-      
-      // Remove from pending list optimistically
-      if (previousCheckpoints) {
-        queryClient.setQueryData<GovernanceCheckpoint[]>(
-          queryKeys.governance.checkpoints('pending'),
-          previousCheckpoints.filter(c => c.id !== checkpointId)
-        )
-      }
-      
-      return { previousCheckpoints }
+    mutationFn: ({ checkpoint_id, note }: { checkpoint_id: string; note?: string }) =>
+      apiClient.post<Checkpoint>(API_CONFIG.ENDPOINTS.GOVERNANCE.RESOLVE, { 
+        checkpoint_id, 
+        decision: 'approve',
+        note 
+      }),
+    onSuccess: (_, { checkpoint_id }) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CHECKPOINT(checkpoint_id) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CHECKPOINTS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_STATS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUDIT_LOG });
     },
-    onError: (_err, _data, context) => {
-      if (context?.previousCheckpoints) {
-        queryClient.setQueryData(
-          queryKeys.governance.checkpoints('pending'),
-          context.previousCheckpoints
-        )
-      }
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.governance.all })
-      queryClient.invalidateQueries({ queryKey: ['user', 'tokens'] })
-    },
-  })
+  });
 }
 
 /**
- * Reject checkpoint
+ * Reject a checkpoint
  */
 export function useRejectCheckpoint() {
-  const queryClient = useQueryClient()
-  
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({ checkpointId, ...data }: RejectCheckpointRequest & { checkpointId: UUID }) =>
-      apiPost<GovernanceCheckpoint>(`/governance/checkpoints/${checkpointId}/reject`, data),
-    onMutate: async ({ checkpointId }) => {
-      await queryClient.cancelQueries({ queryKey: queryKeys.governance.checkpoints() })
-      
-      const previousCheckpoints = queryClient.getQueryData<GovernanceCheckpoint[]>(
-        queryKeys.governance.checkpoints('pending')
-      )
-      
-      if (previousCheckpoints) {
-        queryClient.setQueryData<GovernanceCheckpoint[]>(
-          queryKeys.governance.checkpoints('pending'),
-          previousCheckpoints.filter(c => c.id !== checkpointId)
-        )
-      }
-      
-      return { previousCheckpoints }
-    },
-    onError: (_err, _data, context) => {
-      if (context?.previousCheckpoints) {
-        queryClient.setQueryData(
-          queryKeys.governance.checkpoints('pending'),
-          context.previousCheckpoints
-        )
-      }
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.governance.all })
-    },
-  })
-}
-
-// ============================================================================
-// GOVERNANCE STATS HOOKS
-// ============================================================================
-
-/**
- * Get governance statistics
- */
-export function useGovernanceStats() {
-  return useQuery({
-    queryKey: queryKeys.governance.stats(),
-    queryFn: () => apiGet<GovernanceStats>('/governance/stats'),
-    staleTime: 30 * 1000, // 30 seconds
-    refetchInterval: 60 * 1000, // Refetch every minute
-  })
-}
-
-/**
- * Check if there are high-risk pending checkpoints
- */
-export function useHasHighRiskPending() {
-  const { data: stats } = useGovernanceStats()
-  return stats?.high_risk_pending && stats.high_risk_pending > 0
-}
-
-// ============================================================================
-// AUDIT LOG HOOKS
-// ============================================================================
-
-/**
- * Get audit log entries with filters
- */
-export function useAuditLog(filters?: AuditLogFilters) {
-  return useQuery({
-    queryKey: queryKeys.governance.audit(filters),
-    queryFn: () => apiGet<PaginatedResponse<AuditLogEntry>>('/governance/audit', {
-      params: filters,
-    }),
-    staleTime: 60 * 1000, // 1 minute
-  })
-}
-
-/**
- * Get infinite scrolling audit log
- */
-export function useInfiniteAuditLog(filters?: Omit<AuditLogFilters, 'page'>) {
-  return useInfiniteQuery({
-    queryKey: [...queryKeys.governance.audit(filters), 'infinite'],
-    queryFn: ({ pageParam = 1 }) =>
-      apiGet<PaginatedResponse<AuditLogEntry>>('/governance/audit', {
-        params: { ...filters, page: pageParam },
+    mutationFn: ({ checkpoint_id, reason }: { checkpoint_id: string; reason: string }) =>
+      apiClient.post<Checkpoint>(API_CONFIG.ENDPOINTS.GOVERNANCE.RESOLVE, { 
+        checkpoint_id, 
+        decision: 'reject',
+        note: reason 
       }),
-    getNextPageParam: (lastPage) =>
-      lastPage.has_next ? lastPage.page + 1 : undefined,
-    initialPageParam: 1,
-    staleTime: 60 * 1000,
-  })
+    onSuccess: (_, { checkpoint_id }) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CHECKPOINT(checkpoint_id) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CHECKPOINTS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_STATS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUDIT_LOG });
+    },
+  });
 }
 
-// ============================================================================
-// GOVERNANCE UTILITIES
-// ============================================================================
+// ═══════════════════════════════════════════════════════════════════════════
+// UTILITY HOOKS
+// ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Count pending checkpoints by risk level
+ * Get checkpoint counts by status
  */
-export function useCheckpointsByRisk() {
-  const { data: checkpoints } = usePendingCheckpoints()
-  
-  if (!checkpoints) return null
-  
+export function useCheckpointCounts() {
+  const { data: checkpoints } = useCheckpoints();
+
+  if (!checkpoints) {
+    return { pending: 0, approved: 0, rejected: 0, total: 0 };
+  }
+
   return {
-    critical: checkpoints.filter(c => c.risk_level === 'critical').length,
-    high: checkpoints.filter(c => c.risk_level === 'high').length,
-    medium: checkpoints.filter(c => c.risk_level === 'medium').length,
-    low: checkpoints.filter(c => c.risk_level === 'low').length,
+    pending: checkpoints.filter(c => c.status === 'pending').length,
+    approved: checkpoints.filter(c => c.status === 'approved').length,
+    rejected: checkpoints.filter(c => c.status === 'rejected').length,
     total: checkpoints.length,
-  }
+  };
 }
 
 /**
- * Get checkpoints requiring immediate attention
+ * Check if there are critical pending checkpoints
  */
-export function useUrgentCheckpoints() {
-  const { data: checkpoints, ...rest } = usePendingCheckpoints()
-  
-  const urgent = checkpoints?.filter(c => 
-    c.risk_level === 'critical' || 
-    c.risk_level === 'high' ||
-    new Date(c.expires_at) < new Date(Date.now() + 60 * 60 * 1000) // Expires in < 1 hour
-  )
-  
-  return { data: urgent, ...rest }
-}
-
-/**
- * Get checkpoint expiration status
- */
-export function useCheckpointExpiration(checkpoint: GovernanceCheckpoint | undefined) {
-  if (!checkpoint) return null
-  
-  const now = Date.now()
-  const expiresAt = new Date(checkpoint.expires_at).getTime()
-  const remaining = expiresAt - now
-  
-  return {
-    expiresAt: new Date(checkpoint.expires_at),
-    remainingMs: remaining,
-    remainingMinutes: Math.floor(remaining / 60000),
-    remainingHours: Math.floor(remaining / 3600000),
-    isExpired: remaining <= 0,
-    isUrgent: remaining > 0 && remaining < 3600000, // Less than 1 hour
-    isWarning: remaining > 0 && remaining < 86400000, // Less than 24 hours
-  }
-}
-
-/**
- * Invalidate all governance queries (after WebSocket update)
- */
-export function useInvalidateGovernance() {
-  const queryClient = useQueryClient()
-  
-  return {
-    invalidateCheckpoints: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.governance.checkpoints() })
-    },
-    invalidateStats: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.governance.stats() })
-    },
-    invalidateAll: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.governance.all })
-    },
-  }
+export function useHasCriticalCheckpoints() {
+  const { data: pending } = usePendingCheckpoints();
+  return pending?.some(c => c.priority === 'critical') ?? false;
 }
