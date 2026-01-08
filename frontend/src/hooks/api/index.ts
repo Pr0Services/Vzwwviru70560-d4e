@@ -1,178 +1,48 @@
 /**
- * ═══════════════════════════════════════════════════════════════════════════
- * CHE·NU™ V75 — API HOOKS INDEX
- * ═══════════════════════════════════════════════════════════════════════════
- * Barrel export for all API hooks
- * ═══════════════════════════════════════════════════════════════════════════
+ * CHE·NU™ V75 — API Hooks Index
+ * 
+ * Centralized export of all API hooks
+ * GOUVERNANCE > EXÉCUTION
  */
 
-// ═══════════════════════════════════════════════════════════════════════════
-// DASHBOARD
-// ═══════════════════════════════════════════════════════════════════════════
-export {
-  useDashboardStats,
-  useRecentActivity,
-  useQuickActions,
-  useDashboardData,
-  type DashboardStats,
-  type RecentActivity,
-  type QuickAction,
-} from './useDashboardStats';
-
-// ═══════════════════════════════════════════════════════════════════════════
-// THREADS
-// ═══════════════════════════════════════════════════════════════════════════
-export {
-  useThreads,
-  useThread,
-  useThreadEvents,
-  useThreadsBySphere,
-  useActiveThreads,
-  useCreateThread,
-  useUpdateThread,
-  useArchiveThread,
-  useDeleteThread,
-  useAddThreadEvent,
-  type Thread,
-  type ThreadEvent,
-  type ThreadStatus,
-  type ThreadType,
-  type ThreadVisibility,
-  type CreateThreadInput,
-  type UpdateThreadInput,
-  type ThreadFilters,
-} from './useThreads';
-
-// ═══════════════════════════════════════════════════════════════════════════
-// AGENTS
-// ═══════════════════════════════════════════════════════════════════════════
-export {
-  useAgents,
-  useAgent,
-  useHiredAgents,
-  useAvailableAgents,
-  useSuggestedAgents,
-  useAgentsBySphere,
-  useAgentsByLevel,
-  useHireAgent,
-  useFireAgent,
-  useAgentCounts,
-  type Agent,
-  type AgentLevel,
-  type AgentStatus,
-  type AgentSuggestion,
-  type AgentFilters,
-  type HireAgentInput,
-} from './useAgents';
-
-// ═══════════════════════════════════════════════════════════════════════════
-// GOVERNANCE
-// ═══════════════════════════════════════════════════════════════════════════
-export {
-  useCheckpoints,
-  usePendingCheckpoints,
-  useCheckpoint,
-  useAuditLog,
-  useGovernancePolicies,
-  useApproveCheckpoint,
-  useRejectCheckpoint,
-  useCheckpointCounts,
-  useHasCriticalCheckpoints,
-  type Checkpoint,
-  type CheckpointType,
-  type CheckpointStatus,
-  type CheckpointPriority,
-  type CheckpointOption,
-  type AuditLogEntry,
-  type GovernancePolicy,
-  type PolicyRule,
-  type CheckpointFilters,
-} from './useGovernance';
-
-// ═══════════════════════════════════════════════════════════════════════════
-// SPHERES
-// ═══════════════════════════════════════════════════════════════════════════
-export {
-  useSpheres,
-  useSphere,
-  useSphereStats,
-  useSphereThreads,
-  useActiveSpheres,
-  getSphereIcon,
-  getSphereColor,
-  getSphereGradient,
-  SPHERE_METADATA,
-  type Sphere,
-  type SphereId,
-  type SphereStats,
-  type SphereThread,
-} from './useSpheres';
-
-// ═══════════════════════════════════════════════════════════════════════════
-// NOVA
-// ═══════════════════════════════════════════════════════════════════════════
-export {
-  useNovaStatus,
-  useNovaHistory,
-  useNovaSuggestions,
-  useNovaQuery,
-  useNovaAnalysis,
-  useNovaAvailable,
-  useNovaTokenUsage,
-  NOVA_LANES,
-  type NovaSystemStatus,
-  type NovaLane,
-  type NovaStatus,
-  type NovaLaneStatus,
-  type NovaQuery,
-  type NovaQueryResponse,
-  type NovaSuggestion,
-  type NovaHistoryEntry,
-  type NovaAnalysis,
-} from './useNova';
-
-// ═══════════════════════════════════════════════════════════════════════════
-// XR
-// ═══════════════════════════════════════════════════════════════════════════
-export {
-  useXREnvironments,
-  useXRTemplates,
-  useXREnvironment,
-  useXRPreview,
-  useGenerateXR,
-  CANONICAL_ZONES,
-  XR_TEMPLATE_META,
-  type XREnvironment,
-  type XRZone,
-  type XRTemplate,
-  type XRTemplateId,
-  type CanonicalZone,
-  type GenerateXRInput,
-  type XRPreview,
-} from './useXR';
-
-// ═══════════════════════════════════════════════════════════════════════════
-// AUTH (Keep existing)
-// ═══════════════════════════════════════════════════════════════════════════
+// Core Hooks
 export * from './useAuth';
+export * from './useThreads';
+export * from './useDecisions';
+export * from './useAgents';
+export * from './useSpheres';
+export * from './useNova';
+export * from './useGovernance';
 
-// ═══════════════════════════════════════════════════════════════════════════
-// DECISIONS
-// ═══════════════════════════════════════════════════════════════════════════
-export {
-  useDecisions,
-  useDecision,
-  usePendingDecisions,
-  useBlinkDecisions,
-  useResolveDecision,
-  useDeferDecision,
-  useDecisionCounts,
-  AGING_CONFIG,
-  type DecisionPoint,
-  type DecisionOption,
-  type AISuggestion,
-  type AgingLevel,
-  type DecisionStatus,
-  type DecisionPriority,
-  type DecisionFilters,
-} from './useDecisions';
+// Extended Hooks
+export * from './useSearch';
+export * from './useXR';
+export * from './useFileUpload';
+export * from './useDashboardStats';
+
+// Phase 8 Hooks - P0 Core
+export * from './useIdentity';
+export * from './useWorkspaces';
+export * from './useDataspaces';
+export * from './useMeetings';
+
+// Phase 8 Hooks - P1
+export * from './useNotifications';
+export * from './useActivity';
+export * from './useTokens';
+
+// Re-export types for convenience
+export type { Thread, ThreadEvent, CreateThreadRequest } from './useThreads';
+export type { Decision, CreateDecisionRequest } from './useDecisions';
+export type { Agent, HireAgentRequest } from './useAgents';
+export type { Sphere } from './useSpheres';
+export type { NovaResponse, NovaIntent } from './useNova';
+export type { SearchResult, SearchFilters } from './useSearch';
+export type { XREnvironment, XRBlueprint } from './useXR';
+export type { Identity, IdentityType } from './useIdentity';
+export type { Workspace, WorkspaceMode, Panel } from './useWorkspaces';
+export type { Dataspace, DataspaceItem } from './useDataspaces';
+export type { Meeting, Participant, MeetingNote } from './useMeetings';
+export type { Notification, NotificationType } from './useNotifications';
+export type { Activity, ActivityType } from './useActivity';
+export type { TokenBalance, TokenTransaction, TokenBudget } from './useTokens';

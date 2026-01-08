@@ -1,74 +1,41 @@
-/**
- * CHE·NU - Resolver Types
- * Types pour le système de résolution de pages
- */
+// Resolver types
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// PAGE TYPES
-// ═══════════════════════════════════════════════════════════════════════════════
-
-export interface PageConfig {
-  id: string;
-  path: string;
-  title: string;
-  layout: 'default' | 'full' | 'sidebar' | 'centered';
-  components: ComponentConfig[];
+export interface ResolvedDimension {
+  width: number;
+  height: number;
+  aspectRatio: number;
+  breakpoint: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 }
 
-export interface ComponentConfig {
-  id: string;
-  type: string;
-  props?: Record<string, unknown>;
-  children?: ComponentConfig[];
+export interface ResolverConfig {
+  baseWidth: number;
+  baseHeight: number;
+  minWidth: number;
+  maxWidth: number;
 }
 
-export interface ResolverContext {
-  sphereId?: string;
-  userId?: string;
-  permissions: string[];
+export interface ResolverResult<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
 }
 
-export interface ResolvedPage {
-  config: PageConfig;
-  data: Record<string, unknown>;
-  ready: boolean;
-}
+export type ResolutionMode = 'fit' | 'fill' | 'contain' | 'cover';
 
-export type PageResolver = (context: ResolverContext) => Promise<ResolvedPage>;
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// SPHERE TYPES
-// ═══════════════════════════════════════════════════════════════════════════════
-
-export interface SphereConfig {
-  id: string;
-  name: string;
-  icon: string;
-  color: string;
-  description?: string;
-  enabled: boolean;
-  order: number;
-}
-
-export type ComplexityLevel = 'simple' | 'moderate' | 'complex' | 'expert';
-
-export type PermissionLevel = 'read' | 'write' | 'admin' | 'owner';
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// AGENT TYPES  
-// ═══════════════════════════════════════════════════════════════════════════════
-
-export interface AgentConfig {
-  id: string;
-  name: string;
-  type: 'assistant' | 'analyzer' | 'executor' | 'orchestrator';
-  capabilities: string[];
-  permissions: PermissionLevel;
-  complexity: ComplexityLevel;
-}
-
-export interface AgentState {
-  status: 'idle' | 'working' | 'waiting' | 'error';
-  currentTask?: string;
-  lastActivity?: Date;
+export function resolveDimension(
+  width: number,
+  height: number,
+  mode: ResolutionMode = 'fit'
+): ResolvedDimension {
+  const aspectRatio = width / height;
+  let breakpoint: ResolvedDimension['breakpoint'] = 'md';
+  
+  if (width < 640) breakpoint = 'xs';
+  else if (width < 768) breakpoint = 'sm';
+  else if (width < 1024) breakpoint = 'md';
+  else if (width < 1280) breakpoint = 'lg';
+  else if (width < 1536) breakpoint = 'xl';
+  else breakpoint = '2xl';
+  
+  return { width, height, aspectRatio, breakpoint };
 }
