@@ -723,3 +723,198 @@ async def get_recent_activity(
 ):
     """Get recent activity."""
     return ApiResponse(success=True, data=[])
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# THREAD EVENTS ENDPOINTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/threads/{thread_id}/events", response_model=ApiResponse[List[dict]], tags=["Threads"])
+async def get_thread_events(
+    thread_id: str,
+    limit: int = Query(default=50, le=200),
+    offset: int = Query(default=0, ge=0),
+):
+    """Get events for a specific thread (append-only event log)."""
+    events = [
+        {
+            "id": f"evt-{thread_id}-001",
+            "thread_id": thread_id,
+            "type": "thread.created",
+            "data": {"founding_intent": "Q1 Planning"},
+            "created_by": "user-123",
+            "created_at": "2026-01-08T10:00:00Z",
+        },
+        {
+            "id": f"evt-{thread_id}-002",
+            "thread_id": thread_id,
+            "type": "intent.declared",
+            "data": {"intent": "Define quarterly objectives"},
+            "created_by": "user-123",
+            "created_at": "2026-01-08T10:05:00Z",
+        },
+        {
+            "id": f"evt-{thread_id}-003",
+            "thread_id": thread_id,
+            "type": "decision.recorded",
+            "data": {"decision": "Allocate 30% budget to marketing", "rationale": "Growth focus"},
+            "created_by": "user-123",
+            "created_at": "2026-01-08T10:15:00Z",
+        },
+        {
+            "id": f"evt-{thread_id}-004",
+            "thread_id": thread_id,
+            "type": "action.created",
+            "data": {"action": "Schedule team meeting", "due_date": "2026-01-10"},
+            "created_by": "user-123",
+            "created_at": "2026-01-08T10:20:00Z",
+        },
+        {
+            "id": f"evt-{thread_id}-005",
+            "thread_id": thread_id,
+            "type": "note.added",
+            "data": {"content": "Consider hiring 2 more engineers"},
+            "created_by": "user-123",
+            "created_at": "2026-01-08T10:30:00Z",
+        },
+    ]
+    return ApiResponse(success=True, data=events[offset:offset+limit])
+
+@router.post("/threads/{thread_id}/events", response_model=ApiResponse[dict], tags=["Threads"])
+async def add_thread_event(
+    thread_id: str,
+    event_type: str = Body(...),
+    data: dict = Body(...),
+    current_user: User = Depends(get_current_user),
+):
+    """Add a new event to a thread (append-only)."""
+    event = {
+        "id": f"evt-{thread_id}-{uuid.uuid4().hex[:8]}",
+        "thread_id": thread_id,
+        "type": event_type,
+        "data": data,
+        "created_by": current_user.id,
+        "created_at": datetime.utcnow().isoformat(),
+    }
+    return ApiResponse(success=True, data=event, message="Event added to thread")
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# DASHBOARD EXTENDED ENDPOINTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/dashboard/activity", response_model=ApiResponse[List[dict]], tags=["Dashboard"])
+async def get_recent_activity(
+    limit: int = Query(default=10, le=50),
+):
+    """Get recent activity across all spheres."""
+    activities = [
+        {
+            "id": "act-001",
+            "type": "thread_created",
+            "title": "New Thread: Q1 Planning",
+            "sphere": "business",
+            "timestamp": "2026-01-08T10:00:00Z",
+        },
+        {
+            "id": "act-002",
+            "type": "decision_made",
+            "title": "Decision: Marketing Budget Approved",
+            "sphere": "business",
+            "timestamp": "2026-01-08T09:30:00Z",
+        },
+        {
+            "id": "act-003",
+            "type": "agent_hired",
+            "title": "Hired Agent: Research Assistant",
+            "sphere": "scholar",
+            "timestamp": "2026-01-08T09:00:00Z",
+        },
+        {
+            "id": "act-004",
+            "type": "checkpoint_approved",
+            "title": "Checkpoint Approved: Data Export",
+            "sphere": "personal",
+            "timestamp": "2026-01-08T08:30:00Z",
+        },
+        {
+            "id": "act-005",
+            "type": "note_added",
+            "title": "Note added to Project Alpha",
+            "sphere": "creative",
+            "timestamp": "2026-01-08T08:00:00Z",
+        },
+    ]
+    return ApiResponse(success=True, data=activities[:limit])
+
+@router.get("/dashboard/quick-actions", response_model=ApiResponse[List[dict]], tags=["Dashboard"])
+async def get_quick_actions():
+    """Get available quick actions for dashboard."""
+    actions = [
+        {
+            "id": "qa-001",
+            "label": "New Thread",
+            "icon": "plus",
+            "action": "create_thread",
+            "shortcut": "Ctrl+N",
+        },
+        {
+            "id": "qa-002",
+            "label": "Ask Nova",
+            "icon": "message-circle",
+            "action": "open_nova",
+            "shortcut": "Ctrl+K",
+        },
+        {
+            "id": "qa-003",
+            "label": "Quick Note",
+            "icon": "edit",
+            "action": "create_note",
+            "shortcut": "Ctrl+Shift+N",
+        },
+        {
+            "id": "qa-004",
+            "label": "Search",
+            "icon": "search",
+            "action": "open_search",
+            "shortcut": "Ctrl+/",
+        },
+        {
+            "id": "qa-005",
+            "label": "View Checkpoints",
+            "icon": "shield",
+            "action": "view_checkpoints",
+            "shortcut": "Ctrl+G",
+        },
+    ]
+    return ApiResponse(success=True, data=actions)
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# DECISIONS EXTENDED ENDPOINTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/decisions/thread/{thread_id}", response_model=ApiResponse[List[Decision]], tags=["Decisions"])
+async def get_thread_decisions(thread_id: str):
+    """Get all decisions for a specific thread."""
+    decisions = [
+        Decision(
+            id="dec-001",
+            thread_id=thread_id,
+            title="Budget Allocation",
+            description="Approve 30% budget for Q1 marketing",
+            status="approved",
+            impact="high",
+            created_by="user-123",
+            created_at=datetime.utcnow() - timedelta(hours=2),
+            decided_at=datetime.utcnow() - timedelta(hours=1),
+        ),
+        Decision(
+            id="dec-002",
+            thread_id=thread_id,
+            title="Team Expansion",
+            description="Hire 2 additional engineers",
+            status="pending",
+            impact="high",
+            created_by="user-123",
+            created_at=datetime.utcnow() - timedelta(hours=1),
+        ),
+    ]
+    return ApiResponse(success=True, data=decisions)

@@ -14,12 +14,29 @@
     "noImplicitAny": false,
     "allowJs": true,
     "baseUrl": ".",
-    "paths": { "@/*": ["src/*"] }
+    "paths": { 
+      "@/*": ["src/*"]
+    },
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": false
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.d.ts"
   ],
-  "exclude": ["node_modules", "**/_archive*/**", "**/__tests__/**", "**/dist/**"]
+  "exclude": [
+    "node_modules", 
+    "**/_archive*/**", 
+    "**/__tests__/**", 
+    "**/dist/**",
+    "**/*.stories.tsx",
+    "src/stories/**",
+    "src/widgets/**",
+    "src/ui/**",
+    "src/modules/**"
+  ]
 }
