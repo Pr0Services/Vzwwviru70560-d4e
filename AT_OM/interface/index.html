@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AT-OM Sanctuary (Prototype)</title>
+  <style>
+    body{font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin:0; background:#0b0b10; color:#eaeaf2;}
+    header{padding:20px 24px; border-bottom:1px solid #1d1d2a;}
+    h1{margin:0; font-size:18px;}
+    .sub{opacity:.75; font-size:13px; margin-top:6px;}
+    main{display:grid; grid-template-columns:340px 1fr; gap:24px; padding:24px;}
+    .panel{background:#11111a; border:1px solid #1d1d2a; border-radius:12px; padding:16px;}
+    label{display:block; font-size:12px; opacity:.8; margin-bottom:8px;}
+    input{width:100%; padding:10px 12px; border-radius:10px; border:1px solid #2a2a3a; background:#0d0d14; color:#fff;}
+    button{margin-top:12px; padding:10px 12px; border-radius:10px; border:1px solid #2a2a3a; background:#1a1a26; color:#fff; cursor:pointer;}
+    button:hover{background:#222233;}
+    #glyphWrap{display:flex; align-items:center; justify-content:center; min-height:480px;}
+    .meta{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:12px; white-space:pre-wrap; line-height:1.35; background:#0d0d14; border:1px solid #2a2a3a; padding:12px; border-radius:10px;}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AT-OM Sanctuary — Mandala / Glyph Prototype</h1>
+    <div class="sub">Core heartbeat: 444 Hz · Core number: 4 · Goal: anti-patinage by resonance mapping</div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <label for="concept">Concept</label>
+      <input id="concept" value="AT-OM" />
+      <button id="go">Generate Glyph</button>
+
+      <div style="height:14px"></div>
+      <div class="meta" id="meta">(press Generate)</div>
+    </section>
+
+    <section class="panel" id="glyphWrap"></section>
+  </main>
+
+  <script src="./glyphs.js"></script>
+  <script>
+    const conceptInput = document.getElementById('concept');
+    const meta = document.getElementById('meta');
+    const wrap = document.getElementById('glyphWrap');
+    const go = document.getElementById('go');
+
+    function render(){
+      const text = conceptInput.value || '';
+      const a = window.ATOM_GLYPHS.analyze(text);
+      const r = window.ATOM_GLYPHS.resonate(a);
+      const svg = window.ATOM_GLYPHS.glyphSvg(r, text);
+      wrap.innerHTML = svg;
+      meta.textContent = JSON.stringify({
+        concept: text,
+        normalized: a.normalized,
+        values: a.values,
+        raw: a.raw,
+        reduced: a.reduced,
+        heartbeat_hz: 444,
+        frequency_hz: r.frequency,
+        color_hex: r.color
+      }, null, 2);
+    }
+
+    go.addEventListener('click', render);
+    conceptInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter') render(); });
+    render();
+  </script>
+</body>
+</html>

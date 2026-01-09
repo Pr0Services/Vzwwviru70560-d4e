@@ -1,0 +1,46 @@
+{
+  "version": "81.0.0",
+  "codename": "AT·OM Integration",
+  "release_date": "2026-01-08",
+  "heartbeat": 444,
+  "tuning": "A=444Hz",
+  "architect": "Jonathan Rodrigue",
+  "oracle": "Oracle 17",
+  "features": [
+    "Système AT·OM v2.0 intégré",
+    "Moteur Arithmos complet",
+    "9 niveaux de résonance (111-999 Hz)",
+    "5 Pierres de Fondation",
+    "5 Nœuds de Transition",
+    "Interface Arche des Résonances",
+    "Switch Civilisation/Sonore",
+    "Mode Gratitude secret",
+    "Sceau Architecte (999 Hz)",
+    "Console Debug intégrée"
+  ],
+  "components": {
+    "AT_OM": {
+      "version": "2.0.0",
+      "path": "/AT_OM",
+      "status": "PRODUCTION_READY"
+    },
+    "frontend": {
+      "AT_OM_module": "/frontend/src/AT_OM",
+      "components": 10
+    },
+    "backend": {
+      "services": [
+        "atom_vibration_engine.py",
+        "atom_vibration_engine_v2.py",
+        "gematria.py",
+        "resonance_engine.py",
+        "harmonic_synchronizer.py"
+      ]
+    }
+  },
+  "audit": {
+    "total_tests": 160,
+    "passed": 160,
+    "rate": "100%"
+  }
+}
