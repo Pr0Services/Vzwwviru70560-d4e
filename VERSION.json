@@ -1,46 +1,44 @@
 {
-  "version": "81.0.0",
-  "codename": "AT·OM Integration",
-  "release_date": "2026-01-08",
+  "version": "82.0.0",
+  "codename": "Calendrier Vivant",
+  "release_date": "2026-01-09",
   "heartbeat": 444,
   "tuning": "A=444Hz",
   "architect": "Jonathan Rodrigue",
   "oracle": "Oracle 17",
   "features": [
-    "Système AT·OM v2.0 intégré",
-    "Moteur Arithmos complet",
-    "9 niveaux de résonance (111-999 Hz)",
-    "5 Pierres de Fondation",
-    "5 Nœuds de Transition",
-    "Interface Arche des Résonances",
-    "Switch Civilisation/Sonore",
-    "Mode Gratitude secret",
-    "Sceau Architecte (999 Hz)",
-    "Console Debug intégrée"
+    "AT·OM Arithmos (9 niveaux, 111-999 Hz)",
+    "Tzolkin Maya (13 Tons × 20 Nawals)",
+    "Yi-King (64 Hexagrammes)",
+    "Kabbale (10 Sephiroth + 22 Sentiers)",
+    "Chakras (7 centres + Solfège sacré)",
+    "Moteur Cosmique Unifié",
+    "Interface CosmicOracle",
+    "Oracle Quotidien Multi-systèmes"
   ],
-  "components": {
+  "systems": {
     "AT_OM": {
       "version": "2.0.0",
-      "path": "/AT_OM",
-      "status": "PRODUCTION_READY"
+      "levels": 9,
+      "frequencies": "111-999 Hz"
     },
-    "frontend": {
-      "AT_OM_module": "/frontend/src/AT_OM",
-      "components": 10
+    "Maya": {
+      "tons": 13,
+      "nawals": 20,
+      "tzolkin": 260
     },
-    "backend": {
-      "services": [
-        "atom_vibration_engine.py",
-        "atom_vibration_engine_v2.py",
-        "gematria.py",
-        "resonance_engine.py",
-        "harmonic_synchronizer.py"
-      ]
+    "YiKing": {
+      "trigrams": 8,
+      "hexagrams": 64
+    },
+    "Kabbale": {
+      "sephiroth": 10,
+      "paths": 22,
+      "worlds": 4
+    },
+    "Chakras": {
+      "centers": 7,
+      "solfeggio": "396-963 Hz"
     }
-  },
-  "audit": {
-    "total_tests": 160,
-    "passed": 160,
-    "rate": "100%"
   }
 }
