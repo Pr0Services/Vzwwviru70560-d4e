@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CHE-NU XR Environment Blueprint",
+  "type": "object",
+  "required": [
+    "thread_id",
+    "template",
+    "generated_at",
+    "version",
+    "zones"
+  ],
+  "properties": {
+    "thread_id": {
+      "type": "string"
+    },
+    "template": {
+      "type": "string",
+      "enum": [
+        "personal_room",
+        "business_room",
+        "cause_room",
+        "lab_room",
+        "custom_room"
+      ]
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "version": {
+      "type": "string"
+    },
+    "zones": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "title",
+          "items"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "wall",
+              "table",
+              "kiosk",
+              "shelf",
+              "timeline",
+              "portal_area"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "kind",
+                "label",
+                "redaction_level"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "intent",
+                    "decision",
+                    "action",
+                    "memory",
+                    "resource",
+                    "timeline_event",
+                    "note"
+                  ]
+                },
+                "label": {
+                  "type": "string"
+                },
+                "source_event_id": {
+                  "type": "string"
+                },
+                "source_snapshot_id": {
+                  "type": "string"
+                },
+                "redaction_level": {
+                  "type": "string",
+                  "enum": [
+                    "public",
+                    "semi_private",
+                    "private"
+                  ],
+                  "default": "private"
+                },
+                "actions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "layout": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "portals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "label",
+          "thread_id"
+        ],
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "thread_id": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "references": {
+      "type": "object",
+      "properties": {
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "snapshots": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

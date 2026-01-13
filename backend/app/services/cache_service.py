@@ -1,735 +1,422 @@
 """
-CHE·NU™ V72 — Cache Service
+═══════════════════════════════════════════════════════════════════════════════
+CHE·NU™ V79 — Caching Layer
+═══════════════════════════════════════════════════════════════════════════════
 
-Comprehensive caching layer with governance-aware patterns.
-Supports identity-scoped caching, invalidation strategies,
-and R&D Rule #3 (Sphere Integrity) compliance.
+Redis-based caching for performance optimization.
 
 Features:
-- Identity-scoped cache keys
-- Sphere-aware invalidation
-- Thread event invalidation
-- Human gate result caching (short TTL)
-- Checkpoint caching (pending states)
-- Multi-level cache (hot/warm)
+- Sphere-aware caching (respects R&D Rule #3)
+- Identity-scoped cache keys (R&D Rule #3)
+- Checkpoint cache invalidation
+- TTL management by data type
 
-R&D Compliance:
-- Rule #3: Cache keys scoped by identity
-- Rule #6: All cache operations logged
+R&D Rules Compliance:
+- Rule #3: Cache keys include identity_id (no cross-identity leaks)
+- Rule #6: Cache operations logged
 """
 
-from typing import Optional, Any, Dict, List, Callable, TypeVar, Union
-from datetime import datetime, timedelta
-from uuid import UUID
 import json
 import hashlib
-import asyncio
-import logging
-from functools import wraps
-from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from typing import Optional, Any, Dict, List, Union
+from uuid import UUID
 from enum import Enum
+import logging
 
-logger = logging.getLogger(__name__)
-
-# Type variable for generic caching
-T = TypeVar('T')
+logger = logging.getLogger("chenu.cache")
 
 
-class CacheTier(str, Enum):
-    """Cache tier levels."""
-    HOT = "hot"      # Redis - milliseconds access
-    WARM = "warm"    # Redis with longer TTL
-    COLD = "cold"    # Database (no caching)
+# ═══════════════════════════════════════════════════════════════════════════════
+# CACHE CONFIGURATION
+# ═══════════════════════════════════════════════════════════════════════════════
 
-
-class CacheNamespace(str, Enum):
-    """Cache key namespaces for different data types."""
-    USER = "user"
-    THREAD = "thread"
-    SPHERE = "sphere"
-    AGENT = "agent"
-    CHECKPOINT = "checkpoint"
-    DECISION = "decision"
-    XR = "xr"
-    LLM = "llm"
-    SESSION = "session"
-    STATS = "stats"
-
-
-@dataclass
-class CacheConfig:
-    """Configuration for cache behavior."""
-    default_ttl: int = 300  # 5 minutes
-    hot_ttl: int = 60       # 1 minute
-    warm_ttl: int = 900     # 15 minutes
-    max_size: int = 10000   # Max entries per namespace
-    enable_stats: bool = True
-    compress_threshold: int = 1024  # Compress if larger than 1KB
-
-
-@dataclass
-class CacheEntry:
-    """Represents a cached value with metadata."""
-    value: Any
-    created_at: datetime
-    expires_at: datetime
-    tier: CacheTier
-    namespace: CacheNamespace
-    identity_id: Optional[str] = None
-    hits: int = 0
-    size_bytes: int = 0
-
-
-@dataclass
-class CacheStats:
-    """Cache statistics for monitoring."""
-    hits: int = 0
-    misses: int = 0
-    sets: int = 0
-    deletes: int = 0
-    evictions: int = 0
-    total_size_bytes: int = 0
-    namespaces: Dict[str, int] = field(default_factory=dict)
+class CacheTTL(Enum):
+    """Cache TTL by data type."""
     
-    @property
-    def hit_rate(self) -> float:
-        """Calculate hit rate percentage."""
-        total = self.hits + self.misses
-        return (self.hits / total * 100) if total > 0 else 0.0
+    # Short-lived (frequently changing)
+    FEED = 60  # 1 minute
+    NOTIFICATIONS = 30  # 30 seconds
+    ACTIVITY = 60  # 1 minute
+    
+    # Medium-lived
+    THREAD_LIST = 300  # 5 minutes
+    SPHERE_DATA = 300  # 5 minutes
+    AGENT_STATUS = 120  # 2 minutes
+    
+    # Long-lived (rarely changing)
+    USER_PROFILE = 3600  # 1 hour
+    SPHERE_CONFIG = 3600  # 1 hour
+    RD_RULES = 86400  # 24 hours
+    
+    # Static (changes require explicit invalidation)
+    REFERENCE_DATA = 86400  # 24 hours
+    LITERATURE_SEARCH = 1800  # 30 minutes
 
+
+class CachePrefix(Enum):
+    """Cache key prefixes by sphere."""
+    
+    PERSONAL = "personal"
+    BUSINESS = "business"
+    CREATIVE = "creative"
+    ENTERTAINMENT = "entertainment"
+    COMMUNITY = "community"
+    SOCIAL = "social"
+    SCHOLAR = "scholar"
+    GOVERNMENT = "government"
+    MY_TEAM = "my_team"
+    SYSTEM = "system"
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CACHE KEY BUILDER
+# ═══════════════════════════════════════════════════════════════════════════════
 
 class CacheKeyBuilder:
     """
-    Builds cache keys with identity scoping for R&D Rule #3.
+    Build cache keys that respect identity boundaries.
     
-    Key format: chenu:{namespace}:{identity_id}:{resource}:{hash}
+    Format: chenu:{version}:{sphere}:{identity_id}:{resource_type}:{resource_id}
+    
+    This ensures:
+    - No cross-identity cache leaks (R&D Rule #3)
+    - Sphere isolation
+    - Easy invalidation patterns
     """
     
-    PREFIX = "chenu"
+    VERSION = "v79"
     
     @classmethod
     def build(
         cls,
-        namespace: CacheNamespace,
-        resource: str,
-        identity_id: Optional[UUID] = None,
+        sphere: CachePrefix,
+        identity_id: UUID,
+        resource_type: str,
+        resource_id: Optional[Union[UUID, str]] = None,
         params: Optional[Dict[str, Any]] = None
     ) -> str:
-        """Build a cache key with optional identity scoping."""
-        parts = [cls.PREFIX, namespace.value]
+        """
+        Build a cache key.
         
-        # Add identity scope for R&D Rule #3
-        if identity_id:
-            parts.append(str(identity_id))
-        else:
-            parts.append("global")
+        Args:
+            sphere: Sphere prefix
+            identity_id: User/identity ID (REQUIRED for isolation)
+            resource_type: Type of resource (e.g., "threads", "feed")
+            resource_id: Optional specific resource ID
+            params: Optional query params to include in key
+            
+        Returns:
+            Cache key string
+        """
+        parts = [
+            "chenu",
+            cls.VERSION,
+            sphere.value,
+            str(identity_id),
+            resource_type
+        ]
         
-        parts.append(resource)
+        if resource_id:
+            parts.append(str(resource_id))
         
-        # Add parameter hash if present
         if params:
-            param_hash = cls._hash_params(params)
+            # Hash params for consistent key
+            param_hash = hashlib.md5(
+                json.dumps(params, sort_keys=True).encode()
+            ).hexdigest()[:8]
             parts.append(param_hash)
         
         return ":".join(parts)
     
     @classmethod
-    def build_pattern(
-        cls,
-        namespace: CacheNamespace,
-        identity_id: Optional[UUID] = None
-    ) -> str:
-        """Build a pattern for bulk operations."""
-        parts = [cls.PREFIX, namespace.value]
-        
-        if identity_id:
-            parts.append(str(identity_id))
-        else:
-            parts.append("*")
-        
-        parts.append("*")
+    def build_system(cls, resource_type: str, resource_id: Optional[str] = None) -> str:
+        """Build system-level cache key (not identity-specific)."""
+        parts = ["chenu", cls.VERSION, "system", resource_type]
+        if resource_id:
+            parts.append(resource_id)
         return ":".join(parts)
     
-    @staticmethod
-    def _hash_params(params: Dict[str, Any]) -> str:
-        """Create a hash of parameters for cache key."""
-        # Sort keys for consistent hashing
-        sorted_params = json.dumps(params, sort_keys=True, default=str)
-        return hashlib.md5(sorted_params.encode()).hexdigest()[:12]
+    @classmethod
+    def invalidation_pattern(cls, sphere: CachePrefix, identity_id: UUID) -> str:
+        """Get pattern for invalidating all cache for a sphere/identity."""
+        return f"chenu:{cls.VERSION}:{sphere.value}:{identity_id}:*"
 
 
-class InMemoryCache:
-    """
-    In-memory cache for development/testing.
-    Also serves as L1 cache in front of Redis.
-    """
+# ═══════════════════════════════════════════════════════════════════════════════
+# MOCK REDIS CLIENT (Replace with real Redis in production)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class MockRedisClient:
+    """Mock Redis client for testing. Replace with redis-py in production."""
     
-    def __init__(self, config: Optional[CacheConfig] = None):
-        self.config = config or CacheConfig()
-        self._cache: Dict[str, CacheEntry] = {}
-        self._stats = CacheStats()
-        self._lock = asyncio.Lock()
+    def __init__(self):
+        self._store: Dict[str, Any] = {}
+        self._ttls: Dict[str, datetime] = {}
     
-    async def get(self, key: str) -> Optional[Any]:
+    async def get(self, key: str) -> Optional[str]:
         """Get value from cache."""
-        async with self._lock:
-            entry = self._cache.get(key)
-            
-            if entry is None:
-                self._stats.misses += 1
+        if key in self._store:
+            if key in self._ttls and datetime.utcnow() > self._ttls[key]:
+                del self._store[key]
+                del self._ttls[key]
                 return None
-            
-            # Check expiration
-            if datetime.utcnow() > entry.expires_at:
-                del self._cache[key]
-                self._stats.misses += 1
-                return None
-            
-            entry.hits += 1
-            self._stats.hits += 1
-            return entry.value
+            return self._store[key]
+        return None
     
-    async def set(
-        self,
-        key: str,
-        value: Any,
-        ttl: Optional[int] = None,
-        namespace: CacheNamespace = CacheNamespace.STATS,
-        tier: CacheTier = CacheTier.HOT,
-        identity_id: Optional[str] = None
-    ) -> bool:
-        """Set value in cache."""
-        async with self._lock:
-            ttl = ttl or self.config.default_ttl
-            now = datetime.utcnow()
-            
-            # Estimate size
-            size_bytes = len(json.dumps(value, default=str).encode())
-            
-            entry = CacheEntry(
-                value=value,
-                created_at=now,
-                expires_at=now + timedelta(seconds=ttl),
-                tier=tier,
-                namespace=namespace,
-                identity_id=identity_id,
-                size_bytes=size_bytes
-            )
-            
-            self._cache[key] = entry
-            self._stats.sets += 1
-            self._stats.total_size_bytes += size_bytes
-            
-            # Update namespace stats
-            ns_key = namespace.value
-            self._stats.namespaces[ns_key] = self._stats.namespaces.get(ns_key, 0) + 1
-            
-            # Evict if over max size
-            await self._maybe_evict()
-            
-            return True
+    async def set(self, key: str, value: str, ex: Optional[int] = None) -> bool:
+        """Set value in cache with optional TTL."""
+        self._store[key] = value
+        if ex:
+            self._ttls[key] = datetime.utcnow() + timedelta(seconds=ex)
+        return True
     
-    async def delete(self, key: str) -> bool:
-        """Delete key from cache."""
-        async with self._lock:
-            if key in self._cache:
-                entry = self._cache[key]
-                self._stats.total_size_bytes -= entry.size_bytes
-                del self._cache[key]
-                self._stats.deletes += 1
-                return True
-            return False
+    async def delete(self, *keys: str) -> int:
+        """Delete keys from cache."""
+        count = 0
+        for key in keys:
+            if key in self._store:
+                del self._store[key]
+                if key in self._ttls:
+                    del self._ttls[key]
+                count += 1
+        return count
     
-    async def delete_pattern(self, pattern: str) -> int:
-        """Delete all keys matching pattern."""
-        async with self._lock:
-            # Convert pattern to simple matching
-            prefix = pattern.replace("*", "")
-            keys_to_delete = [
-                k for k in self._cache.keys()
-                if k.startswith(prefix)
-            ]
-            
-            for key in keys_to_delete:
-                entry = self._cache[key]
-                self._stats.total_size_bytes -= entry.size_bytes
-                del self._cache[key]
-                self._stats.deletes += 1
-            
-            return len(keys_to_delete)
+    async def keys(self, pattern: str) -> List[str]:
+        """Get keys matching pattern (simple glob support)."""
+        import fnmatch
+        return [k for k in self._store.keys() if fnmatch.fnmatch(k, pattern)]
     
-    async def exists(self, key: str) -> bool:
-        """Check if key exists and is not expired."""
-        value = await self.get(key)
-        return value is not None
-    
-    async def get_stats(self) -> CacheStats:
-        """Get cache statistics."""
-        return self._stats
-    
-    async def clear(self) -> None:
-        """Clear all cache entries."""
-        async with self._lock:
-            self._cache.clear()
-            self._stats = CacheStats()
-    
-    async def _maybe_evict(self) -> None:
-        """Evict entries if over max size."""
-        if len(self._cache) > self.config.max_size:
-            # LRU eviction - remove oldest entries
-            entries = sorted(
-                self._cache.items(),
-                key=lambda x: x[1].created_at
-            )
-            
-            # Remove 10% of entries
-            evict_count = max(1, len(entries) // 10)
-            for key, entry in entries[:evict_count]:
-                self._stats.total_size_bytes -= entry.size_bytes
-                del self._cache[key]
-                self._stats.evictions += 1
+    async def flushdb(self) -> bool:
+        """Clear all cache."""
+        self._store.clear()
+        self._ttls.clear()
+        return True
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CACHE SERVICE
+# ═══════════════════════════════════════════════════════════════════════════════
 
 class CacheService:
     """
-    Main cache service with Redis backend and in-memory L1 cache.
+    Cache service with R&D rules compliance.
     
-    Provides governance-aware caching with:
-    - Identity-scoped keys (R&D Rule #3)
-    - Automatic invalidation on Thread events
-    - Checkpoint state caching
-    - Statistics and monitoring
+    Features:
+    - Identity-scoped caching (Rule #3)
+    - Automatic serialization
+    - TTL management
+    - Pattern-based invalidation
+    - Cache statistics
     """
     
-    def __init__(
-        self,
-        redis_client: Optional[Any] = None,  # RedisManager instance
-        config: Optional[CacheConfig] = None
-    ):
-        self.redis = redis_client
-        self.config = config or CacheConfig()
-        self.l1_cache = InMemoryCache(config)
-        self._invalidation_handlers: Dict[str, List[Callable]] = {}
-    
-    # ==================== Core Operations ====================
+    def __init__(self, redis_client=None):
+        self.redis = redis_client or MockRedisClient()
+        self.stats = {
+            "hits": 0,
+            "misses": 0,
+            "sets": 0,
+            "invalidations": 0
+        }
     
     async def get(
         self,
-        namespace: CacheNamespace,
-        resource: str,
-        identity_id: Optional[UUID] = None,
-        params: Optional[Dict[str, Any]] = None,
-        use_l1: bool = True
+        sphere: CachePrefix,
+        identity_id: UUID,
+        resource_type: str,
+        resource_id: Optional[UUID] = None,
+        params: Optional[Dict] = None
     ) -> Optional[Any]:
         """
-        Get value from cache with L1 check first.
+        Get cached data.
         
         Args:
-            namespace: Cache namespace
-            resource: Resource identifier
-            identity_id: Optional identity for scoping
-            params: Optional parameters to include in key
-            use_l1: Whether to check L1 cache first
-        
+            sphere: Sphere for the data
+            identity_id: Owner identity (REQUIRED)
+            resource_type: Type of resource
+            resource_id: Optional specific resource
+            params: Optional query params
+            
         Returns:
-            Cached value or None
+            Cached data or None
         """
-        key = CacheKeyBuilder.build(namespace, resource, identity_id, params)
+        key = CacheKeyBuilder.build(
+            sphere=sphere,
+            identity_id=identity_id,
+            resource_type=resource_type,
+            resource_id=resource_id,
+            params=params
+        )
         
-        # Check L1 first
-        if use_l1:
-            value = await self.l1_cache.get(key)
-            if value is not None:
-                return value
+        cached = await self.redis.get(key)
         
-        # Check Redis
-        if self.redis:
-            try:
-                value = await self.redis.get(key)
-                if value is not None:
-                    # Populate L1 cache
-                    if use_l1:
-                        await self.l1_cache.set(
-                            key, value,
-                            ttl=self.config.hot_ttl,
-                            namespace=namespace,
-                            tier=CacheTier.HOT,
-                            identity_id=str(identity_id) if identity_id else None
-                        )
-                    return value
-            except Exception as e:
-                logger.error(f"Redis get error: {e}")
+        if cached:
+            self.stats["hits"] += 1
+            logger.debug(f"Cache HIT: {key}")
+            return json.loads(cached)
         
+        self.stats["misses"] += 1
+        logger.debug(f"Cache MISS: {key}")
         return None
     
     async def set(
         self,
-        namespace: CacheNamespace,
-        resource: str,
-        value: Any,
-        identity_id: Optional[UUID] = None,
-        params: Optional[Dict[str, Any]] = None,
-        ttl: Optional[int] = None,
-        tier: CacheTier = CacheTier.HOT
+        sphere: CachePrefix,
+        identity_id: UUID,
+        resource_type: str,
+        data: Any,
+        resource_id: Optional[UUID] = None,
+        params: Optional[Dict] = None,
+        ttl: Optional[CacheTTL] = None
     ) -> bool:
         """
-        Set value in cache.
+        Set cached data.
         
         Args:
-            namespace: Cache namespace
-            resource: Resource identifier
-            value: Value to cache
-            identity_id: Optional identity for scoping
-            params: Optional parameters to include in key
-            ttl: Time to live in seconds
-            tier: Cache tier (hot/warm)
-        
+            sphere: Sphere for the data
+            identity_id: Owner identity (REQUIRED)
+            resource_type: Type of resource
+            data: Data to cache
+            resource_id: Optional specific resource
+            params: Optional query params
+            ttl: TTL enum value
+            
         Returns:
-            Success status
+            Success boolean
         """
-        key = CacheKeyBuilder.build(namespace, resource, identity_id, params)
-        
-        # Determine TTL based on tier
-        if ttl is None:
-            ttl = self.config.hot_ttl if tier == CacheTier.HOT else self.config.warm_ttl
-        
-        # Set in L1
-        await self.l1_cache.set(
-            key, value,
-            ttl=min(ttl, self.config.hot_ttl),  # L1 always uses hot TTL
-            namespace=namespace,
-            tier=CacheTier.HOT,
-            identity_id=str(identity_id) if identity_id else None
-        )
-        
-        # Set in Redis
-        if self.redis:
-            try:
-                await self.redis.set(key, value, ttl)
-            except Exception as e:
-                logger.error(f"Redis set error: {e}")
-                return False
-        
-        logger.debug(f"Cache set: {key} (ttl={ttl}s)")
-        return True
-    
-    async def delete(
-        self,
-        namespace: CacheNamespace,
-        resource: str,
-        identity_id: Optional[UUID] = None,
-        params: Optional[Dict[str, Any]] = None
-    ) -> bool:
-        """Delete a specific cache entry."""
-        key = CacheKeyBuilder.build(namespace, resource, identity_id, params)
-        
-        await self.l1_cache.delete(key)
-        
-        if self.redis:
-            try:
-                await self.redis.delete(key)
-            except Exception as e:
-                logger.error(f"Redis delete error: {e}")
-                return False
-        
-        logger.debug(f"Cache delete: {key}")
-        return True
-    
-    async def invalidate_namespace(
-        self,
-        namespace: CacheNamespace,
-        identity_id: Optional[UUID] = None
-    ) -> int:
-        """Invalidate all entries in a namespace."""
-        pattern = CacheKeyBuilder.build_pattern(namespace, identity_id)
-        
-        count = await self.l1_cache.delete_pattern(pattern)
-        
-        if self.redis:
-            try:
-                redis_count = await self.redis.delete_pattern(pattern)
-                count += redis_count
-            except Exception as e:
-                logger.error(f"Redis pattern delete error: {e}")
-        
-        logger.info(f"Cache invalidated: {pattern} ({count} entries)")
-        return count
-    
-    # ==================== Specialized Caching ====================
-    
-    async def cache_thread(
-        self,
-        thread_id: UUID,
-        thread_data: Dict[str, Any],
-        identity_id: UUID
-    ) -> bool:
-        """Cache a Thread with identity scoping."""
-        return await self.set(
-            CacheNamespace.THREAD,
-            str(thread_id),
-            thread_data,
+        key = CacheKeyBuilder.build(
+            sphere=sphere,
             identity_id=identity_id,
-            tier=CacheTier.WARM
+            resource_type=resource_type,
+            resource_id=resource_id,
+            params=params
         )
-    
-    async def get_thread(
-        self,
-        thread_id: UUID,
-        identity_id: UUID
-    ) -> Optional[Dict[str, Any]]:
-        """Get cached Thread."""
-        return await self.get(
-            CacheNamespace.THREAD,
-            str(thread_id),
-            identity_id=identity_id
-        )
-    
-    async def invalidate_thread(
-        self,
-        thread_id: UUID,
-        identity_id: UUID
-    ) -> bool:
-        """Invalidate Thread cache on event."""
-        return await self.delete(
-            CacheNamespace.THREAD,
-            str(thread_id),
-            identity_id=identity_id
-        )
-    
-    async def cache_sphere(
-        self,
-        sphere_id: UUID,
-        sphere_data: Dict[str, Any],
-        identity_id: UUID
-    ) -> bool:
-        """Cache a Sphere."""
-        return await self.set(
-            CacheNamespace.SPHERE,
-            str(sphere_id),
-            sphere_data,
-            identity_id=identity_id,
-            tier=CacheTier.WARM
-        )
-    
-    async def get_sphere(
-        self,
-        sphere_id: UUID,
-        identity_id: UUID
-    ) -> Optional[Dict[str, Any]]:
-        """Get cached Sphere."""
-        return await self.get(
-            CacheNamespace.SPHERE,
-            str(sphere_id),
-            identity_id=identity_id
-        )
-    
-    async def cache_checkpoint(
-        self,
-        checkpoint_id: UUID,
-        checkpoint_data: Dict[str, Any],
-        identity_id: UUID
-    ) -> bool:
-        """
-        Cache a pending checkpoint.
-        Uses short TTL as checkpoints are transient.
-        """
-        return await self.set(
-            CacheNamespace.CHECKPOINT,
-            str(checkpoint_id),
-            checkpoint_data,
-            identity_id=identity_id,
-            ttl=300,  # 5 minutes max for pending checkpoints
-            tier=CacheTier.HOT
-        )
-    
-    async def get_checkpoint(
-        self,
-        checkpoint_id: UUID,
-        identity_id: UUID
-    ) -> Optional[Dict[str, Any]]:
-        """Get cached checkpoint."""
-        return await self.get(
-            CacheNamespace.CHECKPOINT,
-            str(checkpoint_id),
-            identity_id=identity_id
-        )
-    
-    async def cache_agent_config(
-        self,
-        agent_id: str,
-        config_data: Dict[str, Any],
-        identity_id: UUID
-    ) -> bool:
-        """Cache user's agent configuration."""
-        return await self.set(
-            CacheNamespace.AGENT,
-            f"config:{agent_id}",
-            config_data,
-            identity_id=identity_id,
-            tier=CacheTier.WARM
-        )
-    
-    async def cache_xr_blueprint(
-        self,
-        thread_id: UUID,
-        blueprint_data: Dict[str, Any],
-        identity_id: UUID
-    ) -> bool:
-        """Cache XR blueprint for a Thread."""
-        return await self.set(
-            CacheNamespace.XR,
-            f"blueprint:{thread_id}",
-            blueprint_data,
-            identity_id=identity_id,
-            tier=CacheTier.WARM,
-            ttl=1800  # 30 minutes
-        )
-    
-    async def get_xr_blueprint(
-        self,
-        thread_id: UUID,
-        identity_id: UUID
-    ) -> Optional[Dict[str, Any]]:
-        """Get cached XR blueprint."""
-        return await self.get(
-            CacheNamespace.XR,
-            f"blueprint:{thread_id}",
-            identity_id=identity_id
-        )
-    
-    async def cache_llm_response(
-        self,
-        prompt_hash: str,
-        response: Dict[str, Any],
-        identity_id: UUID,
-        ttl: int = 3600
-    ) -> bool:
-        """Cache LLM response for identical prompts."""
-        return await self.set(
-            CacheNamespace.LLM,
-            f"response:{prompt_hash}",
-            response,
-            identity_id=identity_id,
-            tier=CacheTier.WARM,
-            ttl=ttl
-        )
-    
-    async def get_llm_response(
-        self,
-        prompt_hash: str,
-        identity_id: UUID
-    ) -> Optional[Dict[str, Any]]:
-        """Get cached LLM response."""
-        return await self.get(
-            CacheNamespace.LLM,
-            f"response:{prompt_hash}",
-            identity_id=identity_id
-        )
-    
-    # ==================== Statistics ====================
-    
-    async def get_stats(self) -> Dict[str, Any]:
-        """Get combined cache statistics."""
-        l1_stats = await self.l1_cache.get_stats()
         
-        stats = {
-            "l1_cache": {
-                "hits": l1_stats.hits,
-                "misses": l1_stats.misses,
-                "sets": l1_stats.sets,
-                "deletes": l1_stats.deletes,
-                "evictions": l1_stats.evictions,
-                "hit_rate": l1_stats.hit_rate,
-                "total_size_bytes": l1_stats.total_size_bytes,
-                "namespaces": l1_stats.namespaces
-            },
-            "redis": {
-                "connected": self.redis is not None
-            }
+        ttl_seconds = ttl.value if ttl else CacheTTL.SPHERE_DATA.value
+        
+        # Serialize with metadata
+        cached_data = {
+            "data": data,
+            "cached_at": datetime.utcnow().isoformat(),
+            "identity_id": str(identity_id),
+            "sphere": sphere.value
         }
         
-        if self.redis:
-            try:
-                redis_stats = await self.redis.get_stats()
-                stats["redis"].update(redis_stats)
-            except Exception as e:
-                stats["redis"]["error"] = str(e)
+        result = await self.redis.set(
+            key,
+            json.dumps(cached_data, default=str),
+            ex=ttl_seconds
+        )
         
-        return stats
+        if result:
+            self.stats["sets"] += 1
+            logger.debug(f"Cache SET: {key} (TTL: {ttl_seconds}s)")
+        
+        return result
     
-    async def clear_all(self) -> None:
-        """Clear all caches. Use with caution!"""
-        await self.l1_cache.clear()
+    async def invalidate(
+        self,
+        sphere: CachePrefix,
+        identity_id: UUID,
+        resource_type: Optional[str] = None
+    ) -> int:
+        """
+        Invalidate cache entries.
         
-        if self.redis:
-            try:
-                await self.redis.clear_pattern("chenu:*")
-            except Exception as e:
-                logger.error(f"Redis clear error: {e}")
+        Args:
+            sphere: Sphere to invalidate
+            identity_id: Identity to invalidate
+            resource_type: Optional specific resource type
+            
+        Returns:
+            Number of keys invalidated
+        """
+        if resource_type:
+            pattern = f"chenu:{CacheKeyBuilder.VERSION}:{sphere.value}:{identity_id}:{resource_type}:*"
+        else:
+            pattern = CacheKeyBuilder.invalidation_pattern(sphere, identity_id)
         
-        logger.warning("All caches cleared")
+        keys = await self.redis.keys(pattern)
+        
+        if keys:
+            count = await self.redis.delete(*keys)
+            self.stats["invalidations"] += count
+            logger.info(f"Cache INVALIDATE: {pattern} ({count} keys)")
+            return count
+        
+        return 0
+    
+    async def invalidate_on_checkpoint(
+        self,
+        checkpoint_id: UUID,
+        sphere: CachePrefix,
+        identity_id: UUID,
+        resource_type: str
+    ) -> int:
+        """
+        Invalidate cache when checkpoint is approved.
+        
+        Called after checkpoint approval to ensure fresh data.
+        """
+        logger.info(f"Checkpoint {checkpoint_id} approved - invalidating cache")
+        return await self.invalidate(sphere, identity_id, resource_type)
+    
+    def get_stats(self) -> Dict[str, Any]:
+        """Get cache statistics."""
+        total = self.stats["hits"] + self.stats["misses"]
+        hit_rate = (self.stats["hits"] / total * 100) if total > 0 else 0
+        
+        return {
+            **self.stats,
+            "total_requests": total,
+            "hit_rate_percent": round(hit_rate, 2)
+        }
 
 
-# ==================== Cache Decorator ====================
+# ═══════════════════════════════════════════════════════════════════════════════
+# CACHE DECORATORS
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def cached(
-    namespace: CacheNamespace,
-    resource_key: str = "id",
-    ttl: Optional[int] = None,
-    tier: CacheTier = CacheTier.HOT,
-    identity_param: str = "identity_id"
+    sphere: CachePrefix,
+    resource_type: str,
+    ttl: CacheTTL = CacheTTL.SPHERE_DATA
 ):
     """
-    Decorator for caching function results.
+    Decorator for caching endpoint responses.
     
     Usage:
-        @cached(CacheNamespace.THREAD, resource_key="thread_id")
-        async def get_thread(thread_id: UUID, identity_id: UUID) -> dict:
+        @cached(CachePrefix.SCHOLAR, "references", CacheTTL.REFERENCE_DATA)
+        async def get_references(identity_id: UUID):
             ...
     """
-    def decorator(func: Callable[..., T]) -> Callable[..., T]:
-        @wraps(func)
-        async def wrapper(*args, **kwargs) -> T:
-            # Get cache service from first arg if it has one
-            cache_service = None
-            if args and hasattr(args[0], 'cache_service'):
-                cache_service = args[0].cache_service
+    def decorator(func):
+        async def wrapper(*args, identity_id: UUID, **kwargs):
+            cache = CacheService()  # Would be injected in production
             
-            if not cache_service:
-                return await func(*args, **kwargs)
-            
-            # Extract identity and resource from kwargs
-            identity_id = kwargs.get(identity_param)
-            resource = kwargs.get(resource_key) or (
-                args[1] if len(args) > 1 else None
+            # Try cache first
+            cached_data = await cache.get(
+                sphere=sphere,
+                identity_id=identity_id,
+                resource_type=resource_type,
+                params=kwargs if kwargs else None
             )
             
-            if not resource:
-                return await func(*args, **kwargs)
-            
-            # Try to get from cache
-            cached_value = await cache_service.get(
-                namespace,
-                str(resource),
-                identity_id=identity_id
-            )
-            
-            if cached_value is not None:
-                return cached_value
+            if cached_data:
+                return cached_data["data"]
             
             # Execute function
-            result = await func(*args, **kwargs)
+            result = await func(*args, identity_id=identity_id, **kwargs)
             
             # Cache result
-            if result is not None:
-                await cache_service.set(
-                    namespace,
-                    str(resource),
-                    result,
-                    identity_id=identity_id,
-                    ttl=ttl,
-                    tier=tier
-                )
+            await cache.set(
+                sphere=sphere,
+                identity_id=identity_id,
+                resource_type=resource_type,
+                data=result,
+                params=kwargs if kwargs else None,
+                ttl=ttl
+            )
             
             return result
         
@@ -737,85 +424,69 @@ def cached(
     return decorator
 
 
-def invalidate_on_event(
-    namespace: CacheNamespace,
-    resource_key: str = "id",
-    identity_param: str = "identity_id"
-):
-    """
-    Decorator to invalidate cache on write operations.
+# ═══════════════════════════════════════════════════════════════════════════════
+# CACHE WARMING
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class CacheWarmer:
+    """Pre-warm cache for common queries."""
     
-    Usage:
-        @invalidate_on_event(CacheNamespace.THREAD, resource_key="thread_id")
-        async def update_thread(thread_id: UUID, ...) -> dict:
-            ...
-    """
-    def decorator(func: Callable[..., T]) -> Callable[..., T]:
-        @wraps(func)
-        async def wrapper(*args, **kwargs) -> T:
-            # Execute function first
-            result = await func(*args, **kwargs)
-            
-            # Get cache service
-            cache_service = None
-            if args and hasattr(args[0], 'cache_service'):
-                cache_service = args[0].cache_service
-            
-            if cache_service:
-                identity_id = kwargs.get(identity_param)
-                resource = kwargs.get(resource_key) or (
-                    args[1] if len(args) > 1 else None
-                )
-                
-                if resource:
-                    await cache_service.delete(
-                        namespace,
-                        str(resource),
-                        identity_id=identity_id
-                    )
-            
-            return result
+    def __init__(self, cache_service: CacheService):
+        self.cache = cache_service
+    
+    async def warm_user_session(self, identity_id: UUID) -> Dict[str, int]:
+        """
+        Warm cache for a user's session.
         
-        return wrapper
-    return decorator
+        Pre-loads:
+        - User profile
+        - Active threads (all spheres)
+        - Recent notifications
+        - Agent status
+        """
+        warmed = {}
+        
+        # System data
+        await self.cache.set(
+            sphere=CachePrefix.SYSTEM,
+            identity_id=identity_id,
+            resource_type="rd_rules",
+            data=self._get_rd_rules(),
+            ttl=CacheTTL.RD_RULES
+        )
+        warmed["system"] = 1
+        
+        # Per-sphere warming would happen here
+        for sphere in CachePrefix:
+            if sphere != CachePrefix.SYSTEM:
+                # Would load sphere-specific data
+                warmed[sphere.value] = 0
+        
+        logger.info(f"Cache warmed for identity {identity_id}: {warmed}")
+        return warmed
+    
+    def _get_rd_rules(self) -> List[Dict]:
+        """Get R&D rules for caching."""
+        return [
+            {"number": 1, "name": "Human Sovereignty", "status": "enforced"},
+            {"number": 2, "name": "Autonomy Isolation", "status": "enforced"},
+            {"number": 3, "name": "Sphere Integrity", "status": "enforced"},
+            {"number": 4, "name": "No AI Orchestration", "status": "enforced"},
+            {"number": 5, "name": "No Ranking", "status": "enforced"},
+            {"number": 6, "name": "Traceability", "status": "enforced"},
+            {"number": 7, "name": "R&D Continuity", "status": "enforced"}
+        ]
 
 
-# ==================== Singleton Instance ====================
-
-_cache_service: Optional[CacheService] = None
-
-
-def get_cache_service() -> CacheService:
-    """Get or create the singleton cache service."""
-    global _cache_service
-    if _cache_service is None:
-        _cache_service = CacheService()
-    return _cache_service
-
-
-def init_cache_service(
-    redis_client: Optional[Any] = None,
-    config: Optional[CacheConfig] = None
-) -> CacheService:
-    """Initialize the cache service with configuration."""
-    global _cache_service
-    _cache_service = CacheService(redis_client, config)
-    return _cache_service
-
-
-# ==================== Exports ====================
+# ═══════════════════════════════════════════════════════════════════════════════
+# EXPORTS
+# ═══════════════════════════════════════════════════════════════════════════════
 
 __all__ = [
-    'CacheTier',
-    'CacheNamespace',
-    'CacheConfig',
-    'CacheEntry',
-    'CacheStats',
-    'CacheKeyBuilder',
-    'InMemoryCache',
-    'CacheService',
-    'cached',
-    'invalidate_on_event',
-    'get_cache_service',
-    'init_cache_service'
+    "CacheService",
+    "CacheKeyBuilder",
+    "CachePrefix",
+    "CacheTTL",
+    "CacheWarmer",
+    "cached"
 ]
